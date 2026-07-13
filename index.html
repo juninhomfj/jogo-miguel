@@ -123,10 +123,31 @@
                 // como imagem e recortamos manualmente os 4 quadros (216/217px).
                 this.load.image('miguelSheet', 'miguel_sprites.png');
                 
-                // Gera a textura da moeda via código puro
-                let graficoMoeda = this.make.graphics().fillStyle(0xFFD700).fillCircle(15, 15, 15);
-                graficoMoeda.generateTexture('moeda', 30, 30);
-                graficoMoeda.destroy();
+                // Gera a textura do cristal tecnológico via código puro
+                const graficoCristal = this.make.graphics({ x: 0, y: 0, add: false });
+                graficoCristal.fillStyle(0x00E5FF, 0.35);
+                graficoCristal.fillCircle(18, 18, 18);
+                graficoCristal.fillStyle(0x00FFFF, 1);
+                graficoCristal.fillPoints([
+                    { x: 18, y: 0 },
+                    { x: 34, y: 18 },
+                    { x: 18, y: 36 },
+                    { x: 2, y: 18 }
+                ], true);
+                graficoCristal.lineStyle(3, 0xE6FFFF, 1);
+                graficoCristal.strokePoints([
+                    { x: 18, y: 0 },
+                    { x: 34, y: 18 },
+                    { x: 18, y: 36 },
+                    { x: 2, y: 18 }
+                ], true);
+                graficoCristal.lineStyle(2, 0x7DF9FF, 0.85);
+                graficoCristal.lineBetween(18, 0, 18, 36);
+                graficoCristal.lineBetween(2, 18, 34, 18);
+                graficoCristal.fillStyle(0xFFFFFF, 0.9);
+                graficoCristal.fillCircle(13, 10, 3);
+                graficoCristal.generateTexture('cristalTecnologico', 36, 36);
+                graficoCristal.destroy();
             }
 
             create() {
@@ -168,6 +189,26 @@
             }
 
             create() {
+                // Cenário dinâmico ao fundo: nuvens desenhadas por código
+                this.nuvens = [];
+                const dadosNuvens = [
+                    { x: 130, y: 105, escala: 0.9, velocidade: 0.18 },
+                    { x: 360, y: 75, escala: 0.7, velocidade: 0.12 },
+                    { x: 590, y: 135, escala: 1.05, velocidade: 0.16 },
+                    { x: 760, y: 95, escala: 0.8, velocidade: 0.2 }
+                ];
+
+                dadosNuvens.forEach((dados) => {
+                    const nuvem = this.add.container(dados.x, dados.y).setDepth(-10);
+                    const brilho = 0xFFFFFF;
+                    nuvem.add(this.add.ellipse(-28, 8, 70, 28, brilho, 0.7));
+                    nuvem.add(this.add.ellipse(12, 0, 82, 34, brilho, 0.82));
+                    nuvem.add(this.add.ellipse(42, 10, 62, 24, brilho, 0.68));
+                    nuvem.setScale(dados.escala);
+                    nuvem.velocidade = dados.velocidade;
+                    this.nuvens.push(nuvem);
+                });
+
                 // Placar de Alto Contraste
                 this.nome = this.registry.get('nomeJogador');
                 this.pontos = this.registry.get('pontuacao');
@@ -239,19 +280,21 @@
 
                 this.physics.add.collider(this.player, this.plataformas);
 
-                // MOEDAS DE OURO
-                this.moedas = this.physics.add.group({
-                    key: 'moeda',
+                // CRISTAIS TECNOLÓGICOS COLETÁVEIS
+                this.cristais = this.physics.add.group({
+                    key: 'cristalTecnologico',
                     repeat: 4,
                     setXY: { x: 180, y: 50, stepX: 130 }
                 });
 
-                this.moedas.children.iterate(function (child) {
+                this.cristais.children.iterate(function (child) {
                     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.6));
+                    child.setAngularVelocity(90);
+                    child.setDepth(5);
                 });
 
-                this.physics.add.collider(this.moedas, this.plataformas);
-                this.physics.add.overlap(this.player, this.moedas, this.coletarMoeda, null, this);
+                this.physics.add.collider(this.cristais, this.plataformas);
+                this.physics.add.overlap(this.player, this.cristais, this.coletarCristal, null, this);
 
                 // ANIMAÇÕES
                 if (!this.anims.exists('walk')) {
@@ -296,6 +339,14 @@
             }
 
             update() {
+                // Move as nuvens lentamente para a esquerda e recicla no lado direito
+                this.nuvens.forEach((nuvem) => {
+                    nuvem.x -= nuvem.velocidade;
+                    if (nuvem.x < -120) {
+                        nuvem.x = 920;
+                    }
+                });
+
                 // Sincroniza o bloco cinza de testes com a posição do Miguel
                 this.indicadorPosicao.x = this.player.x;
                 this.indicadorPosicao.y = this.player.y;
@@ -329,13 +380,13 @@
                 }
             }
 
-            coletarMoeda(player, moeda) {
-                moeda.disableBody(true, true);
+            coletarCristal(player, cristal) {
+                cristal.disableBody(true, true);
                 this.pontos += 10;
                 this.registry.set('pontuacao', this.pontos);
                 this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
 
-                if (this.moedas.countActive(true) === 0) {
+                if (this.cristais.countActive(true) === 0) {
                     this.scene.start('Fase2');
                 }
             }
