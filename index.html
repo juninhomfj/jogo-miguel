@@ -2,7 +2,7 @@
 <html>
 <head>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #87CEEB; /* Mudei para um azul céu para destacar o personagem */ }</style>
+    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #e0f7fa; }</style>
 </head>
 <body>
     <script>
@@ -10,6 +10,7 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
+            backgroundColor: '#87CEEB', // Fundo azul céu
             physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
         };
@@ -17,12 +18,19 @@
         const game = new Phaser.Game(config);
 
         function preload() {
-            // ATENÇÃO: Altere o 64 pelo valor correto que você calculou (Largura Total / 4)
-            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 64, frameHeight: 64 });
+            // Aqui estão as dimensões exatas que calculamos!
+            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 543, frameHeight: 724 });
         }
 
         function create() {
+            // Cria o personagem no centro da tela
             this.player = this.physics.add.sprite(400, 300, 'miguel');
+            
+            // REDUZ O TAMANHO DO PERSONAGEM PARA CABER NA TELA (20% do tamanho original)
+            this.player.setScale(0.2); 
+            
+            // Ajusta a "caixa de colisão" para acompanhar o novo tamanho
+            this.player.updateBounds(); 
             this.player.setCollideWorldBounds(true);
 
             // Animação de Caminhada (frames 1 e 2)
@@ -51,31 +59,32 @@
         }
 
         function update() {
-            // Verifica se o jogador está no chão
             let noChao = this.player.body.onFloor();
 
-            // Movimento para os lados
+            // Movimento para esquerda
             if (this.cursors.left.isDown) {
                 this.player.setVelocityX(-200);
-                this.player.flipX = true;
+                this.player.flipX = true; // Vira o personagem
                 if (noChao) this.player.anims.play('walk', true);
             }
+            // Movimento para direita
             else if (this.cursors.right.isDown) {
                 this.player.setVelocityX(200);
                 this.player.flipX = false;
                 if (noChao) this.player.anims.play('walk', true);
             }
+            // Parado
             else {
                 this.player.setVelocityX(0);
                 if (noChao) this.player.anims.play('idle', true);
             }
 
-            // Pulo e animação de pulo
+            // Pulo
             if (this.cursors.up.isDown && noChao) {
                 this.player.setVelocityY(-350);
             }
 
-            // Se não estiver no chão, toca a animação de pulo independente de estar indo pros lados
+            // Animação de pulo (se não estiver no chão)
             if (!noChao) {
                 this.player.anims.play('jump', true);
             }
