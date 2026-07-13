@@ -118,10 +118,10 @@
                     alert("AVISO DEV: Não foi possível carregar a imagem '" + file.src + "'. Verifique se o nome está idêntico com letras minúsculas!");
                 });
 
-                // Spritesheets novos: Miguel usa 6 colunas x 3 linhas (864x288 úteis;
-                // os 2px excedentes finais da imagem 866x288 são ignorados pelo Phaser).
-                this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 144, frameHeight: 96 });
-                this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 129, frameHeight: 129 });
+                // Spritesheets novos: Miguel usa frames de 216x288 com 1px de spacing
+                // para ignorar resíduos de borda; robô usa 645px / 3 = 215px por frame.
+                this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 216, frameHeight: 288, spacing: 1 });
+                this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 215, frameHeight: 129 });
                 
                 // Gera a textura do cristal tecnológico via código puro
                 const graficoCristal = this.make.graphics({ x: 0, y: 0, add: false });
@@ -301,9 +301,9 @@
                     this.anims.create({ key: 'jump_double', frames: this.anims.generateFrameNumbers('miguel', { start: 4, end: 5 }), frameRate: 12, repeat: 0 });
                     this.anims.create({ key: 'attack', frames: this.anims.generateFrameNumbers('miguel', { start: 6, end: 8 }), frameRate: 16, repeat: 0 });
                     this.anims.create({ key: 'dust_effect', frames: this.anims.generateFrameNumbers('miguel', { start: 12, end: 17 }), frameRate: 18, repeat: 0 });
-                    this.anims.create({ key: 'robo_patrol', frames: this.anims.generateFrameNumbers('robo', { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
-                    this.anims.create({ key: 'robo_damage', frames: this.anims.generateFrameNumbers('robo', { start: 4, end: 7 }), frameRate: 12, repeat: 0 });
-                    this.anims.create({ key: 'robo_explosion', frames: this.anims.generateFrameNumbers('robo', { start: 8, end: 14 }), frameRate: 16, repeat: 0 });
+                    this.anims.create({ key: 'robo_patrol', frames: this.anims.generateFrameNumbers('robo', { start: 0, end: 2 }), frameRate: 8, repeat: -1 });
+                    this.anims.create({ key: 'robo_damage', frames: this.anims.generateFrameNumbers('robo', { start: 3, end: 5 }), frameRate: 12, repeat: 0 });
+                    this.anims.create({ key: 'robo_explosion', frames: this.anims.generateFrameNumbers('robo', { start: 6, end: 8 }), frameRate: 16, repeat: 0 });
                 }
                 this.vilao.anims.play('robo_patrol', true);
 
