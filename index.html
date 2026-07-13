@@ -2,7 +2,7 @@
 <html>
 <head>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #333; }</style>
+    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #87CEEB; /* Mudei para um azul céu para destacar o personagem */ }</style>
 </head>
 <body>
     <script>
@@ -10,65 +10,74 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: false } },
+            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
         };
 
         const game = new Phaser.Game(config);
 
         function preload() {
-            // Carrega o spritesheet que você criou (certifique-se que o nome está igual)
-            // IMPORTANTE: Aqui definimos o tamanho exato de cada "quadradinho" da imagem.
-            // Assumindo que a imagem total tem 256x64 (4 quadros de 64x64)
+            // ATENÇÃO: Altere o 64 pelo valor correto que você calculou (Largura Total / 4)
             this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 64, frameHeight: 64 });
         }
 
         function create() {
-            // Cria o personagem
             this.player = this.physics.add.sprite(400, 300, 'miguel');
             this.player.setCollideWorldBounds(true);
 
-            // Cria as Animações
-            // Animação de Caminhada (usa os frames 1, 2, 3 do spritesheet)
+            // Animação de Caminhada (frames 1 e 2)
             this.anims.create({
                 key: 'walk',
                 frames: this.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }),
                 frameRate: 10,
-                repeat: -1 // Repete infinitamente
+                repeat: -1
             });
 
-            // Animação Parado (usa o frame 0)
+            // Animação Parado (frame 0)
             this.anims.create({
                 key: 'idle',
                 frames: [ { key: 'miguel', frame: 0 } ],
                 frameRate: 20
             });
 
-            // Habilita controle pelo teclado
+            // Animação Pulando (frame 3)
+            this.anims.create({
+                key: 'jump',
+                frames: [ { key: 'miguel', frame: 3 } ],
+                frameRate: 20
+            });
+
             this.cursors = this.input.keyboard.createCursorKeys();
         }
 
         function update() {
-            // Lógica de Movimento
+            // Verifica se o jogador está no chão
+            let noChao = this.player.body.onFloor();
+
+            // Movimento para os lados
             if (this.cursors.left.isDown) {
-                this.player.setVelocityX(-160);
-                this.player.flipX = true; // Vira o sprite para a esquerda
-                this.player.anims.play('walk', true);
+                this.player.setVelocityX(-200);
+                this.player.flipX = true;
+                if (noChao) this.player.anims.play('walk', true);
             }
             else if (this.cursors.right.isDown) {
-                this.player.setVelocityX(160);
-                this.player.flipX = false; // Mantém o sprite original
-                this.player.anims.play('walk', true);
+                this.player.setVelocityX(200);
+                this.player.flipX = false;
+                if (noChao) this.player.anims.play('walk', true);
             }
             else {
                 this.player.setVelocityX(0);
-                this.player.anims.play('idle', true);
+                if (noChao) this.player.anims.play('idle', true);
             }
 
-            // Pulo (só pode pular se estiver no chão)
-            if (this.cursors.up.isDown && this.player.body.onFloor()) {
-                this.player.setVelocityY(-300);
-                // Nota: Como o spritesheet só tem 4 frames, não criamos animação de pulo complexa aqui para simplificar.
+            // Pulo e animação de pulo
+            if (this.cursors.up.isDown && noChao) {
+                this.player.setVelocityY(-350);
+            }
+
+            // Se não estiver no chão, toca a animação de pulo independente de estar indo pros lados
+            if (!noChao) {
+                this.player.anims.play('jump', true);
             }
         }
     </script>
