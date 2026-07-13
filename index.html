@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }</style>
+</head>
+<body>
+    <script>
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            physics: { default: 'arcade', arcade: { gravity: { y: 300 } } },
+            scene: { preload: preload, create: create, update: update }
+        };
+
+        const game = new Phaser.Game(config);
+
+        function preload() {
+            // Aqui carregaremos o desenho do Miguel 8-bits
+            this.load.image('miguel', 'https://labs.phaser.io/assets/sprites/phaser-dude.png');
+        }
+
+        function create() {
+            this.player = this.physics.add.sprite(400, 300, 'miguel');
+            this.cursors = this.input.keyboard.createCursorKeys();
+        }
+
+        function update() {
+            if (this.cursors.left.isDown) this.player.setVelocityX(-160);
+            else if (this.cursors.right.isDown) this.player.setVelocityX(160);
+            else this.player.setVelocityX(0);
+        }
+    </script>
+</body>
+</html>
