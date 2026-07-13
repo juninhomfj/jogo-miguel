@@ -118,10 +118,20 @@
                     alert("AVISO DEV: Não foi possível carregar a imagem '" + file.src + "'. Verifique se o nome está idêntico com letras minúsculas!");
                 });
 
-                // Spritesheets novos: Miguel usa frames de 216x288 com 1px de spacing
-                // para ignorar resíduos de borda; robô usa 645px / 3 = 215px por frame.
-                this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 216, frameHeight: 288, spacing: 1 });
-                this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 215, frameHeight: 129 });
+                // Spritesheets novos: Miguel possui 18 quadros em uma grade 6x3.
+                // A imagem tem 866x288px; usando margem lateral de 1px, cada quadro fica 144x96px
+                // sem invadir o padding das bordas. O robô usa grade perfeita 3x3 em 645x387px.
+                this.load.spritesheet('miguel', 'miguel_sprites.png', {
+                    frameWidth: 144,
+                    frameHeight: 96,
+                    margin: 1,
+                    spacing: 0
+                });
+                this.load.spritesheet('robo', 'robo_sprites.png', {
+                    frameWidth: 215,
+                    frameHeight: 129,
+                    spacing: 0
+                });
                 
                 // Gera a textura do cristal tecnológico via código puro
                 const graficoCristal = this.make.graphics({ x: 0, y: 0, add: false });
