@@ -1,5 +1,5 @@
 index,arquivo,acao,dimensao,status
-0,00_idle.png,parado,256x256,pendente
+0,00_idle.png,parado,256x256,aprovado
 1,01_walk_1.png,caminhada_1,256x256,pendente
 2,02_walk_2.png,caminhada_2,256x256,pendente
 3,03_walk_3.png,caminhada_3,256x256,pendente
