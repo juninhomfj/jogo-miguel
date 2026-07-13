@@ -10,45 +10,46 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            backgroundColor: '#87CEEB', // Fundo azul céu
-            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
+            backgroundColor: '#87CEEB',
+            physics: { default: 'arcade', arcade: { gravity: { y: 600 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
         };
 
         const game = new Phaser.Game(config);
 
         function preload() {
-            // Aqui estão as dimensões exatas que calculamos!
-            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 543, frameHeight: 724 });
+            // Novas dimensões do removedor de fundo
+            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 216, frameHeight: 288 });
         }
 
         function create() {
-            // Cria o personagem no centro da tela
+            // CRIANDO O CHÃO (PLATAFORMA)
+            this.plataformas = this.physics.add.staticGroup();
+            // Cria um retângulo verde para servir de chão provisório (x, y, largura, altura, cor)
+            let chao = this.add.rectangle(400, 580, 800, 40, 0x228B22);
+            this.plataformas.add(chao);
+
+            // CRIANDO O MIGUEL
             this.player = this.physics.add.sprite(400, 300, 'miguel');
-            
-            // REDUZ O TAMANHO DO PERSONAGEM PARA CABER NA TELA (20% do tamanho original)
-            this.player.setScale(0.2); 
-            
-            // Ajusta a "caixa de colisão" para acompanhar o novo tamanho
+            this.player.setScale(0.4); // Ajustado para ficar com um tamanho legal
             this.player.updateBounds(); 
             this.player.setCollideWorldBounds(true);
 
-            // Animação de Caminhada (frames 1 e 2)
+            // Faz o Miguel pisar no chão
+            this.physics.add.collider(this.player, this.plataformas);
+
+            // ANIMAÇÕES
             this.anims.create({
                 key: 'walk',
                 frames: this.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }),
                 frameRate: 10,
                 repeat: -1
             });
-
-            // Animação Parado (frame 0)
             this.anims.create({
                 key: 'idle',
                 frames: [ { key: 'miguel', frame: 0 } ],
                 frameRate: 20
             });
-
-            // Animação Pulando (frame 3)
             this.anims.create({
                 key: 'jump',
                 frames: [ { key: 'miguel', frame: 3 } ],
@@ -59,32 +60,27 @@
         }
 
         function update() {
-            let noChao = this.player.body.onFloor();
+            let noChao = this.player.body.touching.down; // Verifica se está tocando a plataforma
 
-            // Movimento para esquerda
             if (this.cursors.left.isDown) {
                 this.player.setVelocityX(-200);
-                this.player.flipX = true; // Vira o personagem
+                this.player.flipX = true;
                 if (noChao) this.player.anims.play('walk', true);
             }
-            // Movimento para direita
             else if (this.cursors.right.isDown) {
                 this.player.setVelocityX(200);
                 this.player.flipX = false;
                 if (noChao) this.player.anims.play('walk', true);
             }
-            // Parado
             else {
                 this.player.setVelocityX(0);
                 if (noChao) this.player.anims.play('idle', true);
             }
 
-            // Pulo
             if (this.cursors.up.isDown && noChao) {
-                this.player.setVelocityY(-350);
+                this.player.setVelocityY(-450); // Aumentei a força do pulo
             }
 
-            // Animação de pulo (se não estiver no chão)
             if (!noChao) {
                 this.player.anims.play('jump', true);
             }
