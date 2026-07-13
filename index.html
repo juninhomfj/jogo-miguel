@@ -6,73 +6,74 @@
     <title>As Aventuras do Miguel</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
-        body { margin: 0; background: #0d1117; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         #game-container { position: relative; width: 100vw; height: 100vh; }
+        #ui { position: absolute; z-index: 10; color: #FFCC00; font-family: sans-serif; text-align: center; }
     </style>
 </head>
 <body>
+    <div id="ui">
+        <input type="text" id="nome" placeholder="MIG" maxlength="3">
+        <button id="btn">ENTRAR</button>
+    </div>
     <div id="game-container"></div>
 
     <script>
-        class MenuPrincipal extends Phaser.Scene {
-            constructor() { super('MenuPrincipal'); }
-            preload() {
-                // Dimensões corrigidas pelo Codex para não cortar
-                this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 144, frameHeight: 96, margin: 1 });
-                this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 215, frameHeight: 129 });
-            }
-            create() {
-                this.add.text(400, 200, 'AS AVENTURAS DO MIGUEL', { fontSize: '40px', fill: '#FFCC00' }).setOrigin(0.5);
-                let btn = this.add.text(400, 350, '[ INICIAR ]', { fontSize: '30px', fill: '#FFF' }).setOrigin(0.5).setInteractive();
-                btn.on('pointerdown', () => this.scene.start('Fase1'));
-            }
-        }
-
-        class Fase1 extends Phaser.Scene {
-            constructor() { super('Fase1'); }
-            create() {
-                this.cameras.main.setBackgroundColor('#87CEEB');
-                
-                // Plataformas
-                this.plataformas = this.physics.add.staticGroup();
-                this.plataformas.create(400, 550, null).setSize(800, 50).setVisible(false); // Chão
-                
-                // Robô Vilão
-                this.robo = this.physics.add.sprite(600, 450, 'robo').setScale(0.5);
-                this.robo.setCollideWorldBounds(true);
-                this.physics.add.collider(this.robo, this.plataformas);
-
-                // Miguel
-                this.player = this.physics.add.sprite(100, 400, 'miguel').setScale(0.5);
-                this.player.setCollideWorldBounds(true);
-                this.physics.add.collider(this.player, this.plataformas);
-
-                // Controles Mobile
-                this.input.addPointer(2); // Suporte multi-touch
-                this.cursors = this.input.keyboard.createCursorKeys();
-            }
-
-            update() {
-                // Lógica de Movimento Suave e Pulo Duplo seria inserida aqui
-                if (this.cursors.left.isDown) this.player.setVelocityX(-200);
-                else if (this.cursors.right.isDown) this.player.setVelocityX(200);
-                else this.player.setVelocityX(0);
-
-                if (this.cursors.up.isDown && this.player.body.touching.down) {
-                    this.player.setVelocityY(-500);
-                }
-            }
-        }
-
         const config = {
             type: Phaser.AUTO,
             parent: 'game-container',
             width: 800, height: 600,
             physics: { default: 'arcade', arcade: { gravity: { y: 750 } } },
             scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-            scene: [MenuPrincipal, Fase1]
+            scene: { preload, create, update }
         };
+
         const game = new Phaser.Game(config);
+        let player, plataformas, cristais, cursors;
+
+        function preload() {
+            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 144, frameHeight: 96, margin: 1 });
+            this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 215, frameHeight: 129 });
+        }
+
+        function create() {
+            document.getElementById('btn').onclick = () => {
+                document.getElementById('ui').style.display = 'none';
+                iniciarFase(this);
+            };
+        }
+
+        function iniciarFase(scene) {
+            scene.cameras.main.setBackgroundColor('#87CEEB');
+
+            // Chão
+            plataformas = scene.physics.add.staticGroup();
+            plataformas.create(400, 580, null).setSize(800, 40).setVisible(true);
+
+            // Jogador
+            player = scene.physics.add.sprite(100, 400, 'miguel').setScale(0.5);
+            player.setCollideWorldBounds(true);
+            scene.physics.add.collider(player, plataformas);
+
+            // Cristais (Visual temporário)
+            cristais = scene.physics.add.group({ key: 'cristal', repeat: 3, setXY: { x: 200, y: 0, stepX: 150 } });
+            scene.physics.add.collider(cristais, plataformas);
+
+            // Nuvens simples
+            scene.add.ellipse(100, 100, 100, 50, 0xffffff).setDepth(0);
+            scene.add.ellipse(500, 150, 120, 60, 0xffffff).setDepth(0);
+
+            cursors = scene.input.keyboard.createCursorKeys();
+        }
+
+        function update() {
+            if (!player) return;
+            if (cursors.left.isDown) player.setVelocityX(-200);
+            else if (cursors.right.isDown) player.setVelocityX(200);
+            else player.setVelocityX(0);
+
+            if (cursors.up.isDown && player.body.touching.down) player.setVelocityY(-500);
+        }
     </script>
 </body>
 </html>
