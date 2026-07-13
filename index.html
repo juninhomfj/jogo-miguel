@@ -2,17 +2,110 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Jogo do Miguel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>As Aventuras do Miguel</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
-        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #222; }
-        canvas { border: 4px solid #fff; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0d1117;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Caixa de Input de Nome Estilo Arcade Retro (Mobile Friendly) */
+        #name-input-container {
+            position: absolute;
+            display: none; /* Controlado dinamicamente pelo Phaser */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            background: rgba(20, 25, 35, 0.95);
+            border: 4px solid #FFCC00;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.5);
+            width: 85%;
+            max-width: 340px;
+        }
+        #name-input-container label {
+            font-size: 18px;
+            color: #FFCC00;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        #player-name-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 26px;
+            text-align: center;
+            text-transform: uppercase;
+            border: 2px solid #FFCC00;
+            background: #111;
+            color: #FFF;
+            font-family: inherit;
+            font-weight: bold;
+            letter-spacing: 4px;
+            outline: none;
+            border-radius: 6px;
+        }
+        #start-button {
+            margin-top: 18px;
+            width: 100%;
+            padding: 14px;
+            font-size: 20px;
+            background: #FFCC00;
+            color: #0d1117;
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #CC9900;
+        }
+        #start-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #CC9900;
+        }
     </style>
 </head>
 <body>
+
+    <div id="game-container">
+        <div id="name-input-container">
+            <label for="player-name-input">Iniciais do Herói</label>
+            <input type="text" id="player-name-input" maxlength="3" value="MIG" autocomplete="off">
+            <button id="start-button">ENTRAR</button>
+        </div>
+    </div>
+
     <script>
         // ==========================================
-        // CENA 1: MENU INICIAL E NOME DO JOGADOR
+        // CENA 1: MENU PRINCIPAL
         // ==========================================
         class MenuPrincipal extends Phaser.Scene {
             constructor() {
@@ -20,46 +113,52 @@
             }
 
             preload() {
-                // Carrega o personagem com as medidas corretas
+                // Alerta automático caso a imagem dê erro ao carregar do GitHub
+                this.load.on('loaderror', function (file) {
+                    alert("AVISO DEV: Não foi possível carregar a imagem '" + file.src + "'. Verifique se o nome está idêntico com letras minúsculas!");
+                });
+
+                // Carrega o spritesheet corrigido para as novas dimensões (866 / 4 = 216)
                 this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 216, frameHeight: 288 });
                 
-                // Cria uma "moeda" desenhada pelo código para não precisarmos de outra imagem agora
+                // Gera a textura da moeda via código puro
                 let graficoMoeda = this.make.graphics().fillStyle(0xFFD700).fillCircle(15, 15, 15);
                 graficoMoeda.generateTexture('moeda', 30, 30);
                 graficoMoeda.destroy();
             }
 
             create() {
-                this.cameras.main.setBackgroundColor('#1E90FF'); // Fundo azul escuro
+                // Título em Alto Contraste (Amarelo Arcade sobre fundo quase preto)
+                this.add.text(400, 140, 'AS AVENTURAS DO MIGUEL', { 
+                    fontSize: '36px', 
+                    fill: '#FFCC00', 
+                    fontStyle: 'bold',
+                    fontFamily: 'Courier New'
+                }).setOrigin(0.5);
 
-                this.add.text(400, 150, 'AS AVENTURAS DO MIGUEL', { fontSize: '40px', fill: '#FFF', fontStyle: 'bold' }).setOrigin(0.5);
-                
-                let textoAviso = this.add.text(400, 300, 'CLIQUE NA TELA PARA INICIAR', { fontSize: '24px', fill: '#FFD700' }).setOrigin(0.5);
+                // Ativa e exibe a caixa de texto em HTML em cima do canvas
+                const containerNome = document.getElementById('name-input-container');
+                containerNome.style.display = 'flex';
 
-                // Efeito piscando no texto
-                this.tweens.add({ targets: textoAviso, alpha: 0, duration: 800, ease: 'Linear', yoyo: true, repeat: -1 });
-
-                // Quando o jogador clica na tela, pede o nome
-                this.input.on('pointerdown', () => {
-                    let nome = window.prompt("Digite suas iniciais (Máx 3 letras):", "MIG");
+                // Lógica ao clicar no botão "ENTRAR"
+                const botaoEntrar = document.getElementById('start-button');
+                botaoEntrar.onclick = () => {
+                    let nome = document.getElementById('player-name-input').value.trim();
+                    if (!nome) nome = "MIG";
+                    nome = nome.substring(0, 3).toUpperCase();
                     
-                    if (nome) {
-                        // Formata o nome para ficar com 3 letras maiúsculas (Estilo Fliperama)
-                        nome = nome.substring(0, 3).toUpperCase();
-                        
-                        // Salva o nome e zera a pontuação na "memória" do jogo
-                        this.registry.set('nomeJogador', nome);
-                        this.registry.set('pontuacao', 0);
-                        
-                        // Inicia a Fase 1
-                        this.scene.start('Fase1');
-                    }
-                });
+                    this.registry.set('nomeJogador', nome);
+                    this.registry.set('pontuacao', 0);
+                    
+                    // Oculta a caixa de texto e inicia o jogo nativamente
+                    containerNome.style.display = 'none';
+                    this.scene.start('Fase1');
+                };
             }
         }
 
         // ==========================================
-        // CENA 2: FASE 1 - A MISSÃO
+        // CENA 2: FASE 1
         // ==========================================
         class Fase1 extends Phaser.Scene {
             constructor() {
@@ -67,79 +166,114 @@
             }
 
             create() {
-                this.cameras.main.setBackgroundColor('#87CEEB'); // Fundo azul céu
-
-                // Recupera os dados do jogador
+                // Placar de Alto Contraste
                 this.nome = this.registry.get('nomeJogador');
                 this.pontos = this.registry.get('pontuacao');
+                this.textoPlacar = this.add.text(20, 20, `${this.nome} SCORE: ${this.pontos}`, { 
+                    fontSize: '28px', 
+                    fill: '#FFCC00', 
+                    fontStyle: 'bold' 
+                });
 
-                // Placar na tela
-                this.textoPlacar = this.add.text(20, 20, `${this.nome} SCORE: ${this.pontos}`, { fontSize: '28px', fill: '#000', fontStyle: 'bold' });
-
-                // PLATAFORMAS (Chão e blocos para pular)
+                // PLATAFORMAS (Alto contraste)
                 this.plataformas = this.physics.add.staticGroup();
                 
-                // Chão principal
-                let chao = this.add.rectangle(400, 580, 800, 40, 0x228B22);
-                this.physics.add.existing(chao, true); // true = estático (não cai)
+                // Chão Principal (Verde Neon gritante para contrastar com o uniforme vermelho/azul)
+                let chao = this.add.rectangle(400, 580, 800, 40, 0x00FF66);
+                this.physics.add.existing(chao, true);
                 this.plataformas.add(chao);
 
-                // Plataformas flutuantes
-                let plat1 = this.add.rectangle(600, 450, 150, 20, 0x8B4513); // Marrom
+                // Plataformas flutuantes (Branco Puro para total destaque no fundo escuro)
+                let plat1 = this.add.rectangle(600, 420, 180, 24, 0xFFFFFF);
                 this.physics.add.existing(plat1, true);
                 this.plataformas.add(plat1);
 
-                let plat2 = this.add.rectangle(150, 350, 150, 20, 0x8B4513);
+                let plat2 = this.add.rectangle(200, 320, 180, 24, 0xFFFFFF);
                 this.physics.add.existing(plat2, true);
                 this.plataformas.add(plat2);
 
+                // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
+                this.indicadorPosicao = this.add.rectangle(50, 420, 60, 80, 0x333333);
+                
                 // CRIANDO O MIGUEL
-                this.player = this.physics.add.sprite(50, 450, 'miguel');
-                this.player.setScale(0.35); // Tamanho ajustado
+                this.player = this.physics.add.sprite(50, 420, 'miguel');
+                this.player.setScale(0.35); // Escala adaptada para o tamanho 288 de altura
                 this.player.updateBounds();
                 this.player.setCollideWorldBounds(true);
 
-                // Faz o Miguel não atravessar as plataformas
                 this.physics.add.collider(this.player, this.plataformas);
 
-                // MOEDAS (Cria 5 moedas espalhadas)
+                // MOEDAS DE OURO
                 this.moedas = this.physics.add.group({
                     key: 'moeda',
                     repeat: 4,
-                    setXY: { x: 150, y: 0, stepX: 130 }
+                    setXY: { x: 180, y: 50, stepX: 130 }
                 });
 
-                // Faz as moedas quicarem um pouco ao cair
                 this.moedas.children.iterate(function (child) {
-                    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+                    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.6));
                 });
 
-                // Faz as moedas não atravessarem o chão
                 this.physics.add.collider(this.moedas, this.plataformas);
-
-                // Verifica se o Miguel encostou na moeda (chama a função coletarMoeda)
                 this.physics.add.overlap(this.player, this.moedas, this.coletarMoeda, null, this);
 
                 // ANIMAÇÕES
-                if (!this.anims.exists('walk')) { // Verifica se já existem para não dar erro
-                    this.anims.create({ key: 'walk', frames: this.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }), frameRate: 10, repeat: -1 });
+                if (!this.anims.exists('walk')) {
+                    this.anims.create({ key: 'walk', frames: this.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }), frameRate: 8, repeat: -1 });
                     this.anims.create({ key: 'idle', frames: [ { key: 'miguel', frame: 0 } ], frameRate: 20 });
                     this.anims.create({ key: 'jump', frames: [ { key: 'miguel', frame: 3 } ], frameRate: 20 });
                 }
 
+                // CONTROLES DE TECLADO (Para testes em PC)
                 this.cursors = this.input.keyboard.createCursorKeys();
+
+                // CONTROLES VIRTUAIS NA TELA (MOBILE FIRST - TOUCH)
+                this.moveEsquerda = false;
+                this.moveDireita = false;
+                this.querPular = false;
+
+                // Botão Direcional Esquerda
+                this.btnEsq = this.add.rectangle(80, 510, 100, 80, 0x222222, 0.8).setInteractive();
+                this.btnEsq.setStrokeStyle(2, 0xFFCC00);
+                this.add.text(80, 510, '◀', { fontSize: '36px', fill: '#FFCC00' }).setOrigin(0.5);
+
+                // Botão Direcional Direita
+                this.btnDir = this.add.rectangle(210, 510, 100, 80, 0x222222, 0.8).setInteractive();
+                this.btnDir.setStrokeStyle(2, 0xFFCC00);
+                this.add.text(210, 510, '▶', { fontSize: '36px', fill: '#FFCC00' }).setOrigin(0.5);
+
+                // Botão de Pulo (Amarelo bem visível)
+                this.btnPulo = this.add.rectangle(710, 510, 130, 80, 0xFFCC00, 0.9).setInteractive();
+                this.add.text(710, 510, 'PULO', { fontSize: '22px', fill: '#0d1117', fontStyle: 'bold' }).setOrigin(0.5);
+
+                // Vinculando os eventos de toque do Celular
+                this.btnEsq.on('pointerdown', () => this.moveEsquerda = true);
+                this.btnEsq.on('pointerup', () => this.moveEsquerda = false);
+                this.btnEsq.on('pointerout', () => this.moveEsquerda = false);
+
+                this.btnDir.on('pointerdown', () => this.moveDireita = true);
+                this.btnDir.on('pointerup', () => this.moveDireita = false);
+                this.btnDir.on('pointerout', () => this.moveDireita = false);
+
+                this.btnPulo.on('pointerdown', () => this.querPular = true);
+                this.btnPulo.on('pointerup', () => this.querPular = false);
             }
 
             update() {
+                // Sincroniza o bloco cinza de testes com a posição do Miguel
+                this.indicadorPosicao.x = this.player.x;
+                this.indicadorPosicao.y = this.player.y;
+
                 let noChao = this.player.body.touching.down;
 
-                if (this.cursors.left.isDown) {
-                    this.player.setVelocityX(-200);
+                // Lógica de Movimentação Unificada (Teclado ou Botão Touch)
+                if (this.cursors.left.isDown || this.moveEsquerda) {
+                    this.player.setVelocityX(-220);
                     this.player.flipX = true;
                     if (noChao) this.player.anims.play('walk', true);
                 }
-                else if (this.cursors.right.isDown) {
-                    this.player.setVelocityX(200);
+                else if (this.cursors.right.isDown || this.moveDireita) {
+                    this.player.setVelocityX(220);
                     this.player.flipX = false;
                     if (noChao) this.player.anims.play('walk', true);
                 }
@@ -148,8 +282,10 @@
                     if (noChao) this.player.anims.play('idle', true);
                 }
 
-                if (this.cursors.up.isDown && noChao) {
-                    this.player.setVelocityY(-450);
+                // Lógica do Pulo Unificada
+                if ((this.cursors.up.isDown || this.querPular) && noChao) {
+                    this.player.setVelocityY(-520);
+                    this.querPular = false; // Consome o comando
                 }
 
                 if (!noChao) {
@@ -157,16 +293,12 @@
                 }
             }
 
-            // FUNÇÃO: O que acontece quando pega a moeda
             coletarMoeda(player, moeda) {
-                moeda.disableBody(true, true); // Some com a moeda
-                
-                // Aumenta pontos e atualiza o texto na tela
+                moeda.disableBody(true, true);
                 this.pontos += 10;
                 this.registry.set('pontuacao', this.pontos);
                 this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
 
-                // Se não houver mais moedas ativas, PASSOU DE FASE!
                 if (this.moedas.countActive(true) === 0) {
                     this.scene.start('Fase2');
                 }
@@ -174,7 +306,7 @@
         }
 
         // ==========================================
-        // CENA 3: FASE 2 / TELA DE VITÓRIA
+        // CENA 3: TELA DE VITÓRIA
         // ==========================================
         class Fase2 extends Phaser.Scene {
             constructor() {
@@ -182,16 +314,14 @@
             }
 
             create() {
-                this.cameras.main.setBackgroundColor('#32CD32'); // Fundo verde
-
                 let nome = this.registry.get('nomeJogador');
                 let pontosFinal = this.registry.get('pontuacao');
 
-                this.add.text(400, 200, 'FASE 1 CONCLUÍDA!', { fontSize: '40px', fill: '#FFF', fontStyle: 'bold' }).setOrigin(0.5);
-                this.add.text(400, 300, `HERÓI: ${nome}`, { fontSize: '30px', fill: '#FFF' }).setOrigin(0.5);
-                this.add.text(400, 350, `PONTUAÇÃO TOTAL: ${pontosFinal}`, { fontSize: '30px', fill: '#FFD700' }).setOrigin(0.5);
+                this.add.text(400, 200, 'FASE 1 CONCLUÍDA!', { fontSize: '38px', fill: '#00FF66', fontStyle: 'bold' }).setOrigin(0.5);
+                this.add.text(400, 290, `HERÓI: ${nome}`, { fontSize: '26px', fill: '#FFF' }).setOrigin(0.5);
+                this.add.text(400, 340, `PONTOS: ${pontosFinal}`, { fontSize: '32px', fill: '#FFCC00', fontStyle: 'bold' }).setOrigin(0.5);
 
-                let btnVoltar = this.add.text(400, 450, '[ JOGAR NOVAMENTE ]', { fontSize: '24px', fill: '#000' }).setOrigin(0.5);
+                let btnVoltar = this.add.text(400, 460, '[ JOGAR NOVAMENTE ]', { fontSize: '24px', fill: '#FFCC00', fontStyle: 'bold' }).setOrigin(0.5);
                 btnVoltar.setInteractive();
                 btnVoltar.on('pointerdown', () => {
                     this.scene.start('MenuPrincipal');
@@ -200,18 +330,23 @@
         }
 
         // ==========================================
-        // CONFIGURAÇÕES GERAIS DO JOGO
+        // CONFIGURAÇÕES GERAIS (ESCAlA MOBILE-FIRST)
         // ==========================================
         const config = {
             type: Phaser.AUTO,
+            parent: 'game-container',
             width: 800,
             height: 600,
+            backgroundColor: '#0d1117', // Fundo escuro de altíssimo contraste
+            scale: {
+                mode: Phaser.Scale.FIT, // Faz o jogo expandir e caber perfeitamente em telas de qualquer celular
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
             physics: {
                 default: 'arcade',
-                arcade: { gravity: { y: 600 }, debug: false }
+                arcade: { gravity: { y: 750 }, debug: false }
             },
-            // Avisa o jogo que existem essas 3 Cenas e carrega a primeira da lista
-            scene: [MenuPrincipal, Fase1, Fase2] 
+            scene: [MenuPrincipal, Fase1, Fase2]
         };
 
         const game = new Phaser.Game(config);
