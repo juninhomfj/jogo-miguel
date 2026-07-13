@@ -2,7 +2,7 @@
 <html>
 <head>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }</style>
+    <style>body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #333; }</style>
 </head>
 <body>
     <script>
@@ -10,26 +10,66 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            physics: { default: 'arcade', arcade: { gravity: { y: 300 } } },
+            physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
         };
 
         const game = new Phaser.Game(config);
 
         function preload() {
-            // Aqui carregaremos o desenho do Miguel 8-bits
-            this.load.image('miguel', 'https://labs.phaser.io/assets/sprites/phaser-dude.png');
+            // Carrega o spritesheet que você criou (certifique-se que o nome está igual)
+            // IMPORTANTE: Aqui definimos o tamanho exato de cada "quadradinho" da imagem.
+            // Assumindo que a imagem total tem 256x64 (4 quadros de 64x64)
+            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 64, frameHeight: 64 });
         }
 
         function create() {
+            // Cria o personagem
             this.player = this.physics.add.sprite(400, 300, 'miguel');
+            this.player.setCollideWorldBounds(true);
+
+            // Cria as Animações
+            // Animação de Caminhada (usa os frames 1, 2, 3 do spritesheet)
+            this.anims.create({
+                key: 'walk',
+                frames: this.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }),
+                frameRate: 10,
+                repeat: -1 // Repete infinitamente
+            });
+
+            // Animação Parado (usa o frame 0)
+            this.anims.create({
+                key: 'idle',
+                frames: [ { key: 'miguel', frame: 0 } ],
+                frameRate: 20
+            });
+
+            // Habilita controle pelo teclado
             this.cursors = this.input.keyboard.createCursorKeys();
         }
 
         function update() {
-            if (this.cursors.left.isDown) this.player.setVelocityX(-160);
-            else if (this.cursors.right.isDown) this.player.setVelocityX(160);
-            else this.player.setVelocityX(0);
+            // Lógica de Movimento
+            if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-160);
+                this.player.flipX = true; // Vira o sprite para a esquerda
+                this.player.anims.play('walk', true);
+            }
+            else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(160);
+                this.player.flipX = false; // Mantém o sprite original
+                this.player.anims.play('walk', true);
+            }
+            else {
+                this.player.setVelocityX(0);
+                this.player.anims.play('idle', true);
+            }
+
+            // Pulo (só pode pular se estiver no chão)
+            if (this.cursors.up.isDown && this.player.body.onFloor()) {
+                this.player.setVelocityY(-300);
+                // Nota: Como o spritesheet só tem 4 frames, não criamos animação de pulo complexa aqui para simplificar.
+            }
         }
     </script>
 </body>
