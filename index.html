@@ -194,6 +194,38 @@
                 this.physics.add.existing(plat2, true);
                 this.plataformas.add(plat2);
 
+                // INIMIGO: robô vilão retangular vermelho desenhado via make.graphics
+                if (!this.textures.exists('vilaoRobo')) {
+                    const graficoVilao = this.make.graphics({ x: 0, y: 0, add: false });
+                    graficoVilao.fillStyle(0xCC0000, 1);
+                    graficoVilao.fillRect(0, 0, 54, 54);
+                    graficoVilao.fillStyle(0xFF6666, 1);
+                    graficoVilao.fillRect(8, 10, 12, 12);
+                    graficoVilao.fillRect(34, 10, 12, 12);
+                    graficoVilao.fillStyle(0x660000, 1);
+                    graficoVilao.fillRect(12, 36, 30, 6);
+                    graficoVilao.generateTexture('vilaoRobo', 54, 54);
+                    graficoVilao.destroy();
+                }
+
+                if (!this.textures.exists('particulaVilao')) {
+                    const graficoParticula = this.make.graphics({ x: 0, y: 0, add: false });
+                    graficoParticula.fillStyle(0xFF2222, 1);
+                    graficoParticula.fillRect(0, 0, 8, 8);
+                    graficoParticula.generateTexture('particulaVilao', 8, 8);
+                    graficoParticula.destroy();
+                }
+
+                this.vilao = this.physics.add.sprite(600, 366, 'vilaoRobo');
+                this.vilao.setCollideWorldBounds(false);
+                this.vilao.setVelocityX(90);
+                this.vilao.setBounce(0);
+                this.vilao.body.setSize(54, 54);
+                this.vilao.limiteEsquerda = plat1.x - (plat1.width / 2) + (this.vilao.displayWidth / 2);
+                this.vilao.limiteDireita = plat1.x + (plat1.width / 2) - (this.vilao.displayWidth / 2);
+                this.vilao.direcao = 1;
+                this.ultimoDanoVilao = 0;
+
                 // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
                 this.indicadorPosicao = this.add.rectangle(50, 320, 60, 80, 0x333333);
                 
@@ -238,6 +270,8 @@
                 this.player.setCollideWorldBounds(true);
 
                 this.physics.add.collider(this.player, this.plataformas);
+                this.physics.add.collider(this.vilao, this.plataformas);
+                this.physics.add.collider(this.player, this.vilao, this.acertarVilao, null, this);
 
                 // MOEDAS DE OURO
                 this.moedas = this.physics.add.group({
@@ -303,6 +337,19 @@
 
                 let noChao = this.player.body.touching.down;
 
+                if (this.vilao && this.vilao.active) {
+                    if (this.vilao.x <= this.vilao.limiteEsquerda) {
+                        this.vilao.x = this.vilao.limiteEsquerda;
+                        this.vilao.direcao = 1;
+                        this.vilao.setVelocityX(90);
+                    }
+                    else if (this.vilao.x >= this.vilao.limiteDireita) {
+                        this.vilao.x = this.vilao.limiteDireita;
+                        this.vilao.direcao = -1;
+                        this.vilao.setVelocityX(-90);
+                    }
+                }
+
                 // Lógica de Movimentação Unificada (Teclado ou Botão Touch)
                 if (this.cursors.left.isDown || this.moveEsquerda) {
                     this.player.setVelocityX(-220);
@@ -328,6 +375,36 @@
                 if (!noChao) {
                     this.player.anims.play('jump', true);
                 }
+            }
+
+            acertarVilao(player, vilao) {
+                const pisouNoVilao = player.body.velocity.y > 0 && player.body.bottom <= vilao.body.top + 18;
+
+                if (pisouNoVilao) {
+                    const explosao = this.add.particles(vilao.x, vilao.y, 'particulaVilao', {
+                        speed: { min: 80, max: 260 },
+                        angle: { min: 0, max: 360 },
+                        lifespan: 500,
+                        gravityY: 500,
+                        scale: { start: 1.4, end: 0 },
+                        quantity: 18,
+                        emitting: false
+                    });
+
+                    explosao.explode(18);
+                    this.time.delayedCall(600, () => explosao.destroy());
+                    vilao.disableBody(true, true);
+                    player.setVelocityY(-300);
+                    return;
+                }
+
+                if (this.time.now - this.ultimoDanoVilao < 900) return;
+
+                this.ultimoDanoVilao = this.time.now;
+                this.pontos -= 5;
+                this.registry.set('pontuacao', this.pontos);
+                this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
+                player.setVelocityX(player.x < vilao.x ? -260 : 260);
             }
 
             coletarMoeda(player, moeda) {
