@@ -1,2 +1,7 @@
 .venv-assets/
 artifacts/sprite-audit/
+incoming/sprites/*.png
+artifacts/frame-validation/
+/tmp/jogo-miguel-assets-venv/
+__pycache__/
+*.pyc
