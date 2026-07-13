@@ -98,7 +98,7 @@
     <div id="game-container">
         <div id="name-input-container">
             <label for="player-name-input">Iniciais do Herói</label>
-            <input type="text" id="player-name-input" maxlength="3" value="MIG" autocomplete="off">
+            <input type="text" id="player-name-input" maxlength="3" placeholder="___" autocomplete="off">
             <button id="start-button">ENTRAR</button>
         </div>
     </div>
@@ -172,6 +172,7 @@
                 // Ativa e exibe a caixa de texto em HTML em cima do canvas
                 const containerNome = document.getElementById('name-input-container');
                 containerNome.style.display = 'flex';
+                containerNome.style.visibility = 'visible';
 
                 // Lógica ao clicar no botão "ENTRAR"
                 const botaoEntrar = document.getElementById('start-button');
@@ -183,9 +184,10 @@
                     this.registry.set('nomeJogador', nome);
                     this.registry.set('pontuacao', 0);
                     
-                    // Oculta a caixa de texto e inicia o jogo nativamente
-                    containerNome.style.display = 'none';
+                    // Inicia a fase e garante que a camada HTML não bloqueie o canvas.
                     this.scene.start('Fase1');
+                    containerNome.style.visibility = 'hidden';
+                    containerNome.style.display = 'none';
                 };
             }
         }
@@ -199,6 +201,8 @@
             }
 
             create() {
+                console.log('Fase1 iniciada');
+
                 // Cenário dinâmico ao fundo: nuvens desenhadas por código
                 this.nuvens = [];
                 const dadosNuvens = [
