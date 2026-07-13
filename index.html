@@ -222,21 +222,53 @@
                 this.plataformas = this.physics.add.staticGroup();
                 
                 // Chão Principal (Verde Neon gritante para contrastar com o uniforme vermelho/azul)
-                let chao = this.add.rectangle(400, 580, 800, 40, 0x00FF66);
+                let chao = this.add.rectangle(400, 460, 800, 40, 0x00FF66);
                 this.physics.add.existing(chao, true);
                 this.plataformas.add(chao);
 
                 // Plataformas flutuantes (Branco Puro para total destaque no fundo escuro)
-                let plat1 = this.add.rectangle(600, 420, 180, 24, 0xFFFFFF);
+                let plat1 = this.add.rectangle(600, 300, 180, 24, 0xFFFFFF);
                 this.physics.add.existing(plat1, true);
                 this.plataformas.add(plat1);
 
-                let plat2 = this.add.rectangle(200, 320, 180, 24, 0xFFFFFF);
+                let plat2 = this.add.rectangle(200, 200, 180, 24, 0xFFFFFF);
                 this.physics.add.existing(plat2, true);
                 this.plataformas.add(plat2);
 
+                // INIMIGO: robô vilão retangular vermelho desenhado via make.graphics
+                if (!this.textures.exists('vilaoRobo')) {
+                    const graficoVilao = this.make.graphics({ x: 0, y: 0, add: false });
+                    graficoVilao.fillStyle(0xCC0000, 1);
+                    graficoVilao.fillRect(0, 0, 54, 54);
+                    graficoVilao.fillStyle(0xFF6666, 1);
+                    graficoVilao.fillRect(8, 10, 12, 12);
+                    graficoVilao.fillRect(34, 10, 12, 12);
+                    graficoVilao.fillStyle(0x660000, 1);
+                    graficoVilao.fillRect(12, 36, 30, 6);
+                    graficoVilao.generateTexture('vilaoRobo', 54, 54);
+                    graficoVilao.destroy();
+                }
+
+                if (!this.textures.exists('particulaVilao')) {
+                    const graficoParticula = this.make.graphics({ x: 0, y: 0, add: false });
+                    graficoParticula.fillStyle(0xFF2222, 1);
+                    graficoParticula.fillRect(0, 0, 8, 8);
+                    graficoParticula.generateTexture('particulaVilao', 8, 8);
+                    graficoParticula.destroy();
+                }
+
+                this.vilao = this.physics.add.sprite(600, 366, 'vilaoRobo');
+                this.vilao.setCollideWorldBounds(false);
+                this.vilao.setVelocityX(90);
+                this.vilao.setBounce(0);
+                this.vilao.body.setSize(54, 54);
+                this.vilao.limiteEsquerda = plat1.x - (plat1.width / 2) + (this.vilao.displayWidth / 2);
+                this.vilao.limiteDireita = plat1.x + (plat1.width / 2) - (this.vilao.displayWidth / 2);
+                this.vilao.direcao = 1;
+                this.ultimoDanoVilao = 0;
+
                 // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
-                this.indicadorPosicao = this.add.rectangle(50, 420, 60, 80, 0x333333);
+                this.indicadorPosicao = this.add.rectangle(50, 320, 60, 80, 0x333333);
                 
                 // Corrige o recorte do spritesheet: 866px não divide exatamente por 4.
                 // Se usar frameWidth: 216, o Phaser corta os frames fora do alinhamento real.
@@ -273,18 +305,20 @@
                 }
 
                 // CRIANDO O MIGUEL
-                this.player = this.physics.add.sprite(50, 420, 'miguel', 0);
+                this.player = this.physics.add.sprite(50, 320, 'miguel', 0);
                 this.player.setScale(0.35); // Escala adaptada para o tamanho 288 de altura
                 this.player.setDepth(10);
                 this.player.setCollideWorldBounds(true);
 
                 this.physics.add.collider(this.player, this.plataformas);
+                this.physics.add.collider(this.vilao, this.plataformas);
+                this.physics.add.collider(this.player, this.vilao, this.acertarVilao, null, this);
 
                 // CRISTAIS TECNOLÓGICOS COLETÁVEIS
                 this.cristais = this.physics.add.group({
                     key: 'cristalTecnologico',
                     repeat: 4,
-                    setXY: { x: 180, y: 50, stepX: 130 }
+                    setXY: { x: 180, y: 25, stepX: 130 }
                 });
 
                 this.cristais.children.iterate(function (child) {
@@ -312,18 +346,18 @@
                 this.querPular = false;
 
                 // Botão Direcional Esquerda
-                this.btnEsq = this.add.rectangle(80, 510, 100, 80, 0x222222, 0.8).setInteractive();
-                this.btnEsq.setStrokeStyle(2, 0xFFCC00);
-                this.add.text(80, 510, '◀', { fontSize: '36px', fill: '#FFCC00' }).setOrigin(0.5);
+                this.btnEsq = this.add.rectangle(90, 530, 140, 110, 0x222222, 0.85).setInteractive();
+                this.btnEsq.setStrokeStyle(4, 0xFFCC00);
+                this.add.text(90, 530, '◀', { fontSize: '56px', fill: '#FFCC00' }).setOrigin(0.5);
 
                 // Botão Direcional Direita
-                this.btnDir = this.add.rectangle(210, 510, 100, 80, 0x222222, 0.8).setInteractive();
-                this.btnDir.setStrokeStyle(2, 0xFFCC00);
-                this.add.text(210, 510, '▶', { fontSize: '36px', fill: '#FFCC00' }).setOrigin(0.5);
+                this.btnDir = this.add.rectangle(270, 530, 140, 110, 0x222222, 0.85).setInteractive();
+                this.btnDir.setStrokeStyle(4, 0xFFCC00);
+                this.add.text(270, 530, '▶', { fontSize: '56px', fill: '#FFCC00' }).setOrigin(0.5);
 
                 // Botão de Pulo (Amarelo bem visível)
-                this.btnPulo = this.add.rectangle(710, 510, 130, 80, 0xFFCC00, 0.9).setInteractive();
-                this.add.text(710, 510, 'PULO', { fontSize: '22px', fill: '#0d1117', fontStyle: 'bold' }).setOrigin(0.5);
+                this.btnPulo = this.add.rectangle(685, 530, 190, 110, 0xFFCC00, 0.95).setInteractive();
+                this.add.text(685, 530, 'PULO', { fontSize: '30px', fill: '#0d1117', fontStyle: 'bold' }).setOrigin(0.5);
 
                 // Vinculando os eventos de toque do Celular
                 this.btnEsq.on('pointerdown', () => this.moveEsquerda = true);
@@ -336,6 +370,7 @@
 
                 this.btnPulo.on('pointerdown', () => this.querPular = true);
                 this.btnPulo.on('pointerup', () => this.querPular = false);
+                this.btnPulo.on('pointerout', () => this.querPular = false);
             }
 
             update() {
@@ -352,6 +387,19 @@
                 this.indicadorPosicao.y = this.player.y;
 
                 let noChao = this.player.body.touching.down;
+
+                if (this.vilao && this.vilao.active) {
+                    if (this.vilao.x <= this.vilao.limiteEsquerda) {
+                        this.vilao.x = this.vilao.limiteEsquerda;
+                        this.vilao.direcao = 1;
+                        this.vilao.setVelocityX(90);
+                    }
+                    else if (this.vilao.x >= this.vilao.limiteDireita) {
+                        this.vilao.x = this.vilao.limiteDireita;
+                        this.vilao.direcao = -1;
+                        this.vilao.setVelocityX(-90);
+                    }
+                }
 
                 // Lógica de Movimentação Unificada (Teclado ou Botão Touch)
                 if (this.cursors.left.isDown || this.moveEsquerda) {
@@ -382,6 +430,38 @@
 
             coletarCristal(player, cristal) {
                 cristal.disableBody(true, true);
+            acertarVilao(player, vilao) {
+                const pisouNoVilao = player.body.velocity.y > 0 && player.body.bottom <= vilao.body.top + 18;
+
+                if (pisouNoVilao) {
+                    const explosao = this.add.particles(vilao.x, vilao.y, 'particulaVilao', {
+                        speed: { min: 80, max: 260 },
+                        angle: { min: 0, max: 360 },
+                        lifespan: 500,
+                        gravityY: 500,
+                        scale: { start: 1.4, end: 0 },
+                        quantity: 18,
+                        emitting: false
+                    });
+
+                    explosao.explode(18);
+                    this.time.delayedCall(600, () => explosao.destroy());
+                    vilao.disableBody(true, true);
+                    player.setVelocityY(-300);
+                    return;
+                }
+
+                if (this.time.now - this.ultimoDanoVilao < 900) return;
+
+                this.ultimoDanoVilao = this.time.now;
+                this.pontos -= 5;
+                this.registry.set('pontuacao', this.pontos);
+                this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
+                player.setVelocityX(player.x < vilao.x ? -260 : 260);
+            }
+
+            coletarMoeda(player, moeda) {
+                moeda.disableBody(true, true);
                 this.pontos += 10;
                 this.registry.set('pontuacao', this.pontos);
                 this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
