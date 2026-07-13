@@ -181,21 +181,21 @@
                 this.plataformas = this.physics.add.staticGroup();
                 
                 // Chão Principal (Verde Neon gritante para contrastar com o uniforme vermelho/azul)
-                let chao = this.add.rectangle(400, 580, 800, 40, 0x00FF66);
+                let chao = this.add.rectangle(400, 460, 800, 40, 0x00FF66);
                 this.physics.add.existing(chao, true);
                 this.plataformas.add(chao);
 
                 // Plataformas flutuantes (Branco Puro para total destaque no fundo escuro)
-                let plat1 = this.add.rectangle(600, 420, 180, 24, 0xFFFFFF);
+                let plat1 = this.add.rectangle(600, 300, 180, 24, 0xFFFFFF);
                 this.physics.add.existing(plat1, true);
                 this.plataformas.add(plat1);
 
-                let plat2 = this.add.rectangle(200, 320, 180, 24, 0xFFFFFF);
+                let plat2 = this.add.rectangle(200, 200, 180, 24, 0xFFFFFF);
                 this.physics.add.existing(plat2, true);
                 this.plataformas.add(plat2);
 
                 // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
-                this.indicadorPosicao = this.add.rectangle(50, 420, 60, 80, 0x333333);
+                this.indicadorPosicao = this.add.rectangle(50, 320, 60, 80, 0x333333);
                 
                 // Corrige o recorte do spritesheet: 866px não divide exatamente por 4.
                 // Se usar frameWidth: 216, o Phaser corta os frames fora do alinhamento real.
@@ -232,7 +232,7 @@
                 }
 
                 // CRIANDO O MIGUEL
-                this.player = this.physics.add.sprite(50, 420, 'miguel', 0);
+                this.player = this.physics.add.sprite(50, 320, 'miguel', 0);
                 this.player.setScale(0.35); // Escala adaptada para o tamanho 288 de altura
                 this.player.setDepth(10);
                 this.player.setCollideWorldBounds(true);
@@ -243,7 +243,7 @@
                 this.moedas = this.physics.add.group({
                     key: 'moeda',
                     repeat: 4,
-                    setXY: { x: 180, y: 50, stepX: 130 }
+                    setXY: { x: 180, y: 25, stepX: 130 }
                 });
 
                 this.moedas.children.iterate(function (child) {
@@ -269,18 +269,18 @@
                 this.querPular = false;
 
                 // Botão Direcional Esquerda
-                this.btnEsq = this.add.rectangle(80, 510, 100, 80, 0x222222, 0.8).setInteractive();
-                this.btnEsq.setStrokeStyle(2, 0xFFCC00);
-                this.add.text(80, 510, '◀', { fontSize: '36px', fill: '#FFCC00' }).setOrigin(0.5);
+                this.btnEsq = this.add.rectangle(90, 530, 140, 110, 0x222222, 0.85).setInteractive();
+                this.btnEsq.setStrokeStyle(4, 0xFFCC00);
+                this.add.text(90, 530, '◀', { fontSize: '56px', fill: '#FFCC00' }).setOrigin(0.5);
 
                 // Botão Direcional Direita
-                this.btnDir = this.add.rectangle(210, 510, 100, 80, 0x222222, 0.8).setInteractive();
-                this.btnDir.setStrokeStyle(2, 0xFFCC00);
-                this.add.text(210, 510, '▶', { fontSize: '36px', fill: '#FFCC00' }).setOrigin(0.5);
+                this.btnDir = this.add.rectangle(270, 530, 140, 110, 0x222222, 0.85).setInteractive();
+                this.btnDir.setStrokeStyle(4, 0xFFCC00);
+                this.add.text(270, 530, '▶', { fontSize: '56px', fill: '#FFCC00' }).setOrigin(0.5);
 
                 // Botão de Pulo (Amarelo bem visível)
-                this.btnPulo = this.add.rectangle(710, 510, 130, 80, 0xFFCC00, 0.9).setInteractive();
-                this.add.text(710, 510, 'PULO', { fontSize: '22px', fill: '#0d1117', fontStyle: 'bold' }).setOrigin(0.5);
+                this.btnPulo = this.add.rectangle(685, 530, 190, 110, 0xFFCC00, 0.95).setInteractive();
+                this.add.text(685, 530, 'PULO', { fontSize: '30px', fill: '#0d1117', fontStyle: 'bold' }).setOrigin(0.5);
 
                 // Vinculando os eventos de toque do Celular
                 this.btnEsq.on('pointerdown', () => this.moveEsquerda = true);
@@ -293,6 +293,7 @@
 
                 this.btnPulo.on('pointerdown', () => this.querPular = true);
                 this.btnPulo.on('pointerup', () => this.querPular = false);
+                this.btnPulo.on('pointerout', () => this.querPular = false);
             }
 
             update() {
