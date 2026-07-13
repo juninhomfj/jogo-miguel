@@ -118,8 +118,10 @@
                     alert("AVISO DEV: Não foi possível carregar a imagem '" + file.src + "'. Verifique se o nome está idêntico com letras minúsculas!");
                 });
 
-                // Carrega o spritesheet corrigido para as novas dimensões (866 / 4 = 216)
-                this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 216, frameHeight: 288 });
+                // A imagem tem 866px de largura: 866 / 4 = 216,5px.
+                // Phaser precisa de frames inteiros em spritesheet; por isso carregamos
+                // como imagem e recortamos manualmente os 4 quadros (216/217px).
+                this.load.image('miguelSheet', 'miguel_sprites.png');
                 
                 // Gera a textura da moeda via código puro
                 let graficoMoeda = this.make.graphics().fillStyle(0xFFD700).fillCircle(15, 15, 15);
@@ -195,10 +197,44 @@
                 // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
                 this.indicadorPosicao = this.add.rectangle(50, 420, 60, 80, 0x333333);
                 
+                // Corrige o recorte do spritesheet: 866px não divide exatamente por 4.
+                // Se usar frameWidth: 216, o Phaser corta os frames fora do alinhamento real.
+                if (!this.textures.exists('miguel')) {
+                    const imagemOriginal = this.textures.get('miguelSheet').getSourceImage();
+                    const recortesMiguel = [
+                        { x: 0,   width: 216 },
+                        { x: 216, width: 217 },
+                        { x: 433, width: 216 },
+                        { x: 649, width: 217 }
+                    ];
+                    const larguraFrame = 217;
+                    const alturaFrame = 288;
+                    const texturaMiguel = this.textures.createCanvas('miguel', larguraFrame * 4, alturaFrame);
+                    const contexto = texturaMiguel.getContext();
+
+                    recortesMiguel.forEach((recorte, frame) => {
+                        const destinoX = frame * larguraFrame;
+                        contexto.drawImage(
+                            imagemOriginal,
+                            recorte.x,
+                            0,
+                            recorte.width,
+                            alturaFrame,
+                            destinoX,
+                            0,
+                            recorte.width,
+                            alturaFrame
+                        );
+                        texturaMiguel.add(frame, 0, destinoX, 0, larguraFrame, alturaFrame);
+                    });
+
+                    texturaMiguel.refresh();
+                }
+
                 // CRIANDO O MIGUEL
-                this.player = this.physics.add.sprite(50, 420, 'miguel');
+                this.player = this.physics.add.sprite(50, 420, 'miguel', 0);
                 this.player.setScale(0.35); // Escala adaptada para o tamanho 288 de altura
-                this.player.updateBounds();
+                this.player.setDepth(10);
                 this.player.setCollideWorldBounds(true);
 
                 this.physics.add.collider(this.player, this.plataformas);
