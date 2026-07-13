@@ -2,91 +2,77 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>As Aventuras do Miguel</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
         body { margin: 0; background: #0d1117; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        #ui-layer { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; color: #FFCC00; font-family: monospace; }
-        input { padding: 10px; font-size: 20px; text-transform: uppercase; text-align: center; }
-        button { padding: 10px 20px; font-size: 20px; cursor: pointer; background: #FFCC00; border: none; margin-top: 10px; }
+        #game-container { position: relative; width: 100vw; height: 100vh; }
     </style>
 </head>
 <body>
-    <div id="ui-layer">
-        <input type="text" id="nomeInput" maxlength="3" placeholder="MIG">
-        <button id="btnStart">ENTRAR</button>
-    </div>
-    <div id="game"></div>
+    <div id="game-container"></div>
 
     <script>
-        // Configuração Refatorada para maior estabilidade
+        class MenuPrincipal extends Phaser.Scene {
+            constructor() { super('MenuPrincipal'); }
+            preload() {
+                // Dimensões corrigidas pelo Codex para não cortar
+                this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 144, frameHeight: 96, margin: 1 });
+                this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 215, frameHeight: 129 });
+            }
+            create() {
+                this.add.text(400, 200, 'AS AVENTURAS DO MIGUEL', { fontSize: '40px', fill: '#FFCC00' }).setOrigin(0.5);
+                let btn = this.add.text(400, 350, '[ INICIAR ]', { fontSize: '30px', fill: '#FFF' }).setOrigin(0.5).setInteractive();
+                btn.on('pointerdown', () => this.scene.start('Fase1'));
+            }
+        }
+
+        class Fase1 extends Phaser.Scene {
+            constructor() { super('Fase1'); }
+            create() {
+                this.cameras.main.setBackgroundColor('#87CEEB');
+                
+                // Plataformas
+                this.plataformas = this.physics.add.staticGroup();
+                this.plataformas.create(400, 550, null).setSize(800, 50).setVisible(false); // Chão
+                
+                // Robô Vilão
+                this.robo = this.physics.add.sprite(600, 450, 'robo').setScale(0.5);
+                this.robo.setCollideWorldBounds(true);
+                this.physics.add.collider(this.robo, this.plataformas);
+
+                // Miguel
+                this.player = this.physics.add.sprite(100, 400, 'miguel').setScale(0.5);
+                this.player.setCollideWorldBounds(true);
+                this.physics.add.collider(this.player, this.plataformas);
+
+                // Controles Mobile
+                this.input.addPointer(2); // Suporte multi-touch
+                this.cursors = this.input.keyboard.createCursorKeys();
+            }
+
+            update() {
+                // Lógica de Movimento Suave e Pulo Duplo seria inserida aqui
+                if (this.cursors.left.isDown) this.player.setVelocityX(-200);
+                else if (this.cursors.right.isDown) this.player.setVelocityX(200);
+                else this.player.setVelocityX(0);
+
+                if (this.cursors.up.isDown && this.player.body.touching.down) {
+                    this.player.setVelocityY(-500);
+                }
+            }
+        }
+
         const config = {
             type: Phaser.AUTO,
-            parent: 'game',
-            width: 800,
-            height: 600,
+            parent: 'game-container',
+            width: 800, height: 600,
+            physics: { default: 'arcade', arcade: { gravity: { y: 750 } } },
             scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-            physics: { default: 'arcade', arcade: { gravity: { y: 750 }, debug: false } },
-            scene: { preload: preload, create: create, update: update }
+            scene: [MenuPrincipal, Fase1]
         };
-
         const game = new Phaser.Game(config);
-        let player, cursors, plataformas, moedas, textoPlacar, pontos = 0;
-
-        function preload() {
-            this.load.spritesheet('miguel', 'miguel_sprites.png', { frameWidth: 144, frameHeight: 96 });
-            this.load.spritesheet('robo', 'robo_sprites.png', { frameWidth: 215, frameHeight: 129 });
-        }
-
-        function create() {
-            this.cameras.main.setBackgroundColor('#87CEEB');
-            
-            // UI Layer lógica
-            document.getElementById('btnStart').onclick = () => {
-                document.getElementById('ui-layer').style.display = 'none';
-                iniciarJogo(this);
-            };
-        }
-
-        function iniciarJogo(scene) {
-            // Chão e Plataformas
-            plataformas = scene.physics.add.staticGroup();
-            plataformas.create(400, 580, null).setSize(800, 40).setVisible(true);
-            plataformas.create(600, 400, null).setSize(180, 20).setVisible(true);
-
-            // Jogador
-            player = scene.physics.add.sprite(100, 450, 'miguel').setScale(0.5);
-            player.setCollideWorldBounds(true);
-            scene.physics.add.collider(player, plataformas);
-
-            // Animações simples e seguras
-            scene.anims.create({ key: 'idle', frames: scene.anims.generateFrameNumbers('miguel', { start: 0, end: 0 }), frameRate: 10 });
-            scene.anims.create({ key: 'walk', frames: scene.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }), frameRate: 10, repeat: -1 });
-
-            cursors = scene.input.keyboard.createCursorKeys();
-        }
-
-        function update() {
-            if (!player) return; // Aguarda o jogador ser criado
-            
-            if (cursors.left.isDown) {
-                player.setVelocityX(-200);
-                player.anims.play('walk', true);
-                player.flipX = true;
-            } else if (cursors.right.isDown) {
-                player.setVelocityX(200);
-                player.anims.play('walk', true);
-                player.flipX = false;
-            } else {
-                player.setVelocityX(0);
-                player.anims.play('idle', true);
-            }
-
-            if (cursors.up.isDown && player.body.touching.down) {
-                player.setVelocityY(-500);
-            }
-        }
     </script>
 </body>
 </html>
