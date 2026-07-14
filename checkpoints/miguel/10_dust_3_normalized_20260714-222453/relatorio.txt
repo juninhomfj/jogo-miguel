@@ -1,0 +1,14 @@
+Entrada: incoming/sprites/10_dust_3_limpo_final.png
+Referência: assets/reference/miguel/10_dust_3_reference.png
+Saída: incoming/sprites/10_dust_3.png
+Bounding box original total: (311, 446, 1000, 907)
+Bounding box da referência: (56, 113, 199, 224)
+Componente principal original: (488, 446, 775, 907)
+Componente principal da referência: (82, 113, 142, 224)
+Altura do componente principal: 461 -> 111
+Escala aplicada: 0.240781
+Conjunto redimensionado: 166x111
+Posição no canvas: x=35, y=113
+Bounding box final: (35, 113, 201, 224)
+Margens finais: {'esquerda': 35, 'topo': 113, 'direita': 55, 'inferior': 32}
+Prévia: artifacts/frame-validation/10_dust_3_normalization/10_dust_3_normalized_preview.png
