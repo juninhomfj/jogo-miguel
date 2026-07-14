@@ -155,7 +155,7 @@ with manifest_path.open(
     writer = csv.DictWriter(
         destination,
         fieldnames=fieldnames,
-        lineterminator="\\n",
+        lineterminator="\n",
     )
 
     writer.writeheader()
