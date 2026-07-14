@@ -92,7 +92,7 @@ mkdir -p "$TARGET_DIR"
 TARGET="$TARGET_DIR/$TARGET_NAME"
 
 if [ -f "$TARGET" ]; then
-  BACKUP_DIR="/tmp/jogo-miguel-frame-backups"
+  BACKUP_DIR="$ROOT/workbench/frame-backups"
   TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 
   mkdir -p "$BACKUP_DIR"

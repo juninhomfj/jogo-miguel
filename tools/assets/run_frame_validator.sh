@@ -3,7 +3,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-VENV_DIR="/tmp/jogo-miguel-assets-venv"
+VENV_DIR="$ROOT/.venv-assets"
 
 cd "$ROOT" || {
   echo "ERRO: não foi possível acessar o projeto."

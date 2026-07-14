@@ -5,3 +5,4 @@ artifacts/frame-validation/
 /tmp/jogo-miguel-assets-venv/
 __pycache__/
 *.pyc
+workbench/
