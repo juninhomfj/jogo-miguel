@@ -171,3 +171,23 @@ Um conjunto somente será aprovado quando:
 6. não houver conteúdo de um frame dentro de outro;
 7. os arquivos forem visualmente inspecionados;
 8. o spritesheet final for gerado por script, não manualmente.
+
+
+## Frames adicionais do Miguel
+
+Além da sequência principal já definida, o projeto passa a prever também
+os seguintes frames extras do personagem Miguel:
+
+- `12_hurt.png` — animação/frame de dano, quando o personagem leva um golpe.
+- `13_victory_trophy.png` — animação/frame de vitória, com Miguel segurando um troféu.
+
+### Regras para esses novos frames
+- manter o mesmo personagem Miguel já aprovado;
+- manter o mesmo estilo pixel art 8-bits;
+- manter fundo transparente;
+- manter dimensão final de 256x256;
+- manter proporções, paleta, contorno e leitura visual compatíveis com os
+  demais frames aprovados do personagem;
+- ambos devem ser criados individualmente e passar pelo fluxo de validação
+  técnica e visual antes de qualquer uso no jogo.
+

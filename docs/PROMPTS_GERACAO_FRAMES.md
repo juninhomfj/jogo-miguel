@@ -324,3 +324,54 @@ transparente. Não precisa ser gerado por IA.
 11. três frames de explosão.
 
 Aprovar visualmente cada imagem antes de gerar a próxima.
+
+
+## Miguel — 12_hurt.png
+
+Crie um frame individual em pixel art 8-bits estrito, fundo transparente,
+do personagem Miguel levando dano.
+
+Requisitos:
+- usar como base o mesmo personagem Miguel já aprovado;
+- menino herói de aproximadamente 6 anos;
+- cabelo castanho curto;
+- camiseta vermelha com símbolo branco;
+- luvas azuis;
+- calça azul;
+- botas azuis;
+- preservar a identidade visual, escala, proporções e espessura de contorno.
+
+Pose:
+- reação de dano / impacto;
+- corpo levemente inclinado;
+- expressão de dor ou susto;
+- braços reagindo ao impacto;
+- leitura clara de que levou um golpe;
+- sem exagerar efeitos externos;
+- manter composição adequada para frame individual 256x256.
+
+
+
+## Miguel — 13_victory_trophy.png
+
+Crie um frame individual em pixel art 8-bits estrito, fundo transparente,
+do personagem Miguel em pose de vitória segurando um troféu pequeno.
+
+Requisitos:
+- usar como base o mesmo personagem Miguel já aprovado;
+- menino herói de aproximadamente 6 anos;
+- cabelo castanho curto;
+- camiseta vermelha com símbolo branco;
+- luvas azuis;
+- calça azul;
+- botas azuis;
+- preservar identidade visual, escala, proporções e espessura de contorno.
+
+Pose:
+- pose alegre de vitória;
+- troféu pequeno visível em uma das mãos;
+- expressão feliz/orgulhosa;
+- postura infantil e heroica;
+- sem fundo;
+- composição adequada para frame individual 256x256.
+
