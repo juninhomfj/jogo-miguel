@@ -1,0 +1,9 @@
+Entrada: incoming/sprites/12_hurt_pre_magenta_fix_backup.png
+Saída: incoming/sprites/12_hurt.png
+Dimensão: 256x256
+Pixels suspeitos encontrados: 0
+Pixels substituídos: 0
+Pixels não resolvidos: 0
+Pixels suspeitos remanescentes: 0
+Bounding box final: (86, 102, 171, 224)
+Relatório: artifacts/frame-validation/12_hurt_magenta_fix/relatorio_correcao.txt

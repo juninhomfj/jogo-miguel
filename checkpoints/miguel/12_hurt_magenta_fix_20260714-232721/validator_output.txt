@@ -1,0 +1,23 @@
+Python utilizado: /workspaces/jogo-miguel/.venv-assets/bin/python
+Arquivo: incoming/sprites/12_hurt.png
+Tipo: character
+
+========================================================================
+VALIDAÇÃO DE FRAME
+========================================================================
+Arquivo: incoming/sprites/12_hurt.png
+Tipo: character
+Formato: PNG
+Modo: RGBA
+Dimensão: 256x256
+Bounding box: (86, 102, 171, 224)
+Pixels visíveis: 6099
+Pixels semitransparentes: 0 (0.00%)
+Margens violadas: nenhuma
+Diferença para a linha-base: +0px
+
+Relatório: artifacts/frame-validation/12_hurt.json
+Prévia: artifacts/frame-validation/12_hurt_preview.png
+
+RESULTADO: APROVADO TECNICAMENTE
+Ainda é necessária aprovação visual.
