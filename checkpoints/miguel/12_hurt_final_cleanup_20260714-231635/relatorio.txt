@@ -1,0 +1,10 @@
+Entrada: incoming/sprites/12_hurt_chroma_sem_fundo_conectado.png
+Saída: incoming/sprites/12_hurt_limpo_final.png
+Dimensão: 1254x1254
+Componentes encontrados inicialmente: 3
+Componentes preservados: 3
+Pixels de chroma removidos: 32
+Pixels de chroma restantes: 0
+Pixels visíveis preservados: 118557
+Bounding box final: (437, 365, 812, 902)
+Prévia: artifacts/frame-validation/12_hurt_final_cleanup/12_hurt_limpo_final_preview.png
