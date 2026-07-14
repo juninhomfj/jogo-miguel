@@ -1,0 +1,40 @@
+{
+  "file": "incoming/sprites/10_dust_3.png",
+  "kind": "character",
+  "format": "PNG",
+  "mode": "RGBA",
+  "size": [
+    256,
+    256
+  ],
+  "expected_size": [
+    256,
+    256
+  ],
+  "safe_margin": 8,
+  "bbox": [
+    35,
+    113,
+    201,
+    224
+  ],
+  "pixels": {
+    "transparent": 60004,
+    "opaque": 5532,
+    "semitransparent": 0,
+    "visible": 5532,
+    "total": 65536
+  },
+  "semitransparent_ratio": 0.0,
+  "safe_margin_violations": {
+    "left": 0,
+    "right": 0,
+    "top": 0,
+    "bottom": 0
+  },
+  "baseline_target": 224,
+  "baseline_difference": 0,
+  "errors": [],
+  "warnings": [],
+  "approved_technically": true
+}
