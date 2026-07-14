@@ -1,0 +1,11 @@
+Entrada: incoming/sprites/10_dust_3_chroma_sem_fundo_conectado.png
+Saída: incoming/sprites/10_dust_3_limpo_final.png
+Dimensão: 1254x1254
+Componentes encontrados inicialmente: 13
+Componentes preservados: 12
+Componentes descartados: 1
+Pixels de chroma removidos: 18
+Pixels de chroma restantes: 0
+Pixels visíveis preservados: 94978
+Bounding box final: (311, 446, 1000, 907)
+Prévia: artifacts/frame-validation/10_dust_3_final_cleanup/10_dust_3_limpo_final_preview.png
