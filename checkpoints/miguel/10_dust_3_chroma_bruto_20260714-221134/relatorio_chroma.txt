@@ -1,0 +1,58 @@
+Arquivo: incoming/sprites/10_dust_3_chroma_bruto.png
+Dimensão: 1254x1254
+Faixa externa analisada: 100px
+Pixels candidatos a chroma: 1477536
+Bounding box da máscara: (0, 0, 1254, 1254)
+
+PIXELS DOS CANTOS:
+superior_esquerdo: (236, 13, 226, 255)
+superior_direito: (239, 18, 226, 255)
+inferior_esquerdo: (235, 38, 224, 255)
+inferior_direito: (239, 29, 228, 255)
+centro_superior: (245, 7, 239, 255)
+centro_inferior: (247, 13, 233, 255)
+
+VALORES DE ALPHA MAIS COMUNS:
+alpha=255 | pixels=1572516
+
+CORES MAIS COMUNS NA BORDA:
+(248, 4, 238, 255) | pixels=102858
+(248, 4, 237, 255) | pixels=57330
+(247, 3, 237, 255) | pixels=30764
+(248, 3, 237, 255) | pixels=28133
+(247, 4, 237, 255) | pixels=26497
+(248, 3, 238, 255) | pixels=22497
+(248, 5, 238, 255) | pixels=19043
+(249, 4, 238, 255) | pixels=18450
+(247, 4, 238, 255) | pixels=18132
+(247, 3, 238, 255) | pixels=13421
+(249, 5, 238, 255) | pixels=11164
+(248, 4, 239, 255) | pixels=11016
+(249, 5, 239, 255) | pixels=10605
+(248, 5, 237, 255) | pixels=8661
+(249, 4, 239, 255) | pixels=7435
+(248, 5, 239, 255) | pixels=6829
+(249, 4, 237, 255) | pixels=6656
+(247, 3, 236, 255) | pixels=5278
+(248, 4, 236, 255) | pixels=4508
+(247, 4, 236, 255) | pixels=4476
+(249, 3, 238, 255) | pixels=4274
+(249, 5, 237, 255) | pixels=3723
+(247, 5, 238, 255) | pixels=3574
+(248, 3, 236, 255) | pixels=3494
+(247, 5, 237, 255) | pixels=3207
+(249, 3, 237, 255) | pixels=2675
+(247, 4, 239, 255) | pixels=1717
+(248, 3, 239, 255) | pixels=1679
+(247, 5, 239, 255) | pixels=1347
+(249, 3, 239, 255) | pixels=1310
+(250, 4, 238, 255) | pixels=850
+(248, 4, 240, 255) | pixels=838
+(247, 3, 239, 255) | pixels=708
+(247, 5, 236, 255) | pixels=641
+(250, 4, 239, 255) | pixels=608
+(248, 5, 236, 255) | pixels=591
+(248, 2, 236, 255) | pixels=505
+(247, 2, 236, 255) | pixels=441
+(248, 5, 240, 255) | pixels=414
+(250, 3, 238, 255) | pixels=401
