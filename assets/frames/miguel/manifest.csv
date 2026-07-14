@@ -6,7 +6,7 @@ index,arquivo,acao,dimensao,status
 4,04_jump.png,pulo_simples,256x256,aprovado
 5,05_double_jump.png,cambalhota_pulo_duplo,256x256,aprovado
 6,06_punch.png,soco,256x256,aprovado
-7,07_power_cast.png,disparo_de_poder,256x256,pendente
+7,07_power_cast.png,disparo_de_poder,256x256,aprovado
 8,08_dust_1.png,poeira_inicio,256x256,pendente
 9,09_dust_2.png,poeira_expansao,256x256,pendente
 10,10_dust_3.png,poeira_dissipacao,256x256,pendente
