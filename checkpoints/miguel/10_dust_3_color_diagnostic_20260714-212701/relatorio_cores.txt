@@ -1,0 +1,72 @@
+Imagem bruta: incoming/sprites/10_dust_3_branco.png
+Imagem analisada: incoming/sprites/10_dust_3_noise_clean.png
+Dimensão: 1254x1254
+Faixa externa analisada: 104px
+Cores na paleta aprovada: 13578
+Cores suspeitas: 4466
+Pixels suspeitos: 16655
+Bounding box suspeita: (240, 418, 1034, 985)
+
+CORES MAIS COMUNS NA BORDA:
+(254, 254, 254) | borda=118416 | visível=253
+(244, 244, 244) | borda=72568 | visível=2813
+(245, 245, 245) | borda=65374 | visível=964
+(255, 255, 255) | borda=26717 | visível=610
+(253, 253, 253) | borda=18884 | visível=104
+(245, 244, 244) | borda=17299 | visível=640
+(254, 253, 254) | borda=13690 | visível=16
+(243, 243, 243) | borda=13048 | visível=1339
+(255, 254, 255) | borda=10556 | visível=14
+(245, 245, 244) | borda=9285 | visível=402
+(244, 245, 245) | borda=7997 | visível=213
+(255, 254, 254) | borda=7048 | visível=90
+(245, 244, 245) | borda=6778 | visível=202
+(254, 253, 253) | borda=6638 | visível=98
+(244, 245, 244) | borda=5562 | visível=178
+(246, 246, 246) | borda=5510 | visível=223
+(244, 244, 245) | borda=5299 | visível=160
+(250, 250, 250) | borda=4098 | visível=43
+(254, 255, 254) | borda=3864 | visível=12
+(248, 248, 248) | borda=3676 | visível=68
+
+CORES SUSPEITAS MAIS FREQUENTES:
+(243, 243, 243) | pixels=1339
+(245, 245, 245) | pixels=964
+(245, 244, 244) | pixels=640
+(245, 245, 244) | pixels=402
+(244, 243, 243) | pixels=344
+(244, 244, 243) | pixels=279
+(241, 241, 241) | pixels=233
+(246, 246, 246) | pixels=223
+(244, 245, 245) | pixels=213
+(245, 244, 245) | pixels=202
+(244, 245, 244) | pixels=178
+(243, 243, 242) | pixels=163
+(244, 244, 245) | pixels=160
+(243, 244, 244) | pixels=147
+(243, 243, 244) | pixels=146
+(243, 242, 242) | pixels=142
+(240, 240, 240) | pixels=142
+(244, 243, 244) | pixels=133
+(242, 242, 241) | pixels=112
+(246, 245, 245) | pixels=103
+(242, 241, 241) | pixels=99
+(239, 239, 239) | pixels=96
+(243, 242, 243) | pixels=84
+(242, 243, 242) | pixels=79
+(241, 241, 240) | pixels=79
+(242, 242, 243) | pixels=75
+(242, 243, 243) | pixels=74
+(240, 240, 239) | pixels=66
+(241, 240, 240) | pixels=64
+(238, 238, 238) | pixels=56
+(241, 242, 242) | pixels=54
+(242, 241, 242) | pixels=52
+(241, 241, 242) | pixels=52
+(240, 240, 241) | pixels=50
+(11, 1, 0) | pixels=45
+(239, 239, 238) | pixels=44
+(240, 241, 240) | pixels=42
+(241, 242, 241) | pixels=41
+(240, 241, 241) | pixels=40
+(240, 239, 239) | pixels=39
