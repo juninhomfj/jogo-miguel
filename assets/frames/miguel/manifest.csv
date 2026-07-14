@@ -8,7 +8,7 @@ index,arquivo,acao,dimensao,status
 6,06_punch.png,soco,256x256,aprovado
 7,07_power_cast.png,disparo_de_poder,256x256,aprovado
 8,08_dust_1.png,poeira_inicio,256x256,aprovado
-9,09_dust_2.png,poeira_expansao,256x256,pendente
+9,09_dust_2.png,poeira_expansao,256x256,aprovado
 10,10_dust_3.png,poeira_dissipacao,256x256,pendente
 11,11_reserved.png,reservado_transparente,256x256,aprovado
 12,12_hurt.png,dano,256x256,pendente
