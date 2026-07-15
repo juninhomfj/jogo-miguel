@@ -1,0 +1,2 @@
+# Dependências e imports do Phaser
+
