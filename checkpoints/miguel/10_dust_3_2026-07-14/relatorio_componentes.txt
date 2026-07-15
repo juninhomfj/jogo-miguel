@@ -1,0 +1,25 @@
+Arquivo: incoming/sprites/10_dust_3_sem_fundo.png
+Dimensão: 1254x1254
+Componentes encontrados: 2213
+
+MAIORES COMPONENTES:
+C00 | pixels=128769 | bbox=(347, 418, 806, 985) | tamanho=459x567 | borda=não
+C01 | pixels=4433 | bbox=(751, 896, 858, 985) | tamanho=107x89 | borda=não
+C02 | pixels=1314 | bbox=(359, 807, 420, 853) | tamanho=61x46 | borda=não
+C03 | pixels=1276 | bbox=(299, 896, 358, 955) | tamanho=59x59 | borda=não
+C04 | pixels=1247 | bbox=(986, 928, 1034, 985) | tamanho=48x57 | borda=não
+C05 | pixels=1168 | bbox=(781, 836, 836, 887) | tamanho=55x51 | borda=não
+C06 | pixels=917 | bbox=(896, 919, 926, 955) | tamanho=30x36 | borda=não
+C07 | pixels=878 | bbox=(239, 866, 289, 911) | tamanho=50x45 | borda=não
+C08 | pixels=869 | bbox=(1045, 0, 1074, 30) | tamanho=29x30 | borda=sim
+C09 | pixels=863 | bbox=(836, 209, 865, 239) | tamanho=29x30 | borda=não
+C10 | pixels=862 | bbox=(478, 209, 507, 239) | tamanho=29x30 | borda=não
+C11 | pixels=862 | bbox=(836, 1224, 865, 1254) | tamanho=29x30 | borda=sim
+C12 | pixels=861 | bbox=(806, 0, 835, 30) | tamanho=29x30 | borda=sim
+C13 | pixels=860 | bbox=(60, 1224, 89, 1254) | tamanho=29x30 | borda=sim
+C14 | pixels=857 | bbox=(717, 209, 746, 239) | tamanho=29x30 | borda=não
+C15 | pixels=855 | bbox=(896, 209, 925, 239) | tamanho=29x30 | borda=não
+C16 | pixels=852 | bbox=(60, 209, 89, 239) | tamanho=29x30 | borda=não
+C17 | pixels=850 | bbox=(657, 1224, 686, 1254) | tamanho=29x30 | borda=sim
+C18 | pixels=849 | bbox=(806, 1015, 835, 1045) | tamanho=29x30 | borda=não
+C19 | pixels=848 | bbox=(1015, 209, 1044, 239) | tamanho=29x30 | borda=não

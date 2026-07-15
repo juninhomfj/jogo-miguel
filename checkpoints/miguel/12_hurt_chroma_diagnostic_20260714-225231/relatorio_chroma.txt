@@ -1,0 +1,58 @@
+Arquivo: incoming/sprites/12_hurt_chroma_bruto.png
+Dimensão: 1254x1254
+Faixa externa analisada: 100px
+Pixels candidatos a chroma: 1453959
+Bounding box da máscara: (0, 0, 1254, 1254)
+
+PIXELS DOS CANTOS:
+superior_esquerdo: (232, 16, 197, 255)
+superior_direito: (236, 18, 200, 255)
+inferior_esquerdo: (232, 34, 192, 255)
+inferior_direito: (235, 29, 200, 255)
+centro_superior: (242, 8, 213, 255)
+centro_inferior: (243, 15, 206, 255)
+
+VALORES DE ALPHA MAIS COMUNS:
+alpha=255 | pixels=1572516
+
+CORES MAIS COMUNS NA BORDA:
+(244, 6, 211, 255) | pixels=79132
+(244, 5, 210, 255) | pixels=47959
+(244, 6, 210, 255) | pixels=46101
+(244, 5, 211, 255) | pixels=35396
+(245, 6, 211, 255) | pixels=31230
+(243, 5, 210, 255) | pixels=22991
+(243, 6, 210, 255) | pixels=17892
+(244, 7, 211, 255) | pixels=13594
+(245, 6, 212, 255) | pixels=12796
+(245, 5, 211, 255) | pixels=12194
+(244, 6, 212, 255) | pixels=11253
+(245, 6, 210, 255) | pixels=9943
+(243, 6, 211, 255) | pixels=8965
+(245, 7, 212, 255) | pixels=8637
+(245, 7, 211, 255) | pixels=8102
+(243, 5, 209, 255) | pixels=8071
+(243, 5, 211, 255) | pixels=8069
+(245, 5, 210, 255) | pixels=7324
+(244, 5, 209, 255) | pixels=7123
+(244, 7, 212, 255) | pixels=5534
+(244, 6, 209, 255) | pixels=4475
+(244, 7, 210, 255) | pixels=4441
+(244, 5, 212, 255) | pixels=3999
+(243, 6, 209, 255) | pixels=3881
+(245, 5, 212, 255) | pixels=3813
+(243, 4, 209, 255) | pixels=2378
+(243, 7, 210, 255) | pixels=2364
+(243, 4, 210, 255) | pixels=1999
+(244, 4, 210, 255) | pixels=1955
+(243, 7, 211, 255) | pixels=1930
+(245, 7, 210, 255) | pixels=1826
+(244, 4, 209, 255) | pixels=1404
+(243, 6, 212, 255) | pixels=1175
+(244, 4, 211, 255) | pixels=1106
+(243, 5, 212, 255) | pixels=1007
+(243, 4, 211, 255) | pixels=908
+(246, 6, 211, 255) | pixels=788
+(246, 5, 212, 255) | pixels=777
+(246, 5, 211, 255) | pixels=690
+(246, 6, 212, 255) | pixels=641

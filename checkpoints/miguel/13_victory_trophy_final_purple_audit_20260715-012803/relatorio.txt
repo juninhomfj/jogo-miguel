@@ -1,0 +1,137 @@
+Entrada: incoming/sprites/13_victory_trophy_dark_purple_fixed_candidate.png
+Dimensão: (1254, 1254)
+Bounding box: (418, 308, 916, 938)
+Pixels suspeitos — filtro estrito: 1870
+Pixels suspeitos — filtro amplo: 3705
+Componentes suspeitos — filtro estrito: 263
+Componentes suspeitos — filtro amplo: 392
+
+LEGENDA DO OVERLAY:
+ciano = suspeito estrito
+laranja = suspeito apenas no filtro amplo
+
+MAIORES COMPONENTES ESTRITOS:
+E00 | pixels=164 | bbox=(492, 647, 520, 676)
+E01 | pixels=58 | bbox=(460, 619, 475, 626)
+E02 | pixels=55 | bbox=(488, 630, 495, 642)
+E03 | pixels=48 | bbox=(634, 836, 643, 849)
+E04 | pixels=44 | bbox=(680, 447, 689, 457)
+E05 | pixels=42 | bbox=(851, 392, 862, 401)
+E06 | pixels=38 | bbox=(529, 765, 535, 773)
+E07 | pixels=38 | bbox=(474, 629, 482, 640)
+E08 | pixels=31 | bbox=(473, 671, 481, 679)
+E09 | pixels=29 | bbox=(559, 876, 567, 889)
+E10 | pixels=29 | bbox=(749, 431, 755, 439)
+E11 | pixels=28 | bbox=(444, 508, 449, 523)
+E12 | pixels=28 | bbox=(697, 588, 705, 593)
+E13 | pixels=27 | bbox=(833, 480, 839, 487)
+E14 | pixels=21 | bbox=(418, 640, 422, 649)
+E15 | pixels=21 | bbox=(601, 828, 603, 839)
+E16 | pixels=21 | bbox=(714, 573, 722, 577)
+E17 | pixels=20 | bbox=(446, 584, 457, 594)
+E18 | pixels=19 | bbox=(707, 581, 714, 585)
+E19 | pixels=19 | bbox=(882, 410, 887, 422)
+E20 | pixels=18 | bbox=(657, 438, 663, 443)
+E21 | pixels=17 | bbox=(682, 757, 687, 762)
+E22 | pixels=17 | bbox=(786, 573, 794, 578)
+E23 | pixels=17 | bbox=(856, 427, 863, 432)
+E24 | pixels=16 | bbox=(678, 694, 679, 710)
+E25 | pixels=16 | bbox=(559, 892, 561, 901)
+E26 | pixels=16 | bbox=(654, 851, 655, 867)
+E27 | pixels=16 | bbox=(504, 818, 511, 822)
+E28 | pixels=16 | bbox=(805, 556, 820, 558)
+E29 | pixels=15 | bbox=(672, 909, 673, 924)
+
+MAIORES COMPONENTES AMPLOS:
+A00 | pixels=254 | bbox=(484, 645, 520, 682)
+A01 | pixels=80 | bbox=(486, 627, 496, 643)
+A02 | pixels=79 | bbox=(456, 618, 475, 628)
+A03 | pixels=70 | bbox=(851, 437, 863, 446)
+A04 | pixels=70 | bbox=(633, 835, 646, 850)
+A05 | pixels=68 | bbox=(559, 876, 567, 908)
+A06 | pixels=64 | bbox=(678, 447, 689, 457)
+A07 | pixels=62 | bbox=(445, 722, 455, 736)
+A08 | pixels=59 | bbox=(677, 692, 679, 748)
+A09 | pixels=58 | bbox=(851, 426, 863, 435)
+A10 | pixels=56 | bbox=(546, 909, 552, 936)
+A11 | pixels=50 | bbox=(850, 391, 862, 401)
+A12 | pixels=46 | bbox=(529, 764, 535, 773)
+A13 | pixels=43 | bbox=(749, 429, 755, 439)
+A14 | pixels=42 | bbox=(418, 640, 425, 651)
+A15 | pixels=41 | bbox=(805, 556, 835, 558)
+A16 | pixels=40 | bbox=(697, 588, 706, 595)
+A17 | pixels=39 | bbox=(474, 629, 482, 640)
+A18 | pixels=38 | bbox=(472, 671, 481, 679)
+A19 | pixels=38 | bbox=(601, 826, 616, 839)
+A20 | pixels=38 | bbox=(444, 508, 449, 525)
+A21 | pixels=32 | bbox=(789, 567, 797, 575)
+A22 | pixels=30 | bbox=(714, 573, 723, 578)
+A23 | pixels=30 | bbox=(503, 816, 513, 826)
+A24 | pixels=27 | bbox=(833, 480, 839, 487)
+A25 | pixels=26 | bbox=(519, 935, 545, 936)
+A26 | pixels=26 | bbox=(446, 489, 451, 497)
+A27 | pixels=26 | bbox=(760, 389, 770, 399)
+A28 | pixels=26 | bbox=(882, 410, 887, 424)
+A29 | pixels=25 | bbox=(446, 583, 457, 594)
+A30 | pixels=24 | bbox=(476, 657, 483, 669)
+A31 | pixels=24 | bbox=(707, 580, 715, 586)
+A32 | pixels=24 | bbox=(854, 472, 861, 479)
+A33 | pixels=23 | bbox=(717, 935, 740, 936)
+A34 | pixels=23 | bbox=(681, 757, 689, 762)
+A35 | pixels=23 | bbox=(786, 570, 795, 578)
+A36 | pixels=22 | bbox=(517, 649, 528, 652)
+A37 | pixels=22 | bbox=(520, 799, 527, 807)
+A38 | pixels=22 | bbox=(833, 384, 851, 388)
+A39 | pixels=22 | bbox=(691, 790, 697, 797)
+
+CORES ESTRITAS MAIS COMUNS:
+(31, 1, 17, 255) | pixels=81
+(28, 0, 13, 255) | pixels=30
+(15, 0, 12, 255) | pixels=27
+(18, 0, 13, 255) | pixels=25
+(26, 0, 12, 255) | pixels=25
+(16, 0, 12, 255) | pixels=25
+(24, 0, 27, 255) | pixels=23
+(26, 9, 20, 255) | pixels=21
+(14, 5, 16, 255) | pixels=19
+(15, 4, 13, 255) | pixels=17
+(30, 6, 13, 255) | pixels=17
+(26, 0, 17, 255) | pixels=16
+(26, 0, 21, 255) | pixels=12
+(21, 0, 13, 255) | pixels=12
+(25, 2, 18, 255) | pixels=11
+(16, 1, 14, 255) | pixels=11
+(16, 0, 14, 255) | pixels=10
+(21, 0, 15, 255) | pixels=10
+(20, 0, 13, 255) | pixels=10
+(17, 1, 19, 255) | pixels=9
+(24, 1, 16, 255) | pixels=9
+(22, 3, 24, 255) | pixels=9
+(20, 0, 19, 255) | pixels=9
+(15, 1, 12, 255) | pixels=9
+(18, 0, 12, 255) | pixels=9
+(23, 0, 15, 255) | pixels=9
+(15, 0, 25, 255) | pixels=8
+(17, 2, 16, 255) | pixels=8
+(33, 1, 13, 255) | pixels=8
+(27, 0, 20, 255) | pixels=8
+(22, 0, 17, 255) | pixels=8
+(16, 0, 19, 255) | pixels=8
+(24, 0, 20, 255) | pixels=8
+(16, 1, 15, 255) | pixels=8
+(17, 0, 14, 255) | pixels=8
+(24, 0, 12, 255) | pixels=7
+(31, 2, 17, 255) | pixels=7
+(19, 0, 12, 255) | pixels=7
+(17, 1, 15, 255) | pixels=7
+(21, 0, 12, 255) | pixels=7
+(19, 0, 15, 255) | pixels=7
+(17, 0, 17, 255) | pixels=7
+(17, 3, 15, 255) | pixels=7
+(27, 4, 23, 255) | pixels=7
+(35, 0, 17, 255) | pixels=7
+(15, 0, 15, 255) | pixels=6
+(18, 1, 23, 255) | pixels=6
+(27, 0, 18, 255) | pixels=6
+(18, 1, 13, 255) | pixels=6
+(29, 0, 17, 255) | pixels=6

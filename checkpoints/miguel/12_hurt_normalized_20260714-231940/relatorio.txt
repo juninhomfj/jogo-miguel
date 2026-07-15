@@ -1,0 +1,15 @@
+Entrada: incoming/sprites/12_hurt_limpo_final.png
+Saída: incoming/sprites/12_hurt.png
+Bounding box original total: (437, 365, 812, 902)
+Componente principal original: (437, 365, 804, 902)
+Alturas das referências: [122, 122, 122, 122, 108]
+Altura-alvo pela mediana: 122
+Centro-alvo pela mediana: 128.00
+Linha-base alvo: 224
+Altura do Miguel: 537 -> 122
+Escala aplicada: 0.227188
+Conjunto redimensionado: 85x122
+Posição no canvas: x=86, y=102
+Bounding box final: (86, 102, 171, 224)
+Margens finais: {'esquerda': 86, 'topo': 102, 'direita': 85, 'inferior': 32}
+Prévia: artifacts/frame-validation/12_hurt_normalization/12_hurt_normalized_preview.png

@@ -1,0 +1,18 @@
+Entrada: incoming/sprites/12_hurt_full_magenta_fixed_candidate.png
+Saída candidata: incoming/sprites/12_hurt_final_clean_candidate.png
+Bounding box: (86, 102, 171, 224)
+Componentes encontrados: 5
+Componentes do impacto analisados: 4
+Pixels pertencentes ao impacto: 143
+Pixels magenta encontrados no impacto: 7
+Pixels magenta restantes no impacto: 0
+Pixels visíveis: 6099
+
+ALTERAÇÕES:
+(164, 153) | (240, 56, 127, 255) -> (254, 118, 25, 255)
+(164, 154) | (238, 48, 105, 255) -> (253, 153, 98, 255)
+(154, 155) | (245, 70, 118, 255) -> (253, 141, 24, 255)
+(165, 155) | (253, 61, 98, 255) -> (244, 84, 77, 255)
+(154, 156) | (248, 70, 124, 255) -> (253, 141, 24, 255)
+(166, 156) | (244, 62, 108, 255) -> (244, 84, 77, 255)
+(164, 161) | (230, 89, 115, 255) -> (247, 119, 29, 255)

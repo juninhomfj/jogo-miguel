@@ -1,0 +1,3 @@
+# Estrutura relevante do projeto
+
+./index.html

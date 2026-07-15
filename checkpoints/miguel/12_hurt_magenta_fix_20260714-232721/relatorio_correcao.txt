@@ -1,0 +1,10 @@
+CORREÇÃO DE PIXELS MAGENTA — 12_hurt
+============================================================
+Entrada: incoming/sprites/12_hurt_pre_magenta_fix_backup.png
+Saída: incoming/sprites/12_hurt.png
+Dimensão: 256x256
+Pixels suspeitos encontrados: 0
+Pixels substituídos: 0
+Pixels não resolvidos: 0
+Pixels suspeitos remanescentes: 0
+

@@ -1,0 +1,40 @@
+{
+  "file": "incoming/sprites/13_victory_trophy.png",
+  "kind": "character",
+  "format": "PNG",
+  "mode": "RGBA",
+  "size": [
+    256,
+    256
+  ],
+  "expected_size": [
+    256,
+    256
+  ],
+  "safe_margin": 8,
+  "bbox": [
+    91,
+    82,
+    204,
+    224
+  ],
+  "pixels": {
+    "transparent": 58407,
+    "opaque": 7129,
+    "semitransparent": 0,
+    "visible": 7129,
+    "total": 65536
+  },
+  "semitransparent_ratio": 0.0,
+  "safe_margin_violations": {
+    "left": 0,
+    "right": 0,
+    "top": 0,
+    "bottom": 0
+  },
+  "baseline_target": 224,
+  "baseline_difference": 0,
+  "errors": [],
+  "warnings": [],
+  "approved_technically": true
+}

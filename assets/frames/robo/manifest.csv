@@ -1,0 +1,10 @@
+index,arquivo,acao,dimensao,status
+0,00_idle.png,parado,256x256,pendente
+1,01_patrol_1.png,patrulha_1,256x256,pendente
+2,02_patrol_2.png,patrulha_2,256x256,pendente
+3,03_patrol_3.png,patrulha_3,256x256,pendente
+4,04_patrol_4.png,patrulha_4,256x256,pendente
+5,05_damage.png,dano,256x256,pendente
+6,06_explosion_1.png,explosao_inicio,256x256,pendente
+7,07_explosion_2.png,explosao_expansao,256x256,pendente
+8,08_explosion_3.png,explosao_dissipacao,256x256,pendente

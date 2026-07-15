@@ -1,0 +1,23 @@
+Python utilizado: /workspaces/jogo-miguel/.venv-assets/bin/python
+Arquivo: incoming/sprites/10_dust_3.png
+Tipo: character
+
+========================================================================
+VALIDAÇÃO DE FRAME
+========================================================================
+Arquivo: incoming/sprites/10_dust_3.png
+Tipo: character
+Formato: PNG
+Modo: RGBA
+Dimensão: 256x256
+Bounding box: (35, 113, 201, 224)
+Pixels visíveis: 5532
+Pixels semitransparentes: 0 (0.00%)
+Margens violadas: nenhuma
+Diferença para a linha-base: +0px
+
+Relatório: artifacts/frame-validation/10_dust_3.json
+Prévia: artifacts/frame-validation/10_dust_3_preview.png
+
+RESULTADO: APROVADO TECNICAMENTE
+Ainda é necessária aprovação visual.

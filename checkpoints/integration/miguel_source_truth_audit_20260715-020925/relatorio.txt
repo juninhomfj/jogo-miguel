@@ -1,0 +1,49 @@
+AUDITORIA DA FONTE DO JOGO
+===========================
+
+Commit da versão completa analisada: 4e7974b
+
+VERSÃO: atual
+Linhas do HTML: 79
+Linhas de JavaScript embutido: 55
+Cenas Phaser por classe: nenhuma
+Texturas carregadas: spritesheet:miguel, spritesheet:robo
+Animações encontradas: nenhuma
+Recursos:
+  menu: não
+  fase_principal: sim
+  tela_vitoria: não
+  pulo_duplo: não
+  ataque: não
+  poeira: não
+  robo: não
+  cristais: não
+  controles_touch: não
+
+VERSÃO: completo_4e7974b
+Linhas do HTML: 582
+Linhas de JavaScript embutido: 473
+Cenas Phaser por classe: MenuPrincipal, Fase1, Fase2
+Texturas carregadas: spritesheet:miguel, spritesheet:robo
+Animações encontradas: walk, idle, jump, jump_double, attack, dust_effect, robo_patrol, robo_damage, robo_explosion
+Recursos:
+  menu: sim
+  fase_principal: sim
+  tela_vitoria: sim
+  pulo_duplo: sim
+  ataque: sim
+  poeira: sim
+  robo: sim
+  cristais: sim
+  controles_touch: sim
+
+CONCLUSÃO
+=========
+
+O index.html atual é uma versão simplificada com 79 linhas.
+O commit 4e7974b possui a versão funcional com 582 linhas.
+
+A integração dos novos frames não deve ser feita diretamente sobre a versão simplificada.
+A próxima etapa deverá criar uma versão candidata baseada no código funcional de 4e7974b, preservando os 14 PNGs aprovados.
+
+Nenhuma alteração funcional foi aplicada ao index.html nesta auditoria.

@@ -1,0 +1,9 @@
+Entrada: incoming/sprites/13_victory_trophy_chroma_bruto.png
+Saída: incoming/sprites/13_victory_trophy_chroma_sem_fundo_conectado.png
+Dimensão: 1254x1254
+Pixels candidatos a chroma: 1433850
+Pixels conectados às bordas removidos: 1432275
+Candidatos não conectados preservados: 1575
+Pixels visíveis restantes: 140241
+Bounding box final: (418, 308, 916, 938)
+Prévia: artifacts/frame-validation/13_victory_trophy_chroma_removal/13_victory_trophy_chroma_preview.png

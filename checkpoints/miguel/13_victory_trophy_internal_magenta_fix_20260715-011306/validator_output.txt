@@ -1,0 +1,29 @@
+Python utilizado: /workspaces/jogo-miguel/.venv-assets/bin/python
+Arquivo: incoming/sprites/13_victory_trophy_internal_magenta_fixed_candidate.png
+Tipo: character
+
+========================================================================
+VALIDAÇÃO DE FRAME
+========================================================================
+Arquivo: incoming/sprites/13_victory_trophy_internal_magenta_fixed_candidate.png
+Tipo: character
+Formato: PNG
+Modo: RGBA
+Dimensão: 1254x1254
+Bounding box: (418, 308, 916, 938)
+Pixels visíveis: 140241
+Pixels semitransparentes: 0 (0.00%)
+Margens violadas: nenhuma
+Diferença para a linha-base: +714px
+
+AVISOS:
+- A base do conteúdo está em y=938; o alvo é aproximadamente y=224.
+- Conteúdo próximo demais dos limites: 498x630px.
+
+ERROS:
+- Dimensão inválida: 1254x1254. Esperado: 256x256.
+
+Relatório: artifacts/frame-validation/13_victory_trophy_internal_magenta_fixed_candidate.json
+Prévia: artifacts/frame-validation/13_victory_trophy_internal_magenta_fixed_candidate_preview.png
+
+RESULTADO: REPROVADO

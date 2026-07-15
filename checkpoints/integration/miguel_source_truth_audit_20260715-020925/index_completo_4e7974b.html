@@ -118,81 +118,22 @@
                     alert("AVISO DEV: Não foi possível carregar a imagem '" + file.src + "'. Verifique se o nome está idêntico com letras minúsculas!");
                 });
 
-                // MIGUEL — 14 frames individuais aprovados.
-                // Cada textura possui canvas RGBA de 256x256.
-                this.load.image(
-                    'miguel_idle',
-                    'assets/frames/miguel/00_idle.png'
-                );
-                this.load.image(
-                    'miguel_walk_1',
-                    'assets/frames/miguel/01_walk_1.png'
-                );
-                this.load.image(
-                    'miguel_walk_2',
-                    'assets/frames/miguel/02_walk_2.png'
-                );
-                this.load.image(
-                    'miguel_walk_3',
-                    'assets/frames/miguel/03_walk_3.png'
-                );
-                this.load.image(
-                    'miguel_jump',
-                    'assets/frames/miguel/04_jump.png'
-                );
-                this.load.image(
-                    'miguel_double_jump',
-                    'assets/frames/miguel/05_double_jump.png'
-                );
-                this.load.image(
-                    'miguel_punch',
-                    'assets/frames/miguel/06_punch.png'
-                );
-                this.load.image(
-                    'miguel_power_cast',
-                    'assets/frames/miguel/07_power_cast.png'
-                );
-                this.load.image(
-                    'miguel_dust_1',
-                    'assets/frames/miguel/08_dust_1.png'
-                );
-                this.load.image(
-                    'miguel_dust_2',
-                    'assets/frames/miguel/09_dust_2.png'
-                );
-                this.load.image(
-                    'miguel_dust_3',
-                    'assets/frames/miguel/10_dust_3.png'
-                );
-                this.load.image(
-                    'miguel_reserved',
-                    'assets/frames/miguel/11_reserved.png'
-                );
-                this.load.image(
-                    'miguel_hurt',
-                    'assets/frames/miguel/12_hurt.png'
-                );
-                this.load.image(
-                    'miguel_victory',
-                    'assets/frames/miguel/13_victory_trophy.png'
-                );
-
-                // Robô histórico provisório.
-                // Será substituído quando os frames do robô
-                // forem reconstruídos e aprovados.
-                this.load.spritesheet(
-                    'robo',
-                    'assets/legacy/'
-                    + 'sprites-invalidos-2026-07-13/'
-                    + 'robo_sprites_original.png',
-                    {
-                        frameWidth: 215,
-                        frameHeight: 129,
-                        spacing: 0
-                    }
-                );
-
-// Gera a textura do cristal tecnológico via código puro
+                // Spritesheets novos: Miguel possui 18 quadros em uma grade 6x3.
+                // A imagem tem 866x288px; usando margem lateral de 1px, cada quadro fica 144x96px
+                // sem invadir o padding das bordas. O robô usa grade perfeita 3x3 em 645x387px.
+                this.load.spritesheet('miguel', 'miguel_sprites.png', {
+                    frameWidth: 144,
+                    frameHeight: 96,
+                    margin: 1,
+                    spacing: 0
+                });
+                this.load.spritesheet('robo', 'robo_sprites.png', {
+                    frameWidth: 215,
+                    frameHeight: 129,
+                    spacing: 0
+                });
+                
+                // Gera a textura do cristal tecnológico via código puro
                 const graficoCristal = this.make.graphics({ x: 0, y: 0, add: false });
                 graficoCristal.fillStyle(0x00E5FF, 0.35);
                 graficoCristal.fillCircle(18, 18, 18);
@@ -221,9 +162,9 @@
 
             create() {
                 // Título em Alto Contraste (Amarelo Arcade sobre fundo quase preto)
-                this.add.text(400, 140, 'AS AVENTURAS DO MIGUEL', {
-                    fontSize: '36px',
-                    fill: '#FFCC00',
+                this.add.text(400, 140, 'AS AVENTURAS DO MIGUEL', { 
+                    fontSize: '36px', 
+                    fill: '#FFCC00', 
                     fontStyle: 'bold',
                     fontFamily: 'Courier New'
                 }).setOrigin(0.5);
@@ -239,10 +180,10 @@
                     let nome = document.getElementById('player-name-input').value.trim();
                     if (!nome) nome = "MIG";
                     nome = nome.substring(0, 3).toUpperCase();
-
+                    
                     this.registry.set('nomeJogador', nome);
                     this.registry.set('pontuacao', 0);
-
+                    
                     // Inicia a fase e garante que a camada HTML não bloqueie o canvas.
                     this.scene.start('Fase1');
                     containerNome.style.visibility = 'hidden';
@@ -285,15 +226,15 @@
                 // Placar de Alto Contraste
                 this.nome = this.registry.get('nomeJogador');
                 this.pontos = this.registry.get('pontuacao');
-                this.textoPlacar = this.add.text(20, 20, `${this.nome} SCORE: ${this.pontos}`, {
-                    fontSize: '28px',
-                    fill: '#FFCC00',
-                    fontStyle: 'bold'
+                this.textoPlacar = this.add.text(20, 20, `${this.nome} SCORE: ${this.pontos}`, { 
+                    fontSize: '28px', 
+                    fill: '#FFCC00', 
+                    fontStyle: 'bold' 
                 });
 
                 // PLATAFORMAS (Alto contraste)
                 this.plataformas = this.physics.add.staticGroup();
-
+                
                 // Chão Principal (Verde Neon gritante para contrastar com o uniforme vermelho/azul)
                 let chao = this.add.rectangle(400, 460, 800, 40, 0x00FF66);
                 this.physics.add.existing(chao, true);
@@ -331,12 +272,12 @@
 
                 // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
                 this.indicadorPosicao = this.add.rectangle(50, 320, 60, 80, 0x333333);
-
+                
                 // CRIANDO O MIGUEL
-                this.player = this.physics.add.sprite(50, 320, 'miguel_idle');
+                this.player = this.physics.add.sprite(50, 320, 'miguel', 0);
                 this.player.setScale(0.95);
-                this.player.body.setSize(54, 116);
-                this.player.body.setOffset(101, 108);
+                this.player.body.setSize(52, 82);
+                this.player.body.setOffset(46, 14);
                 this.player.pulosDisponiveis = 2;
                 this.player.estaAtacando = false;
                 this.player.estavaNoChao = false;
@@ -347,7 +288,7 @@
                 this.physics.add.collider(this.vilao, this.plataformas);
                 this.physics.add.collider(this.player, this.vilao, this.acertarVilao, null, this);
 
-                this.poeira = this.add.sprite(0, 0, 'miguel_dust_1').setVisible(false).setDepth(9);
+                this.poeira = this.add.sprite(0, 0, 'miguel', 12).setVisible(false).setDepth(9);
                 this.poeira.setScale(0.95);
 
                 // CRISTAIS TECNOLÓGICOS COLETÁVEIS
@@ -366,133 +307,19 @@
                 this.physics.add.collider(this.cristais, this.plataformas);
                 this.physics.add.overlap(this.player, this.cristais, this.coletarCristal, null, this);
 
-                // ANIMAÇÕES DO MIGUEL
-                // Agora utilizam texturas individuais.
+                // ANIMAÇÕES
                 if (!this.anims.exists('walk')) {
-                    this.anims.create({
-                        key: 'walk',
-                        frames: [
-                            { key: 'miguel_walk_1' },
-                            { key: 'miguel_walk_2' },
-                            { key: 'miguel_walk_3' }
-                        ],
-                        frameRate: 8,
-                        repeat: -1
-                    });
-
-                    this.anims.create({
-                        key: 'idle',
-                        frames: [
-                            { key: 'miguel_idle' }
-                        ],
-                        frameRate: 1,
-                        repeat: -1
-                    });
-
-                    this.anims.create({
-                        key: 'jump',
-                        frames: [
-                            { key: 'miguel_jump' }
-                        ],
-                        frameRate: 1,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'jump_double',
-                        frames: [
-                            { key: 'miguel_double_jump' }
-                        ],
-                        frameRate: 1,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'attack',
-                        frames: [
-                            { key: 'miguel_punch' },
-                            { key: 'miguel_punch' },
-                            { key: 'miguel_idle' }
-                        ],
-                        frameRate: 10,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'power_cast',
-                        frames: [
-                            { key: 'miguel_power_cast' },
-                            { key: 'miguel_power_cast' },
-                            { key: 'miguel_idle' }
-                        ],
-                        frameRate: 10,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'dust_effect',
-                        frames: [
-                            { key: 'miguel_dust_1' },
-                            { key: 'miguel_dust_2' },
-                            { key: 'miguel_dust_3' }
-                        ],
-                        frameRate: 12,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'hurt',
-                        frames: [
-                            { key: 'miguel_hurt' }
-                        ],
-                        frameRate: 1,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'victory',
-                        frames: [
-                            { key: 'miguel_victory' }
-                        ],
-                        frameRate: 1,
-                        repeat: -1
-                    });
-
-                    this.anims.create({
-                        key: 'robo_patrol',
-                        frames: this.anims.generateFrameNumbers(
-                            'robo',
-                            { start: 0, end: 2 }
-                        ),
-                        frameRate: 8,
-                        repeat: -1
-                    });
-
-                    this.anims.create({
-                        key: 'robo_damage',
-                        frames: this.anims.generateFrameNumbers(
-                            'robo',
-                            { start: 3, end: 5 }
-                        ),
-                        frameRate: 12,
-                        repeat: 0
-                    });
-
-                    this.anims.create({
-                        key: 'robo_explosion',
-                        frames: this.anims.generateFrameNumbers(
-                            'robo',
-                            { start: 6, end: 8 }
-                        ),
-                        frameRate: 16,
-                        repeat: 0
-                    });
+                    this.anims.create({ key: 'walk', frames: this.anims.generateFrameNumbers('miguel', { start: 1, end: 2 }), frameRate: 8, repeat: -1 });
+                    this.anims.create({ key: 'idle', frames: [ { key: 'miguel', frame: 0 } ], frameRate: 20 });
+                    this.anims.create({ key: 'jump', frames: [ { key: 'miguel', frame: 3 } ], frameRate: 20 });
+                    this.anims.create({ key: 'jump_double', frames: this.anims.generateFrameNumbers('miguel', { start: 4, end: 5 }), frameRate: 12, repeat: 0 });
+                    this.anims.create({ key: 'attack', frames: this.anims.generateFrameNumbers('miguel', { start: 6, end: 8 }), frameRate: 16, repeat: 0 });
+                    this.anims.create({ key: 'dust_effect', frames: this.anims.generateFrameNumbers('miguel', { start: 12, end: 17 }), frameRate: 18, repeat: 0 });
+                    this.anims.create({ key: 'robo_patrol', frames: this.anims.generateFrameNumbers('robo', { start: 0, end: 2 }), frameRate: 8, repeat: -1 });
+                    this.anims.create({ key: 'robo_damage', frames: this.anims.generateFrameNumbers('robo', { start: 3, end: 5 }), frameRate: 12, repeat: 0 });
+                    this.anims.create({ key: 'robo_explosion', frames: this.anims.generateFrameNumbers('robo', { start: 6, end: 8 }), frameRate: 16, repeat: 0 });
                 }
-
-                this.vilao.anims.play(
-                    'robo_patrol',
-                    true
-                );
+                this.vilao.anims.play('robo_patrol', true);
 
                 // CONTROLES DE TECLADO (Para testes em PC)
                 this.cursors = this.input.keyboard.createCursorKeys();
@@ -717,56 +544,11 @@
                 let nome = this.registry.get('nomeJogador');
                 let pontosFinal = this.registry.get('pontuacao');
 
-                this.add.image(
-                    175,
-                    275,
-                    'miguel_victory'
-                )
-                    .setScale(1.05)
-                    .setDepth(5);
+                this.add.text(400, 200, 'FASE 1 CONCLUÍDA!', { fontSize: '38px', fill: '#00FF66', fontStyle: 'bold' }).setOrigin(0.5);
+                this.add.text(400, 290, `HERÓI: ${nome}`, { fontSize: '26px', fill: '#FFF' }).setOrigin(0.5);
+                this.add.text(400, 340, `PONTOS: ${pontosFinal}`, { fontSize: '32px', fill: '#FFCC00', fontStyle: 'bold' }).setOrigin(0.5);
 
-                this.add.text(
-                    505,
-                    175,
-                    'FASE 1 CONCLUÍDA!',
-                    {
-                        fontSize: '38px',
-                        fill: '#00FF66',
-                        fontStyle: 'bold'
-                    }
-                ).setOrigin(0.5);
-
-                this.add.text(
-                    505,
-                    275,
-                    `HERÓI: ${nome}`,
-                    {
-                        fontSize: '26px',
-                        fill: '#FFF'
-                    }
-                ).setOrigin(0.5);
-
-                this.add.text(
-                    505,
-                    335,
-                    `PONTOS: ${pontosFinal}`,
-                    {
-                        fontSize: '32px',
-                        fill: '#FFCC00',
-                        fontStyle: 'bold'
-                    }
-                ).setOrigin(0.5);
-
-                let btnVoltar = this.add.text(
-                    505,
-                    455,
-                    '[ JOGAR NOVAMENTE ]',
-                    {
-                        fontSize: '24px',
-                        fill: '#FFCC00',
-                        fontStyle: 'bold'
-                    }
-                ).setOrigin(0.5);
+                let btnVoltar = this.add.text(400, 460, '[ JOGAR NOVAMENTE ]', { fontSize: '24px', fill: '#FFCC00', fontStyle: 'bold' }).setOrigin(0.5);
                 btnVoltar.setInteractive();
                 btnVoltar.on('pointerdown', () => {
                     this.scene.start('MenuPrincipal');

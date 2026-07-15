@@ -1,0 +1,44 @@
+Arquivo: incoming/sprites/12_hurt_chroma_sem_fundo_conectado.png
+Dimensão: 1254x1254
+Bounding box total: (437, 365, 812, 902)
+Pixels visíveis: 118589
+Componentes encontrados: 3
+
+MAIORES COMPONENTES:
+C00 | pixels=115753 | bbox=(437, 365, 804, 902) | tamanho=367x537 | borda=não
+C01 | pixels=2680 | bbox=(729, 559, 812, 639) | tamanho=83x80 | borda=não
+C02 | pixels=156 | bbox=(764, 642, 775, 659) | tamanho=11x17 | borda=não
+
+Pixels candidatos a chroma restantes: 32
+M00 | posição=(542, 391) | cor=(173, 6, 143)
+M01 | posição=(543, 391) | cor=(176, 8, 150)
+M02 | posição=(542, 392) | cor=(215, 3, 186)
+M03 | posição=(543, 392) | cor=(199, 5, 172)
+M04 | posição=(541, 393) | cor=(192, 2, 163)
+M05 | posição=(542, 393) | cor=(228, 4, 208)
+M06 | posição=(543, 393) | cor=(202, 5, 180)
+M07 | posição=(540, 394) | cor=(180, 1, 154)
+M08 | posição=(541, 394) | cor=(225, 3, 198)
+M09 | posição=(542, 394) | cor=(236, 6, 219)
+M10 | posição=(543, 394) | cor=(208, 6, 185)
+M11 | posição=(539, 395) | cor=(182, 1, 160)
+M12 | posição=(540, 395) | cor=(226, 3, 202)
+M13 | posição=(541, 395) | cor=(240, 8, 219)
+M14 | posição=(542, 395) | cor=(238, 9, 220)
+M15 | posição=(543, 395) | cor=(205, 7, 180)
+M16 | posição=(537, 396) | cor=(172, 1, 136)
+M17 | posição=(538, 396) | cor=(199, 3, 162)
+M18 | posição=(539, 396) | cor=(228, 3, 201)
+M19 | posição=(540, 396) | cor=(238, 5, 223)
+M20 | posição=(541, 396) | cor=(242, 10, 227)
+M21 | posição=(542, 396) | cor=(241, 13, 223)
+M22 | posição=(543, 396) | cor=(205, 11, 174)
+M23 | posição=(535, 397) | cor=(176, 3, 137)
+M24 | posição=(536, 397) | cor=(209, 2, 168)
+M25 | posição=(537, 397) | cor=(209, 2, 173)
+M26 | posição=(538, 397) | cor=(216, 3, 179)
+M27 | posição=(539, 397) | cor=(223, 4, 188)
+M28 | posição=(540, 397) | cor=(224, 4, 194)
+M29 | posição=(541, 397) | cor=(229, 7, 199)
+M30 | posição=(542, 397) | cor=(231, 12, 201)
+M31 | posição=(543, 397) | cor=(195, 13, 155)

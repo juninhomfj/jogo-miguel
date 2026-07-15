@@ -1,0 +1,17 @@
+Entrada: incoming/sprites/13_victory_trophy_limpo_final.png
+Saída: incoming/sprites/13_victory_trophy.png
+Dimensão original: (1254, 1254)
+Bounding box original: (418, 308, 916, 938)
+Bounding box do corpo usado: (418, 398, 711, 938)
+Bounding box inferior usado: (456, 765, 711, 938)
+Centro de apoio original: 583.50
+Altura do corpo: 540
+Altura-alvo do corpo: 122
+Escala aplicada: 0.225926
+Conjunto redimensionado: 113x142
+Posição no canvas: x=91, y=82
+Bounding box final: (91, 82, 204, 224)
+Margens finais: {'esquerda': 91, 'topo': 82, 'direita': 52, 'inferior': 32}
+Pixels visíveis: 7129
+Pixels semitransparentes: 0
+Prévia: artifacts/frame-validation/13_victory_trophy_normalization/13_victory_trophy_normalized_preview.png

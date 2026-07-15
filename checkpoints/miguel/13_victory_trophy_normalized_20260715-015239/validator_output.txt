@@ -1,0 +1,23 @@
+Python utilizado: /workspaces/jogo-miguel/.venv-assets/bin/python
+Arquivo: incoming/sprites/13_victory_trophy.png
+Tipo: character
+
+========================================================================
+VALIDAÇÃO DE FRAME
+========================================================================
+Arquivo: incoming/sprites/13_victory_trophy.png
+Tipo: character
+Formato: PNG
+Modo: RGBA
+Dimensão: 256x256
+Bounding box: (91, 82, 204, 224)
+Pixels visíveis: 7129
+Pixels semitransparentes: 0 (0.00%)
+Margens violadas: nenhuma
+Diferença para a linha-base: +0px
+
+Relatório: artifacts/frame-validation/13_victory_trophy.json
+Prévia: artifacts/frame-validation/13_victory_trophy_preview.png
+
+RESULTADO: APROVADO TECNICAMENTE
+Ainda é necessária aprovação visual.

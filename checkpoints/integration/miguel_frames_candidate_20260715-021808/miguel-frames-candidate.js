@@ -1,110 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>As Aventuras do Miguel</title>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: #0d1117;
-            color: #fff;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        /* Caixa de Input de Nome Estilo Arcade Retro (Mobile Friendly) */
-        #name-input-container {
-            position: absolute;
-            display: none; /* Controlado dinamicamente pelo Phaser */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            background: rgba(20, 25, 35, 0.95);
-            border: 4px solid #FFCC00;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(255, 204, 0, 0.5);
-            width: 85%;
-            max-width: 340px;
-        }
-        #name-input-container label {
-            font-size: 18px;
-            color: #FFCC00;
-            margin-bottom: 12px;
-            font-weight: bold;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        #player-name-input {
-            width: 100%;
-            padding: 12px;
-            font-size: 26px;
-            text-align: center;
-            text-transform: uppercase;
-            border: 2px solid #FFCC00;
-            background: #111;
-            color: #FFF;
-            font-family: inherit;
-            font-weight: bold;
-            letter-spacing: 4px;
-            outline: none;
-            border-radius: 6px;
-        }
-        #start-button {
-            margin-top: 18px;
-            width: 100%;
-            padding: 14px;
-            font-size: 20px;
-            background: #FFCC00;
-            color: #0d1117;
-            border: none;
-            font-family: inherit;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 0 #CC9900;
-        }
-        #start-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #CC9900;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="game-container">
-        <div id="name-input-container">
-            <label for="player-name-input">Iniciais do Herói</label>
-            <input type="text" id="player-name-input" maxlength="3" placeholder="___" autocomplete="off">
-            <button id="start-button">ENTRAR</button>
-        </div>
-    </div>
-
-    <script>
-        // ==========================================
+// ==========================================
         // CENA 1: MENU PRINCIPAL
         // ==========================================
         class MenuPrincipal extends Phaser.Scene {
@@ -122,59 +16,59 @@
                 // Cada textura possui canvas RGBA de 256x256.
                 this.load.image(
                     'miguel_idle',
-                    'assets/frames/miguel/00_idle.png'
+                    '../assets/frames/miguel/00_idle.png'
                 );
                 this.load.image(
                     'miguel_walk_1',
-                    'assets/frames/miguel/01_walk_1.png'
+                    '../assets/frames/miguel/01_walk_1.png'
                 );
                 this.load.image(
                     'miguel_walk_2',
-                    'assets/frames/miguel/02_walk_2.png'
+                    '../assets/frames/miguel/02_walk_2.png'
                 );
                 this.load.image(
                     'miguel_walk_3',
-                    'assets/frames/miguel/03_walk_3.png'
+                    '../assets/frames/miguel/03_walk_3.png'
                 );
                 this.load.image(
                     'miguel_jump',
-                    'assets/frames/miguel/04_jump.png'
+                    '../assets/frames/miguel/04_jump.png'
                 );
                 this.load.image(
                     'miguel_double_jump',
-                    'assets/frames/miguel/05_double_jump.png'
+                    '../assets/frames/miguel/05_double_jump.png'
                 );
                 this.load.image(
                     'miguel_punch',
-                    'assets/frames/miguel/06_punch.png'
+                    '../assets/frames/miguel/06_punch.png'
                 );
                 this.load.image(
                     'miguel_power_cast',
-                    'assets/frames/miguel/07_power_cast.png'
+                    '../assets/frames/miguel/07_power_cast.png'
                 );
                 this.load.image(
                     'miguel_dust_1',
-                    'assets/frames/miguel/08_dust_1.png'
+                    '../assets/frames/miguel/08_dust_1.png'
                 );
                 this.load.image(
                     'miguel_dust_2',
-                    'assets/frames/miguel/09_dust_2.png'
+                    '../assets/frames/miguel/09_dust_2.png'
                 );
                 this.load.image(
                     'miguel_dust_3',
-                    'assets/frames/miguel/10_dust_3.png'
+                    '../assets/frames/miguel/10_dust_3.png'
                 );
                 this.load.image(
                     'miguel_reserved',
-                    'assets/frames/miguel/11_reserved.png'
+                    '../assets/frames/miguel/11_reserved.png'
                 );
                 this.load.image(
                     'miguel_hurt',
-                    'assets/frames/miguel/12_hurt.png'
+                    '../assets/frames/miguel/12_hurt.png'
                 );
                 this.load.image(
                     'miguel_victory',
-                    'assets/frames/miguel/13_victory_trophy.png'
+                    '../assets/frames/miguel/13_victory_trophy.png'
                 );
 
                 // Robô histórico provisório.
@@ -182,7 +76,7 @@
                 // forem reconstruídos e aprovados.
                 this.load.spritesheet(
                     'robo',
-                    'assets/legacy/'
+                    '../assets/legacy/'
                     + 'sprites-invalidos-2026-07-13/'
                     + 'robo_sprites_original.png',
                     {
@@ -795,6 +689,3 @@
         };
 
         const game = new Phaser.Game(config);
-    </script>
-</body>
-</html>

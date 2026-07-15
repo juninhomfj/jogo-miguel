@@ -1,0 +1,58 @@
+Arquivo: incoming/sprites/13_victory_trophy_chroma_bruto.png
+Dimensão: 1254x1254
+Faixa externa analisada: 100px
+Pixels candidatos a chroma: 1433850
+Bounding box da máscara: (0, 0, 1254, 1254)
+
+PIXELS DOS CANTOS:
+superior_esquerdo: (240, 12, 218, 255)
+superior_direito: (245, 17, 222, 255)
+inferior_esquerdo: (238, 33, 211, 255)
+inferior_direito: (242, 28, 217, 255)
+centro_superior: (249, 5, 232, 255)
+centro_inferior: (248, 12, 222, 255)
+
+VALORES DE ALPHA MAIS COMUNS:
+alpha=255 | pixels=1572516
+
+CORES MAIS COMUNS NA BORDA:
+(251, 3, 230, 255) | pixels=49482
+(250, 3, 229, 255) | pixels=47882
+(251, 3, 229, 255) | pixels=45302
+(250, 3, 228, 255) | pixels=29115
+(250, 3, 230, 255) | pixels=28998
+(251, 4, 229, 255) | pixels=24392
+(251, 4, 230, 255) | pixels=23740
+(251, 3, 228, 255) | pixels=21770
+(250, 4, 229, 255) | pixels=18300
+(250, 2, 229, 255) | pixels=12806
+(251, 3, 231, 255) | pixels=12628
+(251, 4, 228, 255) | pixels=12346
+(250, 4, 230, 255) | pixels=11070
+(250, 4, 228, 255) | pixels=10426
+(250, 2, 228, 255) | pixels=7229
+(251, 2, 229, 255) | pixels=7095
+(251, 4, 231, 255) | pixels=6923
+(250, 3, 227, 255) | pixels=6718
+(250, 2, 230, 255) | pixels=6478
+(251, 2, 230, 255) | pixels=5315
+(252, 3, 230, 255) | pixels=4242
+(250, 3, 231, 255) | pixels=4051
+(252, 4, 230, 255) | pixels=3643
+(251, 2, 228, 255) | pixels=3625
+(252, 4, 231, 255) | pixels=3541
+(252, 3, 231, 255) | pixels=3528
+(251, 3, 227, 255) | pixels=3047
+(250, 2, 227, 255) | pixels=2340
+(250, 4, 227, 255) | pixels=2331
+(250, 4, 231, 255) | pixels=2172
+(252, 4, 229, 255) | pixels=2154
+(251, 2, 231, 255) | pixels=2040
+(251, 3, 232, 255) | pixels=2013
+(252, 3, 229, 255) | pixels=1829
+(251, 4, 227, 255) | pixels=1765
+(249, 3, 228, 255) | pixels=1739
+(249, 3, 229, 255) | pixels=1216
+(250, 2, 231, 255) | pixels=1170
+(249, 2, 228, 255) | pixels=1154
+(251, 2, 232, 255) | pixels=1121

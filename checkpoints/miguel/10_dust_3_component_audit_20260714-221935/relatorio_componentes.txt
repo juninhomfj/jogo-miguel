@@ -1,0 +1,20 @@
+Arquivo: incoming/sprites/10_dust_3_chroma_sem_fundo_conectado.png
+Dimensão: 1254x1254
+Bounding box total: (311, 446, 1000, 907)
+Pixels visíveis: 24224490 / 255
+Componentes encontrados: 13
+
+MAIORES COMPONENTES:
+C00 | pixels=86471 | bbox=(488, 446, 775, 907) | tamanho=287x461 | borda=não
+C01 | pixels=3228 | bbox=(766, 842, 850, 907) | tamanho=84x65 | borda=não
+C02 | pixels=2260 | bbox=(365, 851, 441, 906) | tamanho=76x55 | borda=não
+C03 | pixels=917 | bbox=(311, 779, 347, 813) | tamanho=36x34 | borda=não
+C04 | pixels=474 | bbox=(850, 881, 880, 907) | tamanho=30x26 | borda=não
+C05 | pixels=425 | bbox=(973, 817, 1000, 842) | tamanho=27x25 | borda=não
+C06 | pixels=281 | bbox=(854, 794, 876, 813) | tamanho=22x19 | borda=não
+C07 | pixels=254 | bbox=(381, 824, 405, 842) | tamanho=24x18 | borda=não
+C08 | pixels=228 | bbox=(928, 869, 947, 889) | tamanho=19x20 | borda=não
+C09 | pixels=203 | bbox=(443, 865, 461, 883) | tamanho=18x18 | borda=não
+C10 | pixels=142 | bbox=(363, 891, 379, 906) | tamanho=16x15 | borda=não
+C11 | pixels=113 | bbox=(324, 878, 335, 889) | tamanho=11x11 | borda=não
+C12 | pixels=2 | bbox=(493, 787, 495, 788) | tamanho=2x1 | borda=não

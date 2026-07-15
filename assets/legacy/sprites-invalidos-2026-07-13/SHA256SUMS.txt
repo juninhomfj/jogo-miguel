@@ -1,0 +1,2 @@
+3b46439c96ebf8360ce7e65e748a194773a3ec74ce039134512708a67b225d56  assets/legacy/sprites-invalidos-2026-07-13/miguel_sprites_original.png
+e5e7225cd0c60f07e6621518dd46df3aad5604fb7abb3ead64b9145b39dd941d  assets/legacy/sprites-invalidos-2026-07-13/robo_sprites_original.png
