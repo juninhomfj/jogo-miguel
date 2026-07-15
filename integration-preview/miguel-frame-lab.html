@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="
+            width=device-width,
+            initial-scale=1,
+            maximum-scale=1,
+            user-scalable=no,
+            viewport-fit=cover
+        "
+    >
+
+    <title>Laboratório de Frames — Miguel</title>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"
+    ></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            overflow: hidden;
+            background: #070b14;
+            font-family: "Courier New", monospace;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container"></div>
+
+    <script>
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
+        const DEBUG_ATIVO = (
+            params.get('debug') === '1'
+        );
+
+        const TEXTURAS_MIGUEL = {
+            idle: 'miguel_idle',
+            walk1: 'miguel_walk_1',
+            walk2: 'miguel_walk_2',
+            walk3: 'miguel_walk_3',
+            jump: 'miguel_jump',
+            doubleJump: 'miguel_double_jump',
+            punch: 'miguel_punch',
+            power: 'miguel_power_cast',
+            dust1: 'miguel_dust_1',
+            dust2: 'miguel_dust_2',
+            dust3: 'miguel_dust_3',
+            reserved: 'miguel_reserved',
+            hurt: 'miguel_hurt',
+            victory: 'miguel_victory'
+        };
+
+        const CONFIG_MIGUEL = {
+            canvasWidth: 256,
+            canvasHeight: 256,
+
+            scale: 1.2,
+
+            bodyWidth: 66,
+            bodyHeight: 122,
+
+            bodyOffsetX: 95,
+            bodyOffsetY: 102,
+
+            visualLeft: 95,
+            visualTop: 102,
+            visualRight: 161,
+            visualBottom: 224,
+
+            groundTop: 470
+        };
+
+        class MiguelFrameLab extends Phaser.Scene {
+            constructor() {
+                super('MiguelFrameLab');
+            }
+
+            preload() {
+                this.load.on(
+                    'loaderror',
+                    (file) => {
+                        console.error(
+                            'ERRO DE TEXTURA:',
+                            file.key,
+                            file.src
+                        );
+                    }
+                );
+
+                const base = '../assets/frames/miguel/';
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.idle,
+                    base + '00_idle.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.walk1,
+                    base + '01_walk_1.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.walk2,
+                    base + '02_walk_2.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.walk3,
+                    base + '03_walk_3.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.jump,
+                    base + '04_jump.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.doubleJump,
+                    base + '05_double_jump.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.punch,
+                    base + '06_punch.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.power,
+                    base + '07_power_cast.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.dust1,
+                    base + '08_dust_1.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.dust2,
+                    base + '09_dust_2.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.dust3,
+                    base + '10_dust_3.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.reserved,
+                    base + '11_reserved.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.hurt,
+                    base + '12_hurt.png'
+                );
+
+                this.load.image(
+                    TEXTURAS_MIGUEL.victory,
+                    base + '13_victory_trophy.png'
+                );
+            }
+
+            create() {
+                this.cameras.main.setBackgroundColor(
+                    '#111a2d'
+                );
+
+                this.physics.world.setBounds(
+                    0,
+                    0,
+                    800,
+                    600
+                );
+
+                this.criarFundo();
+                this.criarChao();
+                this.criarAnimacoes();
+                this.criarMiguel();
+                this.criarControles();
+                this.criarInterface();
+                this.instalarDiagnostico();
+
+                this.estado = {
+                    bloqueado: false,
+                    vitoria: false,
+                    pulosDisponiveis: 2,
+                    estavaNoChao: false,
+                    atualizacoesAnimacao: 0,
+                    trocasTextura: 0,
+                    ultimaTextura: null
+                };
+
+                this.player.on(
+                    Phaser.Animations.Events.ANIMATION_START,
+                    (animacao) => {
+                        console.log(
+                            '[ANIMATION_START]',
+                            animacao.key
+                        );
+                    }
+                );
+
+                this.player.on(
+                    Phaser.Animations.Events.ANIMATION_UPDATE,
+                    (animacao, frame) => {
+                        this.estado.atualizacoesAnimacao += 1;
+
+                        console.log(
+                            '[ANIMATION_UPDATE]',
+                            animacao.key,
+                            frame.textureKey
+                        );
+                    }
+                );
+
+                this.player.on(
+                    Phaser.Animations.Events.ANIMATION_COMPLETE,
+                    (animacao) => {
+                        console.log(
+                            '[ANIMATION_COMPLETE]',
+                            animacao.key
+                        );
+                    }
+                );
+
+                this.mudarParaIdle();
+            }
+
+            criarFundo() {
+                this.add.rectangle(
+                    400,
+                    300,
+                    800,
+                    600,
+                    0x111a2d
+                );
+
+                this.add.rectangle(
+                    400,
+                    430,
+                    800,
+                    80,
+                    0x17243b
+                );
+
+                this.add.text(
+                    400,
+                    32,
+                    'LABORATÓRIO DE FRAMES — MIGUEL',
+                    {
+                        fontFamily: 'Courier New',
+                        fontSize: '24px',
+                        color: '#ffcc00',
+                        fontStyle: 'bold'
+                    }
+                ).setOrigin(0.5);
+            }
+
+            criarChao() {
+                this.chaoVisual = this.add.rectangle(
+                    400,
+                    CONFIG_MIGUEL.groundTop + 20,
+                    800,
+                    40,
+                    0x25d366
+                );
+
+                this.chaoVisual.setStrokeStyle(
+                    3,
+                    0xffffff
+                );
+
+                this.physics.add.existing(
+                    this.chaoVisual,
+                    true
+                );
+
+                this.add.line(
+                    0,
+                    CONFIG_MIGUEL.groundTop,
+                    0,
+                    0,
+                    800,
+                    0,
+                    0xff3366,
+                    0.8
+                ).setOrigin(0);
+            }
+
+            criarAnimacoes() {
+                const criar = (
+                    key,
+                    frames,
+                    frameRate,
+                    repeat
+                ) => {
+                    if (this.anims.exists(key)) {
+                        this.anims.remove(key);
+                    }
+
+                    this.anims.create({
+                        key,
+                        frames,
+                        frameRate,
+                        repeat
+                    });
+                };
+
+                criar(
+                    'miguel_idle_anim',
+                    [
+                        {
+                            key: TEXTURAS_MIGUEL.idle
+                        }
+                    ],
+                    1,
+                    -1
+                );
+
+                criar(
+                    'miguel_walk_anim',
+                    [
+                        {
+                            key: TEXTURAS_MIGUEL.walk1
+                        },
+                        {
+                            key: TEXTURAS_MIGUEL.walk2
+                        },
+                        {
+                            key: TEXTURAS_MIGUEL.walk3
+                        }
+                    ],
+                    7,
+                    -1
+                );
+
+                criar(
+                    'miguel_dust_anim',
+                    [
+                        {
+                            key: TEXTURAS_MIGUEL.dust1
+                        },
+                        {
+                            key: TEXTURAS_MIGUEL.dust2
+                        },
+                        {
+                            key: TEXTURAS_MIGUEL.dust3
+                        }
+                    ],
+                    8,
+                    0
+                );
+            }
+
+            criarMiguel() {
+                this.player = this.physics.add.sprite(
+                    170,
+                    260,
+                    TEXTURAS_MIGUEL.idle
+                );
+
+                this.player.setScale(
+                    CONFIG_MIGUEL.scale
+                );
+
+                this.player.setDepth(10);
+                this.player.setCollideWorldBounds(true);
+
+                this.player.body.setSize(
+                    CONFIG_MIGUEL.bodyWidth,
+                    CONFIG_MIGUEL.bodyHeight,
+                    false
+                );
+
+                this.player.body.setOffset(
+                    CONFIG_MIGUEL.bodyOffsetX,
+                    CONFIG_MIGUEL.bodyOffsetY
+                );
+
+                this.player.body.setMaxVelocity(
+                    220,
+                    700
+                );
+
+                this.player.body.setDragX(1000);
+
+                this.physics.add.collider(
+                    this.player,
+                    this.chaoVisual
+                );
+            }
+
+            criarControles() {
+                this.cursors = (
+                    this.input.keyboard.createCursorKeys()
+                );
+
+                this.keys = this.input.keyboard.addKeys({
+                    esquerda: 'A',
+                    direita: 'D',
+                    pulo: 'W',
+                    soco: 'X',
+                    poder: 'C',
+                    dano: 'H',
+                    poeira: 'B',
+                    vitoria: 'V',
+                    reset: 'R'
+                });
+            }
+
+            criarInterface() {
+                this.textoAjuda = this.add.text(
+                    18,
+                    505,
+                    [
+                        'Mover: ← → ou A D',
+                        'Pular: ↑ ou W | Segundo toque: pulo duplo',
+                        'X: soco | C: poder | H: dano',
+                        'B: poeira | V: vitória | R: reiniciar'
+                    ],
+                    {
+                        fontFamily: 'Courier New',
+                        fontSize: '15px',
+                        color: '#ffffff',
+                        lineSpacing: 5
+                    }
+                );
+
+                this.textoAjuda.setDepth(50);
+
+                this.painel = this.add.text(
+                    500,
+                    68,
+                    '',
+                    {
+                        fontFamily: 'Courier New',
+                        fontSize: '13px',
+                        color: '#8fffd4',
+                        backgroundColor: '#080d17',
+                        padding: {
+                            x: 10,
+                            y: 8
+                        }
+                    }
+                );
+
+                this.painel.setDepth(50);
+
+                this.add.text(
+                    18,
+                    78,
+                    [
+                        'Linha rosa: topo do chão',
+                        'Caixa azul: bbox visual esperado',
+                        'Caixa física: visível com ?debug=1'
+                    ],
+                    {
+                        fontFamily: 'Courier New',
+                        fontSize: '14px',
+                        color: '#9eb8ff',
+                        lineSpacing: 4
+                    }
+                );
+
+                this.caixaVisual = this.add.graphics();
+
+                this.caixaVisual.lineStyle(
+                    2,
+                    0x33aaff,
+                    1
+                );
+            }
+
+            instalarDiagnostico() {
+                window.__MIGUEL_DEBUG__ = {
+                    scene: this,
+
+                    getPlayer: () => this.player,
+
+                    snapshot: () => {
+                        return this.obterDiagnostico();
+                    },
+
+                    playWalk: () => {
+                        this.estado.bloqueado = false;
+                        this.estado.vitoria = false;
+                        this.player.play(
+                            'miguel_walk_anim',
+                            true
+                        );
+                    },
+
+                    playIdle: () => {
+                        this.estado.bloqueado = false;
+                        this.estado.vitoria = false;
+                        this.mudarParaIdle();
+                    }
+                };
+
+                console.log(
+                    'Diagnóstico disponível em:',
+                    'window.__MIGUEL_DEBUG__'
+                );
+            }
+
+            obterNoChao() {
+                return Boolean(
+                    this.player.body.blocked.down
+                    || this.player.body.touching.down
+                );
+            }
+
+            tocarAnimacao(key) {
+                const atual = (
+                    this.player.anims.currentAnim
+                    ? this.player.anims.currentAnim.key
+                    : null
+                );
+
+                if (
+                    atual === key
+                    && this.player.anims.isPlaying
+                ) {
+                    return;
+                }
+
+                this.player.play(
+                    key,
+                    true
+                );
+            }
+
+            definirTextura(key) {
+                if (this.player.texture.key === key) {
+                    return;
+                }
+
+                this.player.anims.stop();
+                this.player.setTexture(key);
+
+                if (this.estado) {
+                    this.estado.trocasTextura += 1;
+                }
+            }
+
+            mudarParaIdle() {
+                this.tocarAnimacao(
+                    'miguel_idle_anim'
+                );
+            }
+
+            executarTemporario(
+                textura,
+                duracao
+            ) {
+                if (
+                    this.estado.bloqueado
+                    || this.estado.vitoria
+                ) {
+                    return;
+                }
+
+                this.estado.bloqueado = true;
+
+                this.player.setVelocityX(0);
+                this.definirTextura(textura);
+
+                this.time.delayedCall(
+                    duracao,
+                    () => {
+                        this.estado.bloqueado = false;
+                        this.mudarParaIdle();
+                    }
+                );
+            }
+
+            executarPoeira() {
+                if (
+                    this.estado.bloqueado
+                    || this.estado.vitoria
+                ) {
+                    return;
+                }
+
+                this.estado.bloqueado = true;
+                this.player.setVelocityX(0);
+
+                this.player.play(
+                    'miguel_dust_anim',
+                    true
+                );
+
+                this.player.once(
+                    Phaser.Animations.Events
+                        .ANIMATION_COMPLETE,
+                    () => {
+                        this.estado.bloqueado = false;
+                        this.mudarParaIdle();
+                    }
+                );
+            }
+
+            executarVitoria() {
+                this.estado.vitoria = true;
+                this.estado.bloqueado = true;
+
+                this.player.setVelocity(0, 0);
+                this.player.body.allowGravity = false;
+
+                this.definirTextura(
+                    TEXTURAS_MIGUEL.victory
+                );
+            }
+
+            reiniciarEstado() {
+                this.estado.vitoria = false;
+                this.estado.bloqueado = false;
+                this.estado.pulosDisponiveis = 2;
+
+                this.player.body.allowGravity = true;
+                this.player.setVelocity(0, 0);
+                this.player.setPosition(170, 260);
+
+                this.mudarParaIdle();
+            }
+
+            executarPulo(noChao) {
+                if (
+                    this.estado.bloqueado
+                    || this.estado.vitoria
+                ) {
+                    return;
+                }
+
+                if (noChao) {
+                    this.estado.pulosDisponiveis = 1;
+
+                    this.player.setVelocityY(-500);
+
+                    this.definirTextura(
+                        TEXTURAS_MIGUEL.jump
+                    );
+                } else if (
+                    this.estado.pulosDisponiveis > 0
+                ) {
+                    this.estado.pulosDisponiveis = 0;
+
+                    this.player.setVelocityY(-470);
+
+                    this.definirTextura(
+                        TEXTURAS_MIGUEL.doubleJump
+                    );
+                }
+            }
+
+            obterDiagnostico() {
+                const body = this.player.body;
+
+                return {
+                    texture: this.player.texture.key,
+
+                    animation: (
+                        this.player.anims.currentAnim
+                        ? this.player.anims.currentAnim.key
+                        : null
+                    ),
+
+                    animationPlaying: (
+                        this.player.anims.isPlaying
+                    ),
+
+                    animationFrame: (
+                        this.player.anims.currentFrame
+                        ? this.player.anims.currentFrame.textureKey
+                        : null
+                    ),
+
+                    x: Number(
+                        this.player.x.toFixed(2)
+                    ),
+
+                    y: Number(
+                        this.player.y.toFixed(2)
+                    ),
+
+                    scaleX: this.player.scaleX,
+                    scaleY: this.player.scaleY,
+
+                    displayWidth: Number(
+                        this.player.displayWidth.toFixed(2)
+                    ),
+
+                    displayHeight: Number(
+                        this.player.displayHeight.toFixed(2)
+                    ),
+
+                    bodyWidth: Number(
+                        body.width.toFixed(2)
+                    ),
+
+                    bodyHeight: Number(
+                        body.height.toFixed(2)
+                    ),
+
+                    bodyOffsetX: Number(
+                        body.offset.x.toFixed(2)
+                    ),
+
+                    bodyOffsetY: Number(
+                        body.offset.y.toFixed(2)
+                    ),
+
+                    bodyTop: Number(
+                        body.top.toFixed(2)
+                    ),
+
+                    bodyBottom: Number(
+                        body.bottom.toFixed(2)
+                    ),
+
+                    grounded: this.obterNoChao(),
+
+                    velocityX: Number(
+                        body.velocity.x.toFixed(2)
+                    ),
+
+                    velocityY: Number(
+                        body.velocity.y.toFixed(2)
+                    ),
+
+                    jumps: this.estado.pulosDisponiveis,
+
+                    locked: this.estado.bloqueado,
+
+                    animationUpdates: (
+                        this.estado.atualizacoesAnimacao
+                    ),
+
+                    textureChanges: (
+                        this.estado.trocasTextura
+                    )
+                };
+            }
+
+            atualizarPainel() {
+                const info = this.obterDiagnostico();
+
+                this.painel.setText([
+                    `TEXTURA: ${info.texture}`,
+                    `ANIMAÇÃO: ${info.animation}`,
+                    `FRAME: ${info.animationFrame}`,
+                    `PLAYING: ${info.animationPlaying}`,
+                    '',
+                    `POSIÇÃO: ${info.x}, ${info.y}`,
+                    `ESCALA: ${info.scaleX}`,
+                    (
+                        `DISPLAY: ${info.displayWidth}`
+                        + ` x ${info.displayHeight}`
+                    ),
+                    (
+                        `BODY: ${info.bodyWidth}`
+                        + ` x ${info.bodyHeight}`
+                    ),
+                    (
+                        `OFFSET: ${info.bodyOffsetX}`
+                        + `, ${info.bodyOffsetY}`
+                    ),
+                    (
+                        `BODY Y: ${info.bodyTop}`
+                        + ` → ${info.bodyBottom}`
+                    ),
+                    `NO CHÃO: ${info.grounded}`,
+                    (
+                        `VELOCIDADE: ${info.velocityX}`
+                        + `, ${info.velocityY}`
+                    ),
+                    `PULOS: ${info.jumps}`,
+                    `BLOQUEADO: ${info.locked}`,
+                    (
+                        `ANIM UPDATES: `
+                        + info.animationUpdates
+                    ),
+                    (
+                        `TROCAS TEXTURA: `
+                        + info.textureChanges
+                    )
+                ]);
+            }
+
+            atualizarCaixaVisual() {
+                const escala = this.player.scaleX;
+
+                const esquerda = (
+                    this.player.x
+                    - (
+                        CONFIG_MIGUEL.canvasWidth
+                        * escala
+                        * this.player.originX
+                    )
+                    + CONFIG_MIGUEL.visualLeft
+                    * escala
+                );
+
+                const topo = (
+                    this.player.y
+                    - (
+                        CONFIG_MIGUEL.canvasHeight
+                        * escala
+                        * this.player.originY
+                    )
+                    + CONFIG_MIGUEL.visualTop
+                    * escala
+                );
+
+                const largura = (
+                    (
+                        CONFIG_MIGUEL.visualRight
+                        - CONFIG_MIGUEL.visualLeft
+                    )
+                    * escala
+                );
+
+                const altura = (
+                    (
+                        CONFIG_MIGUEL.visualBottom
+                        - CONFIG_MIGUEL.visualTop
+                    )
+                    * escala
+                );
+
+                this.caixaVisual.clear();
+
+                this.caixaVisual.lineStyle(
+                    2,
+                    0x33aaff,
+                    1
+                );
+
+                this.caixaVisual.strokeRect(
+                    esquerda,
+                    topo,
+                    largura,
+                    altura
+                );
+            }
+
+            update() {
+                const noChao = this.obterNoChao();
+
+                if (
+                    noChao
+                    && !this.estado.estavaNoChao
+                ) {
+                    this.estado.pulosDisponiveis = 2;
+                } else if (noChao) {
+                    this.estado.pulosDisponiveis = 2;
+                }
+
+                const pular = (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.cursors.up
+                    )
+                    || Phaser.Input.Keyboard.JustDown(
+                        this.keys.pulo
+                    )
+                );
+
+                if (pular) {
+                    this.executarPulo(noChao);
+                }
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.keys.soco
+                    )
+                ) {
+                    this.executarTemporario(
+                        TEXTURAS_MIGUEL.punch,
+                        260
+                    );
+                }
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.keys.poder
+                    )
+                ) {
+                    this.executarTemporario(
+                        TEXTURAS_MIGUEL.power,
+                        340
+                    );
+                }
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.keys.dano
+                    )
+                ) {
+                    this.executarTemporario(
+                        TEXTURAS_MIGUEL.hurt,
+                        420
+                    );
+                }
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.keys.poeira
+                    )
+                ) {
+                    this.executarPoeira();
+                }
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.keys.vitoria
+                    )
+                ) {
+                    this.executarVitoria();
+                }
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.keys.reset
+                    )
+                ) {
+                    this.reiniciarEstado();
+                }
+
+                if (
+                    !this.estado.bloqueado
+                    && !this.estado.vitoria
+                ) {
+                    const esquerda = (
+                        this.cursors.left.isDown
+                        || this.keys.esquerda.isDown
+                    );
+
+                    const direita = (
+                        this.cursors.right.isDown
+                        || this.keys.direita.isDown
+                    );
+
+                    if (esquerda) {
+                        this.player.setVelocityX(-190);
+                        this.player.setFlipX(true);
+
+                        if (noChao) {
+                            this.tocarAnimacao(
+                                'miguel_walk_anim'
+                            );
+                        }
+                    } else if (direita) {
+                        this.player.setVelocityX(190);
+                        this.player.setFlipX(false);
+
+                        if (noChao) {
+                            this.tocarAnimacao(
+                                'miguel_walk_anim'
+                            );
+                        }
+                    } else {
+                        this.player.setVelocityX(0);
+
+                        if (noChao) {
+                            this.mudarParaIdle();
+                        }
+                    }
+
+                    if (!noChao) {
+                        if (
+                            this.estado.pulosDisponiveis === 0
+                        ) {
+                            this.definirTextura(
+                                TEXTURAS_MIGUEL.doubleJump
+                            );
+                        } else {
+                            this.definirTextura(
+                                TEXTURAS_MIGUEL.jump
+                            );
+                        }
+                    }
+                }
+
+                this.estado.estavaNoChao = noChao;
+
+                this.atualizarPainel();
+                this.atualizarCaixaVisual();
+            }
+        }
+
+        const config = {
+            type: Phaser.AUTO,
+
+            parent: 'game-container',
+
+            width: 800,
+            height: 600,
+
+            backgroundColor: '#111a2d',
+
+            pixelArt: true,
+            roundPixels: true,
+
+            render: {
+                antialias: false,
+                pixelArt: true,
+                roundPixels: true
+            },
+
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 800,
+                height: 600
+            },
+
+            physics: {
+                default: 'arcade',
+
+                arcade: {
+                    gravity: {
+                        y: 900
+                    },
+
+                    debug: DEBUG_ATIVO
+                }
+            },
+
+            scene: [
+                MiguelFrameLab
+            ]
+        };
+
+        window.__MIGUEL_LAB_GAME__ = new Phaser.Game(
+            config
+        );
+    </script>
+</body>
+</html>
