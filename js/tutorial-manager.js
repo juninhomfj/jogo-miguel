@@ -53,7 +53,7 @@
                         'MOVA MIGUEL',
 
                     dicaMobile:
-                        'Use ◀ e ▶ para se movimentar.',
+                        'Toque na esquerda e arraste o analógico.',
 
                     dicaTeclado:
                         'Use A/D ou ←/→ para se mover.',
@@ -73,7 +73,7 @@
                         'FAÇA UM PULO',
 
                     dicaMobile:
-                        'Toque em PULO uma vez.',
+                        'Toque no botão azul ↑.',
 
                     dicaTeclado:
                         'Pressione W ou ↑ uma vez.',
@@ -90,7 +90,7 @@
                         'USE O PULO DUPLO',
 
                     dicaMobile:
-                        'No ar, toque em PULO novamente.',
+                        'No ar, toque no botão azul ↑ de novo.',
 
                     dicaTeclado:
                         'No ar, pressione W ou ↑ novamente.',
@@ -126,7 +126,7 @@
                         'DERROTE O ROBÔ',
 
                     dicaMobile:
-                        'Agora use o botão de golpe.',
+                        'Agora toque no botão vermelho ✦.',
 
                     dicaTeclado:
                         'Agora use X ou ESPAÇO.',
