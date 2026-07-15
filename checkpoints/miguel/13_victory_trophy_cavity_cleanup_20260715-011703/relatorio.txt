@@ -1,0 +1,117 @@
+Entrada: incoming/sprites/13_victory_trophy_internal_magenta_fixed_candidate.png
+Saída candidata: incoming/sprites/13_victory_trophy_cavities_clean_candidate.png
+Dimensão: (1254, 1254)
+Bounding box antes: (418, 308, 916, 938)
+Bounding box depois: (418, 308, 916, 938)
+Pixels magenta residuais encontrados: 521
+Pixels convertidos em transparência: 521
+Pixels magenta restantes: 0
+Pixels visíveis antes: 140241
+Pixels visíveis depois: 139720
+Bounding box dos pixels removidos: (469, 432, 858, 676)
+Máscara: artifacts/frame-validation/13_victory_trophy_cavity_cleanup/pixels_removidos.png
+Overlay: artifacts/frame-validation/13_victory_trophy_cavity_cleanup/pixels_removidos_destacados.png
+Comparação: artifacts/frame-validation/13_victory_trophy_cavity_cleanup/comparacao_ampliada.png
+Prévia: artifacts/frame-validation/13_victory_trophy_cavity_cleanup/candidato_preview.png
+
+PRIMEIROS PIXELS REMOVIDOS:
+(754, 432) | (247, 1, 218, 255) -> transparente
+(755, 432) | (247, 2, 221, 255) -> transparente
+(856, 432) | (250, 3, 233, 255) -> transparente
+(857, 432) | (250, 1, 235, 255) -> transparente
+(754, 433) | (248, 2, 216, 255) -> transparente
+(755, 433) | (248, 3, 218, 255) -> transparente
+(756, 433) | (249, 5, 220, 255) -> transparente
+(856, 433) | (250, 5, 231, 255) -> transparente
+(857, 433) | (250, 1, 233, 255) -> transparente
+(755, 434) | (249, 3, 218, 255) -> transparente
+(756, 434) | (249, 5, 220, 255) -> transparente
+(856, 434) | (249, 6, 232, 255) -> transparente
+(857, 434) | (250, 2, 233, 255) -> transparente
+(755, 435) | (248, 3, 217, 255) -> transparente
+(756, 435) | (248, 5, 218, 255) -> transparente
+(856, 435) | (248, 6, 230, 255) -> transparente
+(857, 435) | (249, 2, 231, 255) -> transparente
+(755, 436) | (247, 2, 214, 255) -> transparente
+(756, 436) | (248, 4, 215, 255) -> transparente
+(856, 436) | (245, 7, 225, 255) -> transparente
+(857, 436) | (246, 4, 226, 255) -> transparente
+(755, 437) | (244, 2, 211, 255) -> transparente
+(756, 437) | (245, 3, 213, 255) -> transparente
+(856, 437) | (243, 8, 222, 255) -> transparente
+(857, 437) | (243, 5, 223, 255) -> transparente
+(755, 438) | (242, 2, 209, 255) -> transparente
+(756, 438) | (243, 3, 210, 255) -> transparente
+(856, 438) | (241, 7, 220, 255) -> transparente
+(857, 438) | (240, 4, 220, 255) -> transparente
+(755, 439) | (240, 2, 206, 255) -> transparente
+(756, 439) | (240, 3, 206, 255) -> transparente
+(856, 439) | (238, 5, 219, 255) -> transparente
+(857, 439) | (238, 3, 220, 255) -> transparente
+(755, 440) | (238, 3, 200, 255) -> transparente
+(856, 440) | (238, 4, 219, 255) -> transparente
+(839, 480) | (105, 2, 126, 255) -> transparente
+(840, 480) | (107, 6, 133, 255) -> transparente
+(841, 480) | (122, 4, 141, 255) -> transparente
+(839, 481) | (95, 20, 150, 255) -> transparente
+(840, 481) | (95, 25, 155, 255) -> transparente
+(841, 481) | (121, 22, 165, 255) -> transparente
+(839, 482) | (108, 30, 176, 255) -> transparente
+(840, 482) | (108, 33, 177, 255) -> transparente
+(841, 482) | (130, 27, 184, 255) -> transparente
+(839, 483) | (108, 27, 175, 255) -> transparente
+(840, 483) | (107, 28, 178, 255) -> transparente
+(841, 483) | (129, 23, 186, 255) -> transparente
+(469, 624) | (237, 1, 220, 255) -> transparente
+(470, 624) | (235, 1, 218, 255) -> transparente
+(469, 625) | (234, 1, 218, 255) -> transparente
+(470, 625) | (233, 0, 215, 255) -> transparente
+(479, 634) | (238, 1, 212, 255) -> transparente
+(480, 634) | (238, 1, 213, 255) -> transparente
+(481, 634) | (238, 1, 215, 255) -> transparente
+(482, 634) | (238, 1, 214, 255) -> transparente
+(483, 634) | (238, 1, 213, 255) -> transparente
+(484, 634) | (241, 2, 216, 255) -> transparente
+(485, 634) | (241, 2, 217, 255) -> transparente
+(486, 634) | (242, 3, 217, 255) -> transparente
+(487, 634) | (242, 4, 216, 255) -> transparente
+(488, 634) | (241, 5, 215, 255) -> transparente
+(489, 634) | (240, 5, 216, 255) -> transparente
+(479, 635) | (238, 1, 212, 255) -> transparente
+(480, 635) | (239, 0, 214, 255) -> transparente
+(481, 635) | (238, 0, 213, 255) -> transparente
+(482, 635) | (239, 0, 215, 255) -> transparente
+(483, 635) | (241, 1, 218, 255) -> transparente
+(484, 635) | (241, 2, 219, 255) -> transparente
+(485, 635) | (241, 2, 218, 255) -> transparente
+(486, 635) | (241, 3, 219, 255) -> transparente
+(487, 635) | (241, 4, 220, 255) -> transparente
+(488, 635) | (241, 5, 218, 255) -> transparente
+(489, 635) | (241, 5, 219, 255) -> transparente
+(488, 636) | (242, 5, 219, 255) -> transparente
+(489, 636) | (243, 5, 221, 255) -> transparente
+(488, 637) | (245, 4, 221, 255) -> transparente
+(489, 637) | (246, 4, 223, 255) -> transparente
+(488, 638) | (247, 4, 225, 255) -> transparente
+(489, 638) | (249, 4, 226, 255) -> transparente
+(488, 639) | (248, 5, 225, 255) -> transparente
+(489, 639) | (250, 5, 227, 255) -> transparente
+(488, 640) | (249, 8, 226, 255) -> transparente
+(489, 640) | (250, 8, 226, 255) -> transparente
+(488, 641) | (250, 9, 228, 255) -> transparente
+(489, 641) | (251, 9, 228, 255) -> transparente
+(488, 642) | (250, 10, 228, 255) -> transparente
+(489, 642) | (252, 9, 228, 255) -> transparente
+(488, 643) | (250, 12, 224, 255) -> transparente
+(489, 643) | (252, 10, 226, 255) -> transparente
+(490, 643) | (252, 10, 227, 255) -> transparente
+(491, 643) | (253, 9, 228, 255) -> transparente
+(492, 643) | (253, 7, 228, 255) -> transparente
+(493, 643) | (251, 6, 226, 255) -> transparente
+(494, 643) | (251, 4, 225, 255) -> transparente
+(495, 643) | (251, 2, 225, 255) -> transparente
+(496, 643) | (251, 2, 226, 255) -> transparente
+(497, 643) | (250, 2, 225, 255) -> transparente
+(498, 643) | (248, 2, 225, 255) -> transparente
+(499, 643) | (248, 2, 225, 255) -> transparente
+(500, 643) | (248, 2, 225, 255) -> transparente
