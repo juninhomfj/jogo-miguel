@@ -40,6 +40,7 @@
                 distanciaMovida: 0,
                 pulo: false,
                 puloDuplo: false,
+                danoRobo: false,
                 ataqueRobo: false,
                 cristais: 0
             };
@@ -100,16 +101,35 @@
                 },
 
                 {
+                    id: 'dano-robo',
+
+                    titulo:
+                        'CUIDADO COM O ROBÔ',
+
+                    dicaMobile:
+                        'Encoste no robô para aprender '
+                        + 'como funciona o dano.',
+
+                    dicaTeclado:
+                        'Encoste no robô para aprender '
+                        + 'como funciona o dano.',
+
+                    concluido: () => {
+                        return this.estado.danoRobo;
+                    }
+                },
+
+                {
                     id: 'ataque-robo',
 
                     titulo:
-                        'ATAQUE O ROBÔ',
+                        'DERROTE O ROBÔ',
 
                     dicaMobile:
-                        'Aproxime-se e toque em BATER.',
+                        'Agora use o botão de golpe.',
 
                     dicaTeclado:
-                        'Aproxime-se e use X ou ESPAÇO.',
+                        'Agora use X ou ESPAÇO.',
 
                     concluido: () => {
                         return this.estado.ataqueRobo;
@@ -460,6 +480,10 @@
                     this.estado.puloDuplo = true;
                     break;
 
+                case 'dano-robo':
+                    this.estado.danoRobo = true;
+                    break;
+
                 case 'ataque-robo':
                     this.estado.ataqueRobo = true;
                     break;
@@ -590,7 +614,9 @@
             });
 
             this.textoEtapa.setText(
-                'TREINAMENTO 5/5'
+                `TREINAMENTO ${
+                    this.objetivos.length
+                }/${this.objetivos.length}`
             );
 
             this.textoObjetivo.setText(
@@ -736,6 +762,12 @@
             this.mostrarFeedback(
                 mensagem,
                 1200
+            );
+        }
+
+        podeDerrotarRobo() {
+            return Boolean(
+                this.estado.danoRobo
             );
         }
 
