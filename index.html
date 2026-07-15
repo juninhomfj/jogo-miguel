@@ -276,6 +276,82 @@
             }
         }
 
+
+        /*
+         * Centralização controlada somente pelo CSS.
+         * Phaser calcula a escala, enquanto o Grid
+         * posiciona o canvas no centro da área visível.
+         */
+        :root {
+            --app-width: 100vw;
+            --app-height: 100dvh;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000000;
+        }
+
+        body {
+            position: fixed;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            overflow: hidden;
+            background: #000000;
+        }
+
+        #game-container {
+            position: fixed;
+            inset: 0;
+
+            width: var(--app-width);
+            height: var(--app-height);
+
+            min-width: 0;
+            min-height: 0;
+
+            display: grid;
+            place-items: center;
+
+            overflow: hidden;
+            background: #000000;
+
+            padding:
+                env(safe-area-inset-top)
+                env(safe-area-inset-right)
+                env(safe-area-inset-bottom)
+                env(safe-area-inset-left);
+        }
+
+        #game-container:fullscreen,
+        #game-container:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #game-container > canvas {
+            grid-area: 1 / 1;
+
+            position: relative !important;
+
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
+
+            margin: 0 !important;
+
+            align-self: center;
+            justify-self: center;
+        }
+
     </style>
 </head>
 <body>
@@ -1645,7 +1721,7 @@
             backgroundColor: '#0d1117', // Fundo escuro de altíssimo contraste
             scale: {
                 mode: Phaser.Scale.FIT, // Faz o jogo expandir e caber perfeitamente em telas de qualquer celular
-                autoCenter: Phaser.Scale.CENTER_BOTH
+                autoCenter: Phaser.Scale.NO_CENTER
             },
             physics: {
                 default: 'arcade',
@@ -1655,6 +1731,182 @@
         };
 
         const game = new Phaser.Game(config);
+
+        const obterViewportJogo = () => {
+            const viewport = window.visualViewport;
+
+            const width = Math.max(
+                1,
+                Math.round(
+                    viewport
+                    ? viewport.width
+                    : window.innerWidth
+                )
+            );
+
+            const height = Math.max(
+                1,
+                Math.round(
+                    viewport
+                    ? viewport.height
+                    : window.innerHeight
+                )
+            );
+
+            return {
+                width,
+                height
+            };
+        };
+
+        const recalcularLayoutJogo = () => {
+            const viewport = obterViewportJogo();
+
+            document.documentElement.style.setProperty(
+                '--app-width',
+                `${viewport.width}px`
+            );
+
+            document.documentElement.style.setProperty(
+                '--app-height',
+                `${viewport.height}px`
+            );
+
+            const container = document.getElementById(
+                'game-container'
+            );
+
+            if (container) {
+                container.style.width = (
+                    `${viewport.width}px`
+                );
+
+                container.style.height = (
+                    `${viewport.height}px`
+                );
+
+                container.style.left = '0px';
+                container.style.top = '0px';
+            }
+
+            if (
+                game
+                && game.scale
+            ) {
+                game.scale.refresh();
+            }
+
+            if (game && game.canvas) {
+                game.canvas.style.margin = '0';
+                game.canvas.style.left = 'auto';
+                game.canvas.style.top = 'auto';
+            }
+
+            window.__MIGUEL_LAYOUT_STATE__ = {
+                viewport,
+
+                canvas: (
+                    game && game.canvas
+                    ? {
+                        width:
+                            game.canvas
+                                .getBoundingClientRect()
+                                .width,
+
+                        height:
+                            game.canvas
+                                .getBoundingClientRect()
+                                .height,
+
+                        left:
+                            game.canvas
+                                .getBoundingClientRect()
+                                .left,
+
+                        top:
+                            game.canvas
+                                .getBoundingClientRect()
+                                .top
+                    }
+                    : null
+                ),
+
+                atualizadoEm: Date.now()
+            };
+        };
+
+        const agendarRecalculoJogo = () => {
+            [
+                0,
+                60,
+                160,
+                320,
+                650
+            ].forEach((atraso) => {
+                window.setTimeout(
+                    recalcularLayoutJogo,
+                    atraso
+                );
+            });
+        };
+
+        window.addEventListener(
+            'resize',
+            agendarRecalculoJogo
+        );
+
+        window.addEventListener(
+            'orientationchange',
+            agendarRecalculoJogo
+        );
+
+        document.addEventListener(
+            'fullscreenchange',
+            agendarRecalculoJogo
+        );
+
+        document.addEventListener(
+            'webkitfullscreenchange',
+            agendarRecalculoJogo
+        );
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener(
+                'resize',
+                agendarRecalculoJogo
+            );
+
+            window.visualViewport.addEventListener(
+                'scroll',
+                agendarRecalculoJogo
+            );
+        }
+
+        if (
+            screen.orientation
+            && typeof screen.orientation
+                .addEventListener === 'function'
+        ) {
+            screen.orientation.addEventListener(
+                'change',
+                agendarRecalculoJogo
+            );
+        }
+
+        window.__MIGUEL_LAYOUT__ = {
+            refresh: agendarRecalculoJogo,
+
+            snapshot: () => {
+                recalcularLayoutJogo();
+
+                return (
+                    window.__MIGUEL_LAYOUT_STATE__
+                );
+            }
+        };
+
+        agendarRecalculoJogo();
+
     </script>
 </body>
 </html>
