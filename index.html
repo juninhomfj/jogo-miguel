@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=unified-input-20260715-213902"></script>
-    <script src="js/device-manager.js?v=unified-input-20260715-213902"></script>
+    <script src="js/phase-config.js?v=consolidated-hud-20260715-214435"></script>
+    <script src="js/device-manager.js?v=consolidated-hud-20260715-214435"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/input-manager.js?v=unified-input-20260715-213902"></script>
-    <script src="js/health-manager.js?v=unified-input-20260715-213902"></script>
-    <script src="js/tutorial-manager.js?v=unified-input-20260715-213902"></script>
+    <script src="js/input-manager.js?v=consolidated-hud-20260715-214435"></script>
+    <script src="js/hud-manager.js?v=consolidated-hud-20260715-214435"></script>
+    <script src="js/health-manager.js?v=consolidated-hud-20260715-214435"></script>
+    <script src="js/tutorial-manager.js?v=consolidated-hud-20260715-214435"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -432,7 +433,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'unified-input-20260715-213902';
+        window.__MIGUEL_BUILD_ID__ = 'consolidated-hud-20260715-214435';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -640,25 +641,22 @@
                     this.nuvens.push(nuvem);
                 });
 
-                // Placar de Alto Contraste
-                this.nome = this.registry.get('nomeJogador');
-                this.pontos = this.registry.get('pontuacao');
-                this.textoPlacar = this.add.text(20, 20, `${this.nome} SCORE: ${this.pontos}`, {
-                    fontSize: '28px',
-                    fill: '#FFCC00',
-                    fontStyle: 'bold'
-                });
+                // Estado exibido pelo HUD consolidado.
+                this.nome = (
+                    this.registry.get(
+                        'nomeJogador'
+                    )
+                    || 'MIG'
+                );
 
-                this.textoTipoFase = this.add.text(
-                    780,
-                    22,
-                    'TUTORIAL · TREINAMENTO',
-                    {
-                        fontSize: '16px',
-                        fill: '#8FE9FF',
-                        fontStyle: 'bold'
-                    }
-                ).setOrigin(1, 0);
+                this.pontos = Number(
+                    this.registry.get(
+                        'pontuacao'
+                    )
+                    || 0
+                );
+
+                this.textoPlacar = null;
 
                 // PLATAFORMAS (Alto contraste)
                 this.plataformas = this.physics.add.staticGroup();
@@ -923,6 +921,21 @@
 
                 this.controles.iniciar();
 
+                this.hudJogo = (
+                    new window.MiguelHUDManager(
+                        this,
+                        {
+                            nome: this.nome,
+                            pontos: this.pontos,
+                            tipoFase:
+                                'TUTORIAL',
+                            totalEtapas: 6
+                        }
+                    )
+                );
+
+                this.hudJogo.iniciar();
+
                 this.sistemaVida = (
                     new window.MiguelHealthManager(
                         this,
@@ -930,6 +943,9 @@
                         {
                             vidaMaxima: 100,
                             vidas: 3,
+
+                            hud:
+                                this.hudJogo,
 
                             duracaoInvulnerabilidade:
                                 1100,
@@ -1002,6 +1018,9 @@
                     new window.MiguelTutorialManager(
                         this,
                         {
+                            hud:
+                                this.hudJogo,
+
                             totalCristais:
                                 this.cristais
                                     .countActive(true),
@@ -1168,6 +1187,14 @@
 
                 if (this.controles) {
                     this.controles.atualizar();
+
+                    if (this.hudJogo) {
+                        this.hudJogo
+                            .atualizarDispositivo(
+                                this.controles
+                                    .ultimoDispositivo
+                            );
+                    }
                 }
 
                 const noChao = Boolean(
@@ -1611,9 +1638,12 @@
                     this.pontos
                 );
 
-                this.textoPlacar.setText(
-                    `${this.nome} SCORE: ${this.pontos}`
-                );
+                if (this.hudJogo) {
+                    this.hudJogo
+                        .atualizarPontuacao(
+                            this.pontos
+                        );
+                }
 
                 if (this.tutorial) {
                     this.tutorial.registrarAcao(
