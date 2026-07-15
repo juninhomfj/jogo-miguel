@@ -33,6 +33,7 @@
                 'aprender-movimento',
                 'aprender-pulo',
                 'aprender-pulo-duplo',
+                'aprender-dano',
                 'aprender-ataque',
                 'coletar-cristais'
             ]),

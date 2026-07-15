@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=tutorial-guided-20260715-211335"></script>
-    <script src="js/device-manager.js?v=tutorial-guided-20260715-211335"></script>
+    <script src="js/phase-config.js?v=tutorial-health-20260715-212632"></script>
+    <script src="js/device-manager.js?v=tutorial-health-20260715-212632"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/tutorial-manager.js?v=tutorial-guided-20260715-211335"></script>
+    <script src="js/health-manager.js?v=tutorial-health-20260715-212632"></script>
+    <script src="js/tutorial-manager.js?v=tutorial-health-20260715-212632"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -430,7 +431,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'tutorial-guided-20260715-211335';
+        window.__MIGUEL_BUILD_ID__ = 'tutorial-health-20260715-212632';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -650,7 +651,7 @@
                 this.textoTipoFase = this.add.text(
                     780,
                     22,
-                    'FASE 1 · TREINAMENTO',
+                    'TUTORIAL · TREINAMENTO',
                     {
                         fontSize: '16px',
                         fill: '#8FE9FF',
@@ -694,6 +695,14 @@
                 this.vilao.limiteEsquerda = plat1.x - (plat1.width / 2) + (this.vilao.displayWidth / 2);
                 this.vilao.limiteDireita = plat1.x + (plat1.width / 2) - (this.vilao.displayWidth / 2);
                 this.vilao.direcao = 1;
+
+                // Configuração reutilizável do inimigo.
+                this.vilao.tipoInimigo = 'robo-tutorial';
+                this.vilao.modoDerrota = 'attack';
+                this.vilao.vida = 1;
+                this.vilao.danoContato = 20;
+                this.vilao.danoPisao = 20;
+
                 this.ultimoDanoVilao = 0;
 
                 // CRIANDO O MIGUEL
@@ -706,6 +715,7 @@
                 this.player.estaEmPoeira = false;
                 this.player.giroDuploAtivo = false;
                 this.player.estavaNoChao = false;
+                this.player.estaMachucado = false;
                 this.player.setDepth(10);
                 this.player.setCollideWorldBounds(true);
 
@@ -1143,6 +1153,81 @@
                     }
                 );
 
+                this.sistemaVida = (
+                    new window.MiguelHealthManager(
+                        this,
+                        this.player,
+                        {
+                            vidaMaxima: 100,
+                            vidas: 3,
+
+                            duracaoInvulnerabilidade:
+                                1100,
+
+                            respawnX: 50,
+                            respawnY: 320,
+
+                            onDamage: (evento) => {
+                                if (this.tutorial) {
+                                    this.tutorial.registrarAcao(
+                                        'dano-robo',
+                                        evento
+                                    );
+
+                                    this.tutorial
+                                        .mostrarDicaTemporaria(
+                                            'Você perdeu vida! '
+                                            + 'Use o golpe para '
+                                            + 'derrotar este robô.'
+                                        );
+                                }
+                            },
+
+                            onLifeLost: () => {
+                                if (this.tutorial) {
+                                    this.tutorial
+                                        .mostrarDicaTemporaria(
+                                            'Você perdeu um coração.'
+                                        );
+                                }
+                            },
+
+                            onRespawn: () => {
+                                if (this.tutorial) {
+                                    this.tutorial
+                                        .mostrarDicaTemporaria(
+                                            'Tente novamente!'
+                                        );
+                                }
+                            },
+
+                            onGameOver: () => {
+                                if (this.tutorial) {
+                                    this.tutorial
+                                        .mostrarDicaTemporaria(
+                                            'Vamos recomeçar '
+                                            + 'o treinamento.'
+                                        );
+                                }
+
+                                this.time.delayedCall(
+                                    1000,
+                                    () => {
+                                        this.registry.set(
+                                            'pontuacao',
+                                            0
+                                        );
+
+                                        this.scene.restart();
+                                    }
+                                );
+                            }
+                        }
+                    )
+                );
+
+                this.sistemaVida.iniciar();
+
                 this.tutorial = (
                     new window.MiguelTutorialManager(
                         this,
@@ -1371,6 +1456,14 @@
                     }
                 }
 
+                const podeControlar = Boolean(
+                    !this.player.estaMachucado
+                    && !(
+                        this.sistemaVida
+                        && this.sistemaVida.morto
+                    )
+                );
+
                 const esquerda = Boolean(
                     this.cursors.left.isDown
                     || this.teclas.esquerda.isDown
@@ -1383,7 +1476,11 @@
                     || this.toquesDireita.size > 0
                 );
 
-                if (esquerda && !direita) {
+                if (
+                    podeControlar
+                    && esquerda
+                    && !direita
+                ) {
                     this.player.setVelocityX(-220);
                     this.player.setFlipX(true);
 
@@ -1398,7 +1495,8 @@
                         );
                     }
                 } else if (
-                    direita
+                    podeControlar
+                    && direita
                     && !esquerda
                 ) {
                     this.player.setVelocityX(220);
@@ -1414,7 +1512,7 @@
                             true
                         );
                     }
-                } else {
+                } else if (podeControlar) {
                     this.player.setVelocityX(0);
 
                     if (
@@ -1441,7 +1539,8 @@
                 );
 
                 if (
-                    descer
+                    podeControlar
+                    && descer
                     && !noChao
                     && this.player.body.velocity.y
                         < 360
@@ -1459,7 +1558,10 @@
                     || this.filaPulos > 0
                 );
 
-                if (pediuPulo) {
+                if (
+                    pediuPulo
+                    && podeControlar
+                ) {
                     if (this.filaPulos > 0) {
                         this.filaPulos -= 1;
                     }
@@ -1477,7 +1579,10 @@
                     || this.filaAtaques > 0
                 );
 
-                if (pediuAtaque) {
+                if (
+                    pediuAtaque
+                    && podeControlar
+                ) {
                     if (this.filaAtaques > 0) {
                         this.filaAtaques -= 1;
                     }
@@ -1490,6 +1595,7 @@
                     && !this.player.estaAtacando
                     && !this.player.giroDuploAtivo
                     && !this.player.estaEmPoeira
+                    && !this.player.estaMachucado
                 ) {
                     const animacaoPulo = (
                         this.player
@@ -1565,7 +1671,16 @@
             }
 
             executarAtaque() {
-                if (this.player.estaAtacando) return;
+                if (
+                    this.player.estaAtacando
+                    || this.player.estaMachucado
+                    || (
+                        this.sistemaVida
+                        && this.sistemaVida.morto
+                    )
+                ) {
+                    return;
+                }
 
                 this.cancelarGiroDuplo();
                 this.cancelarPoeira();
@@ -1585,16 +1700,65 @@
                     90
                 );
 
-                if (this.vilao && this.vilao.active && Phaser.Geom.Rectangle.Overlaps(areaAtaque, this.vilao.getBounds())) {
-                    this.destruirVilao(
-                        this.vilao,
-                        'ataque'
+                if (
+                    this.vilao
+                    && this.vilao.active
+                    && Phaser.Geom.Rectangle.Overlaps(
+                        areaAtaque,
+                        this.vilao.getBounds()
+                    )
+                ) {
+                    const podeDestruir = Boolean(
+                        !this.tutorial
+                        || this.tutorial
+                            .podeDerrotarRobo()
                     );
+
+                    if (podeDestruir) {
+                        this.destruirVilao(
+                            this.vilao,
+                            'ataque'
+                        );
+                    } else {
+                        this.vilao.anims.play(
+                            'robo_damage',
+                            true
+                        );
+
+                        this.vilao.off(
+                            'animationcomplete-robo_damage'
+                        );
+
+                        this.vilao.once(
+                            'animationcomplete-robo_damage',
+                            () => {
+                                if (
+                                    this.vilao
+                                    && this.vilao.active
+                                ) {
+                                    this.vilao.anims.play(
+                                        'robo_patrol',
+                                        true
+                                    );
+                                }
+                            }
+                        );
+
+                        this.tutorial
+                            .mostrarDicaTemporaria(
+                                'Primeiro descubra '
+                                + 'o perigo de encostar '
+                                + 'no robô.'
+                            );
+                    }
                 }
             }
 
             tocarPoeira() {
-                if (this.player.estaAtacando) {
+                if (
+                    this.player.estaAtacando
+                    || this.player.estaMachucado
+                ) {
                     return;
                 }
 
@@ -1703,62 +1867,80 @@
                 }
             }
 
-            acertarVilao(player, vilao) {
-                const pisouNoVilao = player.body.velocity.y > 0 && player.body.bottom <= vilao.body.top + 18;
-
-                if (pisouNoVilao) {
-                    const explosao = this.add.particles(vilao.x, vilao.y, 'particulaVilao', {
-                        speed: { min: 80, max: 260 },
-                        angle: { min: 0, max: 360 },
-                        lifespan: 500,
-                        gravityY: 500,
-                        scale: { start: 1.4, end: 0 },
-                        quantity: 18,
-                        emitting: false
-                    });
-
-                    explosao.explode(18);
-                    this.time.delayedCall(600, () => explosao.destroy());
-                    vilao.anims.play(
-                        'robo_damage',
-                        true
-                    );
-
-                    vilao.once(
-                        'animationcomplete-robo_damage',
-                        () => {
-                            if (vilao.active) {
-                                vilao.anims.play(
-                                    'robo_patrol',
-                                    true
-                                );
-                            }
-                        }
-                    );
-
-                    if (this.tutorial) {
-                        this.tutorial
-                            .mostrarDicaTemporaria(
-                                'Use BATER para concluir '
-                                + 'o treino de ataque!'
-                            );
-                    }
-
-                    player.setVelocityY(-300);
+            acertarVilao(
+                player,
+                vilao
+            ) {
+                if (
+                    !vilao
+                    || !vilao.active
+                    || !this.sistemaVida
+                ) {
                     return;
                 }
 
-                if (this.time.now - this.ultimoDanoVilao < 900) return;
+                const pisouNoVilao = Boolean(
+                    player.body.velocity.y > 0
+                    && player.body.bottom
+                        <= vilao.body.top + 24
+                );
 
-                this.ultimoDanoVilao = this.time.now;
-                this.pontos -= 5;
-                this.registry.set('pontuacao', this.pontos);
-                this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
-                vilao.anims.play('robo_damage', true);
-                vilao.once('animationcomplete-robo_damage', () => {
-                    if (vilao.active) vilao.anims.play('robo_patrol', true);
-                });
-                player.setVelocityX(player.x < vilao.x ? -260 : 260);
+                const dano = (
+                    pisouNoVilao
+                    ? vilao.danoPisao
+                    : vilao.danoContato
+                );
+
+                const direcaoRecuo = (
+                    player.x < vilao.x
+                    ? -1
+                    : 1
+                );
+
+                const danoAplicado = (
+                    this.sistemaVida.receberDano(
+                        dano,
+                        {
+                            origem:
+                                vilao.tipoInimigo,
+
+                            forma:
+                                pisouNoVilao
+                                ? 'pisao'
+                                : 'contato',
+
+                            direcao:
+                                direcaoRecuo,
+
+                            impulsoX:
+                                pisouNoVilao
+                                ? 220
+                                : 280,
+
+                            impulsoY:
+                                pisouNoVilao
+                                ? -340
+                                : -220
+                        }
+                    )
+                );
+
+                if (
+                    danoAplicado
+                    && this.tutorial
+                ) {
+                    this.tutorial.registrarAcao(
+                        'dano-robo',
+                        {
+                            forma:
+                                pisouNoVilao
+                                ? 'pisao'
+                                : 'contato',
+
+                            dano
+                        }
+                    );
+                }
             }
         }
 
@@ -1792,7 +1974,7 @@
                 this.add.text(
                     505,
                     175,
-                    'FASE 1 CONCLUÍDA!',
+                    'TREINAMENTO CONCLUÍDO!',
                     {
                         fontSize: '38px',
                         fill: '#00FF66',
