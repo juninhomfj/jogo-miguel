@@ -8,6 +8,10 @@
             this.scene = scene;
             this.player = player;
 
+            this.hudExterno = (
+                options.hud || null
+            );
+
             this.vidaMaxima = Math.max(
                 1,
                 Number(options.vidaMaxima || 100)
@@ -87,7 +91,10 @@
         }
 
         iniciar() {
-            this.criarHUD();
+            if (!this.hudExterno) {
+                this.criarHUD();
+            }
+
             this.atualizarHUD();
 
             this.scene.events.once(
@@ -213,6 +220,18 @@
         }
 
         atualizarHUD() {
+            if (
+                this.hudExterno
+                && typeof this.hudExterno
+                    .atualizarVida === 'function'
+            ) {
+                this.hudExterno.atualizarVida(
+                    this.obterEstado()
+                );
+
+                return;
+            }
+
             if (
                 !this.textoVida
                 || !this.barraVida

@@ -6,6 +6,10 @@
         ) {
             this.scene = scene;
 
+            this.hudExterno = (
+                options.hud || null
+            );
+
             this.totalCristais = (
                 options.totalCristais || 5
             );
@@ -179,7 +183,9 @@
                 return;
             }
 
-            this.criarHUD();
+            if (!this.hudExterno) {
+                this.criarHUD();
+            }
 
             this.ultimaPosicaoX = (
                 this.scene.player
@@ -613,19 +619,43 @@
                 );
             });
 
-            this.textoEtapa.setText(
-                `TREINAMENTO ${
-                    this.objetivos.length
-                }/${this.objetivos.length}`
-            );
+            if (
+                this.hudExterno
+                && typeof this.hudExterno
+                    .atualizarTutorial
+                    === 'function'
+            ) {
+                this.hudExterno
+                    .atualizarTutorial({
+                        etapa:
+                            this.objetivos.length,
 
-            this.textoObjetivo.setText(
-                'TREINAMENTO CONCLUÍDO!'
-            );
+                        totalEtapas:
+                            this.objetivos.length,
 
-            this.textoDica.setText(
-                'Preparando o resultado da fase...'
-            );
+                        titulo:
+                            'TREINAMENTO CONCLUÍDO!',
+
+                        dica:
+                            'Preparando o resultado...',
+
+                        concluido: true
+                    });
+            } else {
+                this.textoEtapa.setText(
+                    `TREINAMENTO ${
+                        this.objetivos.length
+                    }/${this.objetivos.length}`
+                );
+
+                this.textoObjetivo.setText(
+                    'TREINAMENTO CONCLUÍDO!'
+                );
+
+                this.textoDica.setText(
+                    'Preparando o resultado da fase...'
+                );
+            }
 
             this.mostrarFeedback(
                 '★ TODOS OS OBJETIVOS CONCLUÍDOS ★',
@@ -672,6 +702,38 @@
                 return;
             }
 
+            const dicaAtual = (
+                this.mobile
+                ? objetivo.dicaMobile
+                : objetivo.dicaTeclado
+            );
+
+            if (
+                this.hudExterno
+                && typeof this.hudExterno
+                    .atualizarTutorial
+                    === 'function'
+            ) {
+                this.hudExterno
+                    .atualizarTutorial({
+                        etapa:
+                            this.indiceAtual + 1,
+
+                        totalEtapas:
+                            this.objetivos.length,
+
+                        titulo:
+                            objetivo.titulo,
+
+                        dica:
+                            dicaAtual,
+
+                        concluido: false
+                    });
+
+                return;
+            }
+
             this.textoEtapa.setText(
                 `TREINAMENTO ${
                     this.indiceAtual + 1
@@ -683,9 +745,7 @@
             );
 
             this.textoDica.setText(
-                this.mobile
-                    ? objetivo.dicaMobile
-                    : objetivo.dicaTeclado
+                dicaAtual
             );
 
             this.barras.forEach(
@@ -717,6 +777,20 @@
             duracao = 650
         ) {
             if (!this.ativo) {
+                return;
+            }
+
+            if (
+                this.hudExterno
+                && typeof this.hudExterno
+                    .mostrarMensagem
+                    === 'function'
+            ) {
+                this.hudExterno.mostrarMensagem(
+                    mensagem,
+                    duracao
+                );
+
                 return;
             }
 
