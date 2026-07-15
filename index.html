@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=consolidated-hud-20260715-214435"></script>
-    <script src="js/device-manager.js?v=consolidated-hud-20260715-214435"></script>
+    <script src="js/phase-config.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/device-manager.js?v=rotation-hardened-20260715-220936"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/input-manager.js?v=consolidated-hud-20260715-214435"></script>
-    <script src="js/hud-manager.js?v=consolidated-hud-20260715-214435"></script>
-    <script src="js/health-manager.js?v=consolidated-hud-20260715-214435"></script>
-    <script src="js/tutorial-manager.js?v=consolidated-hud-20260715-214435"></script>
+    <script src="js/input-manager.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/hud-manager.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/health-manager.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/tutorial-manager.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/rotation-manager.js?v=rotation-hardened-20260715-220936"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -369,6 +370,168 @@
             opacity: 0;
         }
 
+
+        /*
+         * A geometria do aviso é independente do canvas.
+         * Quando o navegador continua bloqueado em
+         * paisagem, somente esta camada é girada.
+         */
+        #orientation-overlay {
+            padding: 0;
+            overflow: hidden;
+
+            transform: translateZ(0);
+        }
+
+        #orientation-rotator {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+
+            width:
+                var(
+                    --orientation-stage-width,
+                    100dvw
+                );
+
+            height:
+                var(
+                    --orientation-stage-height,
+                    100dvh
+                );
+
+            display: grid;
+            place-items: center;
+
+            padding:
+                max(
+                    14px,
+                    env(safe-area-inset-top)
+                )
+                max(
+                    14px,
+                    env(safe-area-inset-right)
+                )
+                max(
+                    14px,
+                    env(safe-area-inset-bottom)
+                )
+                max(
+                    14px,
+                    env(safe-area-inset-left)
+                );
+
+            transform:
+                translate(-50%, -50%)
+                rotate(
+                    var(
+                        --orientation-rotation,
+                        0deg
+                    )
+                );
+
+            transform-origin: center center;
+
+            transition:
+                transform 130ms ease;
+        }
+
+        #orientation-rotator .orientation-card {
+            width:
+                min(
+                    calc(100% - 28px),
+                    460px
+                );
+
+            max-height:
+                calc(100% - 28px);
+
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+
+            scrollbar-width: thin;
+        }
+
+        #orientation-overlay.is-rotated
+        .orientation-card {
+            width:
+                min(
+                    calc(100% - 24px),
+                    430px
+                );
+
+            padding: 18px 16px;
+
+            border-width: 3px;
+        }
+
+        #orientation-overlay.is-rotated
+        .orientation-icon {
+            margin-bottom: 7px;
+            font-size: 48px;
+        }
+
+        #orientation-overlay.is-rotated
+        .orientation-card h2 {
+            margin-bottom: 8px;
+
+            font-size:
+                clamp(
+                    22px,
+                    7vw,
+                    32px
+                );
+
+            line-height: 1.15;
+        }
+
+        #orientation-overlay.is-rotated
+        .orientation-card p {
+            margin-bottom: 12px;
+
+            font-size:
+                clamp(
+                    14px,
+                    4vw,
+                    17px
+                );
+
+            line-height: 1.35;
+        }
+
+        #orientation-overlay.is-rotated
+        .orientation-actions {
+            gap: 8px;
+        }
+
+        #orientation-overlay.is-rotated
+        .orientation-actions button {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+
+        #orientation-overlay.is-rotated
+        #orientation-status {
+            margin-top: 9px;
+
+            font-size: 10px;
+
+            overflow-wrap: anywhere;
+        }
+
+        #game-container.orientation-transitioning
+        > canvas,
+
+        #game-container.orientation-blocked
+        > canvas {
+            opacity: 0;
+
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
@@ -378,7 +541,8 @@
             id="orientation-overlay"
             aria-hidden="true"
         >
-            <div class="orientation-card">
+            <div id="orientation-rotator">
+                <div class="orientation-card">
                 <span
                     class="orientation-icon"
                     aria-hidden="true"
@@ -412,6 +576,7 @@
                 <small id="orientation-status">
                     Verificando o aparelho...
                 </small>
+                </div>
             </div>
         </div>
 
@@ -433,7 +598,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'consolidated-hud-20260715-214435';
+        window.__MIGUEL_BUILD_ID__ = 'rotation-hardened-20260715-220936';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -2180,9 +2345,30 @@
             };
         };
 
-        let timerLayoutEstavel = null;
+        let revisaoLayout = 0;
+        let temporizadoresLayout = [];
+
+        const limparTemporizadoresLayout = () => {
+            temporizadoresLayout.forEach(
+                (temporizador) => {
+                    window.clearTimeout(
+                        temporizador
+                    );
+                }
+            );
+
+            temporizadoresLayout = [];
+        };
 
         const agendarRecalculoJogo = () => {
+            revisaoLayout += 1;
+
+            const revisaoAtual = (
+                revisaoLayout
+            );
+
+            limparTemporizadoresLayout();
+
             const container = (
                 document.getElementById(
                     'game-container'
@@ -2195,26 +2381,45 @@
                 );
             }
 
-            window.clearTimeout(
-                timerLayoutEstavel
-            );
-
             [
                 0,
                 70,
-                170,
-                340,
-                680
+                160,
+                300,
+                520,
+                720
             ].forEach((atraso) => {
-                window.setTimeout(
-                    recalcularLayoutJogo,
-                    atraso
+                const temporizador = (
+                    window.setTimeout(
+                        () => {
+                            if (
+                                revisaoAtual
+                                !== revisaoLayout
+                            ) {
+                                return;
+                            }
+
+                            recalcularLayoutJogo();
+                        },
+                        atraso
+                    )
+                );
+
+                temporizadoresLayout.push(
+                    temporizador
                 );
             });
 
-            timerLayoutEstavel = (
+            const temporizadorFinal = (
                 window.setTimeout(
                     () => {
+                        if (
+                            revisaoAtual
+                            !== revisaoLayout
+                        ) {
+                            return;
+                        }
+
                         recalcularLayoutJogo();
 
                         if (container) {
@@ -2222,9 +2427,25 @@
                                 'layout-settling'
                             );
                         }
+
+                        window.dispatchEvent(
+                            new CustomEvent(
+                                'miguel:layout-stable',
+                                {
+                                    detail: {
+                                        revisao:
+                                            revisaoAtual
+                                    }
+                                }
+                            )
+                        );
                     },
-                    760
+                    900
                 )
+            );
+
+            temporizadoresLayout.push(
+                temporizadorFinal
             );
         };
 
@@ -2274,6 +2495,9 @@
         window.__MIGUEL_LAYOUT__ = {
             refresh: agendarRecalculoJogo,
 
+            recalculate:
+                recalcularLayoutJogo,
+
             snapshot: () => {
                 recalcularLayoutJogo();
 
@@ -2284,74 +2508,15 @@
         };
 
 
-        window.addEventListener(
-            'miguel:orientation-state',
-            (evento) => {
-                const estado = (
-                    evento.detail || {}
-                );
+        window.__MIGUEL_GAME__ = game;
 
-                const bloqueado = Boolean(
-                    estado.modoJogoAtivo
-                    && !estado.orientacaoCorreta
-                );
+        window.MIGUEL_ROTATION_MANAGER
+            .inicializar({
+                game,
 
-                const container = (
-                    document.getElementById(
-                        'game-container'
-                    )
-                );
-
-                if (container) {
-                    container.classList.toggle(
-                        'orientation-blocked',
-                        bloqueado
-                    );
-                }
-
-                if (
-                    game
-                    && game.scene
-                ) {
-                    const fase1 = (
-                        game.scene.getScene('Fase1')
-                    );
-
-                    if (bloqueado) {
-                        if (fase1) {
-                            fase1.toquesEsquerda
-                                ?.clear();
-
-                            fase1.toquesDireita
-                                ?.clear();
-
-                            fase1.filaPulos = 0;
-                            fase1.filaAtaques = 0;
-                        }
-
-                        if (
-                            game.scene.isActive(
-                                'Fase1'
-                            )
-                        ) {
-                            game.scene.pause(
-                                'Fase1'
-                            );
-                        }
-                    } else if (
-                        game.scene.isPaused(
-                            'Fase1'
-                        )
-                    ) {
-                        game.scene.resume(
-                            'Fase1'
-                        );
-                    }
-                }
-
-                agendarRecalculoJogo();
-            }
-        );
+                deviceManager:
+                    GERENCIADOR_DISPOSITIVO
+            });
 
         agendarRecalculoJogo();
 
