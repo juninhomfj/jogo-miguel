@@ -176,6 +176,24 @@
 
 
         obterOrientacaoFisica() {
+            const agora = Date.now();
+
+            const manterUltima = () => {
+                if (
+                    this.ultimaOrientacaoFisica
+                    && (
+                        agora
+                        - this.ultimaOrientacaoFisicaEm
+                    ) <= 1800
+                ) {
+                    return (
+                        this.ultimaOrientacaoFisica
+                    );
+                }
+
+                return null;
+            };
+
             if (
                 this.estadoSensor.permissao
                     !== 'ativa'
@@ -187,11 +205,11 @@
                 )
                 || !this.estadoSensor.atualizadoEm
                 || (
-                    Date.now()
+                    agora
                     - this.estadoSensor.atualizadoEm
-                ) > 2200
+                ) > 2600
             ) {
-                return null;
+                return manterUltima();
             }
 
             const beta = Math.abs(
@@ -202,26 +220,21 @@
                 this.estadoSensor.gamma
             );
 
-            // Aparelho em paisagem:
-            // inclinação lateral predominante.
             if (
-                gamma >= 38
-                && gamma > beta + 10
+                gamma >= 34
+                && gamma > beta + 7
             ) {
                 return 'landscape';
             }
 
-            // Aparelho em retrato:
-            // inclinação frontal predominante.
             if (
-                beta >= 38
-                && beta > gamma + 10
+                beta >= 34
+                && beta > gamma + 7
             ) {
                 return 'portrait';
             }
 
-            // Posição plana ou ambígua.
-            return null;
+            return manterUltima();
         }
 
         obterOrientacaoAtual() {
@@ -511,10 +524,12 @@
                 this.obterOrientacaoFisica()
             );
 
-            if (
-                orientacaoFisica
-                !== this.ultimaOrientacaoFisica
-            ) {
+            if (orientacaoFisica) {
+                const mudou = (
+                    orientacaoFisica
+                    !== this.ultimaOrientacaoFisica
+                );
+
                 this.ultimaOrientacaoFisica = (
                     orientacaoFisica
                 );
@@ -523,10 +538,16 @@
                     Date.now()
                 );
 
-                this.atualizarInterface();
-            } else {
-                this.atualizarStatus();
+                if (mudou) {
+                    this.atualizarInterface();
+                } else {
+                    this.atualizarStatus();
+                }
+
+                return;
             }
+
+            this.atualizarStatus();
         }
 
         aoMudarOrientacao() {

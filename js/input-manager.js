@@ -1289,6 +1289,36 @@
             });
         }
 
+        resetarEstado() {
+            this.liberarJoystick();
+
+            this.eixoTouchX = 0;
+            this.eixoTouchY = 0;
+
+            this.eixoTecladoX = 0;
+            this.eixoTecladoY = 0;
+
+            this.eixoGamepadX = 0;
+            this.eixoGamepadY = 0;
+
+            this.eixoFinalX = 0;
+            this.eixoFinalY = 0;
+
+            this.filaPulo = 0;
+            this.filaAtaque = 0;
+            this.filaPoder = 0;
+            this.filaPausa = 0;
+            this.filaReiniciar = 0;
+
+            this.gamepadAnterior = {
+                pulo: false,
+                ataque: false,
+                poder: false,
+                pausa: false,
+                reiniciar: false
+            };
+        }
+
         obterMovimentoX() {
             return this.eixoFinalX;
         }
