@@ -1,0 +1,24 @@
+Entrada: incoming/sprites/13_victory_trophy_limpo_final.png
+Dimensão original: (1254, 1254)
+Bounding box total: (418, 308, 916, 938)
+Pixels visíveis: 139720
+Componentes encontrados: 4
+Componente principal: (418, 382, 889, 938)
+Pixels do componente principal: 137589
+Limite lateral usado para o corpo: x=710
+Bounding box estimado do corpo: (418, 398, 711, 938)
+Altura estimada do corpo: 540
+Bounding box da região inferior: (456, 765, 711, 938)
+Centro de apoio horizontal: 583.50
+Altura-alvo do corpo: 122
+Escala sugerida: 0.225926
+Conjunto final previsto: 113x142
+Posição prevista: x=91, y=82
+Bounding box final previsto: (91, 82, 204, 224)
+Margens finais previstas: {'esquerda': 91, 'topo': 82, 'direita': 52, 'inferior': 32}
+
+COMPONENTES:
+C00 | pixels=137589 | bbox=(418, 382, 889, 938)
+C01 | pixels=753 | bbox=(806, 308, 843, 353)
+C02 | pixels=696 | bbox=(736, 332, 769, 378)
+C03 | pixels=682 | bbox=(880, 370, 916, 416)
