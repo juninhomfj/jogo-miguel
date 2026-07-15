@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=orientation-physical-20260715-195510"></script>
-    <script src="js/device-manager.js?v=orientation-physical-20260715-195510"></script>
+    <script src="js/phase-config.js?v=tutorial-guided-20260715-211335"></script>
+    <script src="js/device-manager.js?v=tutorial-guided-20260715-211335"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <script src="js/tutorial-manager.js?v=tutorial-guided-20260715-211335"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -429,7 +430,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'orientation-physical-20260715-195510';
+        window.__MIGUEL_BUILD_ID__ = 'tutorial-guided-20260715-211335';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -1141,6 +1142,30 @@
                         this.toquesDireita.clear();
                     }
                 );
+
+                this.tutorial = (
+                    new window.MiguelTutorialManager(
+                        this,
+                        {
+                            totalCristais:
+                                this.cristais
+                                    .countActive(true),
+
+                            onComplete: () => {
+                                this.registry.set(
+                                    'tutorialConcluido',
+                                    true
+                                );
+
+                                this.scene.start(
+                                    'Fase2'
+                                );
+                            }
+                        }
+                    )
+                );
+
+                this.tutorial.iniciar();
             }
 
             sincronizarGiroDuplo() {
@@ -1404,6 +1429,12 @@
                     }
                 }
 
+                if (this.tutorial) {
+                    this.tutorial.registrarMovimento(
+                        this.player.x
+                    );
+                }
+
                 const descer = Boolean(
                     this.cursors.down.isDown
                     || this.teclas.descer.isDown
@@ -1501,6 +1532,12 @@
 
                     this.player.setVelocityY(-520);
 
+                    if (this.tutorial) {
+                        this.tutorial.registrarAcao(
+                            'pulo'
+                        );
+                    }
+
                     if (!this.player.estaAtacando) {
                         this.player.anims.play(
                             'jump',
@@ -1516,6 +1553,12 @@
                 ) {
                     this.player.pulosDisponiveis = 0;
                     this.player.setVelocityY(-500);
+
+                    if (this.tutorial) {
+                        this.tutorial.registrarAcao(
+                            'pulo-duplo'
+                        );
+                    }
 
                     this.iniciarGiroDuplo();
                 }
@@ -1543,7 +1586,10 @@
                 );
 
                 if (this.vilao && this.vilao.active && Phaser.Geom.Rectangle.Overlaps(areaAtaque, this.vilao.getBounds())) {
-                    this.destruirVilao(this.vilao);
+                    this.destruirVilao(
+                        this.vilao,
+                        'ataque'
+                    );
                 }
             }
 
@@ -1602,23 +1648,61 @@
                 );
             }
 
-            destruirVilao(vilao) {
+            destruirVilao(
+                vilao,
+                causa = 'desconhecida'
+            ) {
+                if (
+                    causa === 'ataque'
+                    && this.tutorial
+                ) {
+                    this.tutorial.registrarAcao(
+                        'ataque-robo'
+                    );
+                }
+
                 vilao.setVelocity(0, 0);
                 vilao.body.enable = false;
                 vilao.anims.play('robo_explosion', true);
                 vilao.once('animationcomplete-robo_explosion', () => vilao.disableBody(true, true));
             }
 
-            coletarCristal(player, cristal) {
+            coletarCristal(
+                player,
+                cristal
+            ) {
                 cristal.disableBody(true, true);
-                this.pontos += 10;
-                this.registry.set('pontuacao', this.pontos);
-                this.textoPlacar.setText(`${this.nome} SCORE: ${this.pontos}`);
 
-                if (this.cristais.countActive(true) === 0) {
+                this.pontos += 10;
+
+                this.registry.set(
+                    'pontuacao',
+                    this.pontos
+                );
+
+                this.textoPlacar.setText(
+                    `${this.nome} SCORE: ${this.pontos}`
+                );
+
+                if (this.tutorial) {
+                    this.tutorial.registrarAcao(
+                        'cristal',
+                        {
+                            restantes:
+                                this.cristais
+                                    .countActive(true)
+                        }
+                    );
+                } else if (
+                    this.cristais
+                        .countActive(true) === 0
+                ) {
+                    // Fallback defensivo para uma cena
+                    // criada sem o gerenciador.
                     this.scene.start('Fase2');
                 }
             }
+
             acertarVilao(player, vilao) {
                 const pisouNoVilao = player.body.velocity.y > 0 && player.body.bottom <= vilao.body.top + 18;
 
@@ -1635,7 +1719,31 @@
 
                     explosao.explode(18);
                     this.time.delayedCall(600, () => explosao.destroy());
-                    this.destruirVilao(vilao);
+                    vilao.anims.play(
+                        'robo_damage',
+                        true
+                    );
+
+                    vilao.once(
+                        'animationcomplete-robo_damage',
+                        () => {
+                            if (vilao.active) {
+                                vilao.anims.play(
+                                    'robo_patrol',
+                                    true
+                                );
+                            }
+                        }
+                    );
+
+                    if (this.tutorial) {
+                        this.tutorial
+                            .mostrarDicaTemporaria(
+                                'Use BATER para concluir '
+                                + 'o treino de ataque!'
+                            );
+                    }
+
                     player.setVelocityY(-300);
                     return;
                 }
