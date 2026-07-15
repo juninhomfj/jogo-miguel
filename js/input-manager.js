@@ -33,6 +33,18 @@
             this.eixoFinalX = 0;
             this.eixoFinalY = 0;
 
+            // Histerese: entra e sai do agachamento
+            // usando limites diferentes.
+            this.agachamentoSolicitado = false;
+            this.limiarAgacharEntrada = 0.62;
+            this.limiarAgacharSaida = 0.30;
+
+            // O pulo ocorre somente ao atravessar
+            // o limite superior do analógico.
+            this.puloAnalogicoArmado = true;
+            this.limiarPuloAnalogico = -0.68;
+            this.limiarRearmePulo = -0.24;
+
             this.filaPulo = 0;
             this.filaAtaque = 0;
             this.filaPoder = 0;
@@ -106,6 +118,10 @@
 
                 attack: () => {
                     this.solicitarAcao('ataque');
+                },
+
+                power: () => {
+                    this.solicitarAcao('poder');
                 }
             };
 
@@ -245,6 +261,8 @@
                         document.getElementById(
                             'game-container'
                         ),
+
+                    powerUnlocked: false,
 
                     onAxis: (x, y) => {
                         this.eixoTouchX = x;
@@ -500,6 +518,67 @@
                     this.eixoFinalY,
                     0.18
                 )
+            );
+
+            this.atualizarGestosDirecionais();
+        }
+
+        atualizarGestosDirecionais() {
+            const eixoY = this.eixoFinalY;
+
+            if (
+                !this.agachamentoSolicitado
+                && eixoY
+                    >= this.limiarAgacharEntrada
+            ) {
+                this.agachamentoSolicitado = true;
+            } else if (
+                this.agachamentoSolicitado
+                && eixoY
+                    <= this.limiarAgacharSaida
+            ) {
+                this.agachamentoSolicitado = false;
+            }
+
+            const direcionalPodePular = Boolean(
+                this.ultimoDispositivo === 'touch'
+                || this.ultimoDispositivo === 'gamepad'
+            );
+
+            if (!direcionalPodePular) {
+                this.puloAnalogicoArmado = true;
+                return;
+            }
+
+            if (
+                this.puloAnalogicoArmado
+                && eixoY
+                    <= this.limiarPuloAnalogico
+            ) {
+                this.puloAnalogicoArmado = false;
+
+                this.solicitarAcao(
+                    'pulo'
+                );
+
+                if (
+                    window.MIGUEL_SETTINGS_MANAGER
+                ) {
+                    window.MIGUEL_SETTINGS_MANAGER
+                        .vibrar(10);
+                }
+            } else if (
+                !this.puloAnalogicoArmado
+                && eixoY
+                    >= this.limiarRearmePulo
+            ) {
+                this.puloAnalogicoArmado = true;
+            }
+        }
+
+        estaAgachando() {
+            return Boolean(
+                this.agachamentoSolicitado
             );
         }
 
@@ -924,6 +1003,9 @@
             this.eixoFinalX = 0;
             this.eixoFinalY = 0;
 
+            this.agachamentoSolicitado = false;
+            this.puloAnalogicoArmado = true;
+
             this.filaPulo = 0;
             this.filaAtaque = 0;
             this.filaPoder = 0;
@@ -965,6 +1047,14 @@
                         this.eixoFinalY
                             .toFixed(3)
                     )
+                },
+
+                gestos: {
+                    agachamento:
+                        this.agachamentoSolicitado,
+
+                    puloAnalogicoArmado:
+                        this.puloAnalogicoArmado
                 },
 
                 joystick: (
