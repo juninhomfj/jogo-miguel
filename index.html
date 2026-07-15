@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=tutorial-health-20260715-212632"></script>
-    <script src="js/device-manager.js?v=tutorial-health-20260715-212632"></script>
+    <script src="js/phase-config.js?v=scene-architecture-20260715-213211"></script>
+    <script src="js/device-manager.js?v=scene-architecture-20260715-213211"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/health-manager.js?v=tutorial-health-20260715-212632"></script>
-    <script src="js/tutorial-manager.js?v=tutorial-health-20260715-212632"></script>
+    <script src="js/health-manager.js?v=scene-architecture-20260715-213211"></script>
+    <script src="js/tutorial-manager.js?v=scene-architecture-20260715-213211"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -431,7 +431,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'tutorial-health-20260715-212632';
+        window.__MIGUEL_BUILD_ID__ = 'scene-architecture-20260715-213211';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -590,11 +590,11 @@
                         .entrarModoJogo(
                             CONFIGURACAO_FASES
                                 .fases
-                                .Fase1
+                                .Tutorial
                         );
 
                     // Inicia a fase e garante que a camada HTML não bloqueie o canvas.
-                    this.scene.start('Fase1');
+                    this.scene.start('Tutorial');
                     containerNome.style.visibility = 'hidden';
                     containerNome.style.display = 'none';
                 };
@@ -602,21 +602,21 @@
         }
 
         // ==========================================
-        // CENA 2: FASE 1
+        // CENA 2: TUTORIAL
         // ==========================================
-        class Fase1 extends Phaser.Scene {
+        class Tutorial extends Phaser.Scene {
             constructor() {
-                super('Fase1');
+                super('Tutorial');
             }
 
             create() {
-                console.log('Fase1 iniciada');
+                console.log('Tutorial iniciado');
 
                 GERENCIADOR_DISPOSITIVO
                     .ativarFase(
                         CONFIGURACAO_FASES
                             .fases
-                            .Fase1
+                            .Tutorial
                     );
 
                 // Cenário dinâmico ao fundo: nuvens desenhadas por código
@@ -1243,7 +1243,7 @@
                                 );
 
                                 this.scene.start(
-                                    'Fase2'
+                                    'ResultadoTutorial'
                                 );
                             }
                         }
@@ -1863,7 +1863,9 @@
                 ) {
                     // Fallback defensivo para uma cena
                     // criada sem o gerenciador.
-                    this.scene.start('Fase2');
+                    this.scene.start(
+                        'ResultadoTutorial'
+                    );
                 }
             }
 
@@ -1945,11 +1947,13 @@
         }
 
         // ==========================================
-        // CENA 3: TELA DE VITÓRIA
+        // CENA 3: RESULTADO DO TUTORIAL
         // ==========================================
-        class Fase2 extends Phaser.Scene {
+        class ResultadoTutorial
+            extends Phaser.Scene
+        {
             constructor() {
-                super('Fase2');
+                super('ResultadoTutorial');
             }
 
             create() {
@@ -1957,7 +1961,7 @@
                     .ativarFase(
                         CONFIGURACAO_FASES
                             .fases
-                            .Fase2
+                            .ResultadoTutorial
                     );
 
                 let nome = this.registry.get('nomeJogador');
@@ -2003,20 +2007,249 @@
                     }
                 ).setOrigin(0.5);
 
-                let btnVoltar = this.add.text(
-                    505,
-                    455,
-                    '[ JOGAR NOVAMENTE ]',
+                const botaoAventura = (
+                    this.add.text(
+                        505,
+                        425,
+                        '[ COMEÇAR A AVENTURA ]',
+                        {
+                            fontSize: '22px',
+                            fill: '#0d1117',
+                            backgroundColor:
+                                '#28ff9b',
+                            padding: {
+                                x: 18,
+                                y: 12
+                            },
+                            fontStyle: 'bold'
+                        }
+                    )
+                ).setOrigin(0.5);
+
+                botaoAventura.setInteractive({
+                    useHandCursor: true
+                });
+
+                botaoAventura.on(
+                    'pointerdown',
+                    async () => {
+                        await GERENCIADOR_DISPOSITIVO
+                            .entrarModoJogo(
+                                CONFIGURACAO_FASES
+                                    .fases
+                                    .Fase1
+                            );
+
+                        this.scene.start(
+                            'Fase1'
+                        );
+                    }
+                );
+
+                const botaoMenu = (
+                    this.add.text(
+                        505,
+                        500,
+                        '[ VOLTAR AO MENU ]',
+                        {
+                            fontSize: '20px',
+                            fill: '#FFCC00',
+                            fontStyle: 'bold'
+                        }
+                    )
+                ).setOrigin(0.5);
+
+                botaoMenu.setInteractive({
+                    useHandCursor: true
+                });
+
+                botaoMenu.on(
+                    'pointerdown',
+                    () => {
+                        GERENCIADOR_DISPOSITIVO
+                            .desativarFase();
+
+                        this.scene.start(
+                            'MenuPrincipal'
+                        );
+                    }
+                );
+            }
+        }
+
+        // ==========================================
+        // CENA 4: PRIMEIRA AVENTURA
+        // ==========================================
+        class Fase1 extends Phaser.Scene {
+            constructor() {
+                super('Fase1');
+            }
+
+            create() {
+                GERENCIADOR_DISPOSITIVO
+                    .ativarFase(
+                        CONFIGURACAO_FASES
+                            .fases
+                            .Fase1
+                    );
+
+                this.cameras.main.setBackgroundColor(
+                    '#081526'
+                );
+
+                this.add.rectangle(
+                    400,
+                    470,
+                    800,
+                    260,
+                    0x123e58,
+                    1
+                );
+
+                this.add.circle(
+                    665,
+                    105,
+                    54,
+                    0xffe89a,
+                    0.92
+                );
+
+                for (
+                    let indice = 0;
+                    indice < 30;
+                    indice += 1
+                ) {
+                    this.add.circle(
+                        Phaser.Math.Between(
+                            20,
+                            780
+                        ),
+
+                        Phaser.Math.Between(
+                            20,
+                            280
+                        ),
+
+                        Phaser.Math.Between(
+                            1,
+                            3
+                        ),
+
+                        0xffffff,
+
+                        Phaser.Math.FloatBetween(
+                            0.35,
+                            0.9
+                        )
+                    );
+                }
+
+                this.add.text(
+                    400,
+                    80,
+                    'PRIMEIRA AVENTURA',
                     {
-                        fontSize: '24px',
-                        fill: '#FFCC00',
-                        fontStyle: 'bold'
+                        fontFamily:
+                            'Courier New',
+
+                        fontSize:
+                            '38px',
+
+                        color:
+                            '#ffcc00',
+
+                        fontStyle:
+                            'bold'
                     }
                 ).setOrigin(0.5);
-                btnVoltar.setInteractive();
-                btnVoltar.on('pointerdown', () => {
-                    this.scene.start('MenuPrincipal');
+
+                this.add.text(
+                    400,
+                    140,
+                    'FASE 1',
+                    {
+                        fontFamily:
+                            'Courier New',
+
+                        fontSize:
+                            '26px',
+
+                        color:
+                            '#8fe9ff',
+
+                        fontStyle:
+                            'bold'
+                    }
+                ).setOrigin(0.5);
+
+                this.add.image(
+                    400,
+                    315,
+                    'miguel_idle'
+                ).setScale(1.05);
+
+                this.add.text(
+                    400,
+                    430,
+                    'A estrutura da primeira fase '
+                    + 'está pronta para receber '
+                    + 'o cenário, os inimigos '
+                    + 'e o chefe.',
+                    {
+                        fontFamily:
+                            'Courier New',
+
+                        fontSize:
+                            '17px',
+
+                        color:
+                            '#ffffff',
+
+                        align:
+                            'center',
+
+                        wordWrap: {
+                            width: 620
+                        }
+                    }
+                ).setOrigin(0.5);
+
+                const botaoMenu = (
+                    this.add.text(
+                        400,
+                        535,
+                        '[ VOLTAR AO MENU ]',
+                        {
+                            fontFamily:
+                                'Courier New',
+
+                            fontSize:
+                                '20px',
+
+                            color:
+                                '#ffcc00',
+
+                            fontStyle:
+                                'bold'
+                        }
+                    )
+                ).setOrigin(0.5);
+
+                botaoMenu.setInteractive({
+                    useHandCursor: true
                 });
+
+                botaoMenu.on(
+                    'pointerdown',
+                    () => {
+                        GERENCIADOR_DISPOSITIVO
+                            .desativarFase();
+
+                        this.scene.start(
+                            'MenuPrincipal'
+                        );
+                    }
+                );
             }
         }
 
@@ -2037,7 +2270,12 @@
                 default: 'arcade',
                 arcade: { gravity: { y: 750 }, debug: false }
             },
-            scene: [MenuPrincipal, Fase1, Fase2]
+            scene: [
+                MenuPrincipal,
+                Tutorial,
+                ResultadoTutorial,
+                Fase1
+            ]
         };
 
         const game = new Phaser.Game(config);
