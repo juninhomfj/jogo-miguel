@@ -20,6 +20,7 @@
                 'movimento',
                 'pulo',
                 'pulo-duplo',
+                'agachamento',
                 'ataque'
             ]),
 
@@ -33,6 +34,7 @@
                 'aprender-movimento',
                 'aprender-pulo',
                 'aprender-pulo-duplo',
+                'aprender-agachamento',
                 'aprender-dano',
                 'aprender-ataque',
                 'coletar-cristais'
@@ -89,6 +91,7 @@
                 'movimento',
                 'pulo',
                 'pulo-duplo',
+                'agachamento',
                 'ataque',
                 'pausa'
             ]),

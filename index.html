@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=visual-foundation-20260715-221752"></script>
-    <script src="js/device-manager.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/phase-config.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/device-manager.js?v=physical-controls-crouch-20260715-223914"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=visual-foundation-20260715-221752"></script>
-    <script src="js/input-manager.js?v=visual-foundation-20260715-221752"></script>
-    <script src="js/hud-manager.js?v=visual-foundation-20260715-221752"></script>
-    <script src="js/health-manager.js?v=visual-foundation-20260715-221752"></script>
-    <script src="js/tutorial-manager.js?v=visual-foundation-20260715-221752"></script>
-    <script src="js/rotation-manager.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/scene-visuals.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/mobile-controls.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/input-manager.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/hud-manager.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/health-manager.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/tutorial-manager.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/rotation-manager.js?v=physical-controls-crouch-20260715-223914"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -533,6 +534,138 @@
             pointer-events: none;
         }
 
+
+        /*
+         * O formulário do menu usa as áreas livres da
+         * tela física. Em aparelhos compridos ele fica
+         * lateralmente, preservando a arte do canvas.
+         */
+        @media (pointer: coarse) {
+            #name-input-container {
+                position: fixed;
+
+                left: 50%;
+                right: auto;
+                top: auto;
+
+                bottom:
+                    max(
+                        12px,
+                        env(
+                            safe-area-inset-bottom
+                        )
+                    );
+
+                width:
+                    min(
+                        88vw,
+                        320px
+                    );
+
+                max-width: none;
+
+                padding: 13px;
+
+                border-width: 3px;
+                border-radius: 10px;
+
+                transform:
+                    translateX(-50%);
+
+                z-index: 120;
+
+                box-shadow:
+                    0 0 18px
+                    rgba(
+                        255,
+                        204,
+                        0,
+                        0.34
+                    );
+            }
+
+            #name-input-container label {
+                margin-bottom: 7px;
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+
+            #player-name-input {
+                padding: 8px;
+                font-size: 20px;
+            }
+
+            #start-button {
+                margin-top: 9px;
+                padding: 10px;
+                font-size: 15px;
+            }
+        }
+
+        @media (
+            pointer: coarse
+        ) and (
+            orientation: landscape
+        ) {
+            #name-input-container {
+                left: auto;
+
+                right:
+                    max(
+                        12px,
+                        env(
+                            safe-area-inset-right
+                        )
+                    );
+
+                top: 50%;
+                bottom: auto;
+
+                width:
+                    clamp(
+                        218px,
+                        25vw,
+                        300px
+                    );
+
+                max-height:
+                    calc(
+                        100dvh - 20px
+                    );
+
+                padding: 12px;
+
+                transform:
+                    translateY(-50%);
+            }
+        }
+
+        @media (
+            pointer: coarse
+        ) and (
+            orientation: landscape
+        ) and (
+            min-aspect-ratio: 19 / 9
+        ) {
+            #name-input-container {
+                right:
+                    max(
+                        16px,
+                        3vw,
+                        env(
+                            safe-area-inset-right
+                        )
+                    );
+
+                width:
+                    clamp(
+                        210px,
+                        21vw,
+                        280px
+                    );
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -599,7 +732,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'visual-foundation-20260715-221752';
+        window.__MIGUEL_BUILD_ID__ = 'physical-controls-crouch-20260715-223914';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -925,12 +1058,41 @@
                 // CRIANDO O MIGUEL
                 this.player = this.physics.add.sprite(50, 320, 'miguel_idle');
                 this.player.setScale(0.95);
-                this.player.body.setSize(54, 116);
-                this.player.body.setOffset(101, 108);
+                this.player.corpoPadrao = {
+                    largura: 54,
+                    altura: 116,
+                    offsetX: 101,
+                    offsetY: 108
+                };
+
+                this.player.corpoAgachado = {
+                    largura: 54,
+                    altura: 74,
+                    offsetX: 101,
+                    offsetY: 150
+                };
+
+                this.player.body.setSize(
+                    this.player.corpoPadrao
+                        .largura,
+
+                    this.player.corpoPadrao
+                        .altura
+                );
+
+                this.player.body.setOffset(
+                    this.player.corpoPadrao
+                        .offsetX,
+
+                    this.player.corpoPadrao
+                        .offsetY
+                );
+
                 this.player.pulosDisponiveis = 2;
                 this.player.estaAtacando = false;
                 this.player.estaEmPoeira = false;
                 this.player.giroDuploAtivo = false;
+                this.player.estaAgachado = false;
                 this.player.estavaNoChao = false;
                 this.player.estaMachucado = false;
                 this.player.setDepth(10);
@@ -982,6 +1144,26 @@
                     .setDepth(12);
 
                 this.tweenGiroDuplo = null;
+
+                // A mesma pose recolhida da cambalhota é
+                // reutilizada, sem giro, como agachamento.
+                this.crouchVisual = this.add.image(
+                    0,
+                    0,
+                    'miguel_double_jump'
+                );
+
+                this.crouchVisual
+                    .setOrigin(
+                        127.5 / 256,
+                        200 / 256
+                    )
+                    .setScale(
+                        1.02,
+                        0.72
+                    )
+                    .setVisible(false)
+                    .setDepth(12);
 
                 // CRISTAIS TECNOLÓGICOS COLETÁVEIS
                 this.cristais = this.physics.add.group({
@@ -1147,7 +1329,7 @@
                             pontos: this.pontos,
                             tipoFase:
                                 'TUTORIAL',
-                            totalEtapas: 6
+                            totalEtapas: 7
                         }
                     )
                 );
@@ -1394,6 +1576,166 @@
                 }
             }
 
+            sincronizarAgachamento() {
+                if (
+                    !this.player.estaAgachado
+                    || !this.crouchVisual.visible
+                ) {
+                    return;
+                }
+
+                // O ponto inferior do frame recolhido
+                // permanece alinhado aos pés do sprite idle.
+                this.crouchVisual.setPosition(
+                    this.player.x,
+                    this.player.y + 91
+                );
+
+                this.crouchVisual.setFlipX(
+                    this.player.flipX
+                );
+            }
+
+            entrarAgachamento() {
+                if (
+                    this.player.estaAgachado
+                    || this.player.estaAtacando
+                    || this.player.estaMachucado
+                    || this.player.giroDuploAtivo
+                ) {
+                    return;
+                }
+
+                this.cancelarPoeira();
+                this.cancelarGiroDuplo();
+
+                this.player.estaAgachado = true;
+
+                this.player.setVelocityX(0);
+                this.player.anims.stop();
+                this.player.setVisible(false);
+
+                this.player.body.setSize(
+                    this.player.corpoAgachado
+                        .largura,
+
+                    this.player.corpoAgachado
+                        .altura
+                );
+
+                this.player.body.setOffset(
+                    this.player.corpoAgachado
+                        .offsetX,
+
+                    this.player.corpoAgachado
+                        .offsetY
+                );
+
+                if (
+                    typeof this.player.body
+                        .updateFromGameObject
+                        === 'function'
+                ) {
+                    this.player.body
+                        .updateFromGameObject();
+                }
+
+                this.crouchVisual
+                    .setVisible(true)
+                    .setAngle(0)
+                    .setScale(
+                        1.02,
+                        0.72
+                    );
+
+                this.sincronizarAgachamento();
+
+                if (this.tutorial) {
+                    this.tutorial.registrarAcao(
+                        'agachamento'
+                    );
+                }
+            }
+
+            sairAgachamento(
+                forcar = false
+            ) {
+                if (
+                    !this.player.estaAgachado
+                    && !forcar
+                ) {
+                    return;
+                }
+
+                this.player.estaAgachado = false;
+
+                if (this.crouchVisual) {
+                    this.crouchVisual
+                        .setVisible(false)
+                        .setAngle(0);
+                }
+
+                if (this.player.body) {
+                    this.player.body.setSize(
+                        this.player.corpoPadrao
+                            .largura,
+
+                        this.player.corpoPadrao
+                            .altura
+                    );
+
+                    this.player.body.setOffset(
+                        this.player.corpoPadrao
+                            .offsetX,
+
+                        this.player.corpoPadrao
+                            .offsetY
+                    );
+
+                    if (
+                        typeof this.player.body
+                            .updateFromGameObject
+                            === 'function'
+                    ) {
+                        this.player.body
+                            .updateFromGameObject();
+                    }
+                }
+
+                if (
+                    !this.player.estaMachucado
+                    && !this.player.estaAtacando
+                    && !this.player.estaEmPoeira
+                    && !this.player.giroDuploAtivo
+                ) {
+                    this.player.setVisible(true);
+                }
+            }
+
+            atualizarAgachamento(
+                noChao,
+                podeControlar,
+                descer
+            ) {
+                const podeAgachar = Boolean(
+                    podeControlar
+                    && noChao
+                    && !this.player.estaAtacando
+                    && !this.player.estaMachucado
+                );
+
+                if (
+                    podeAgachar
+                    && descer
+                ) {
+                    this.entrarAgachamento();
+                    this.sincronizarAgachamento();
+                    return;
+                }
+
+                this.sairAgachamento();
+            }
+
             update(time, delta) {
                 if (this.visualCenario) {
                     this.visualCenario.atualizar(
@@ -1413,6 +1755,11 @@
                             .atualizarDispositivo(
                                 this.controles
                                     .ultimoDispositivo
+                            );
+
+                        this.hudJogo
+                            .atualizarVisibilidade(
+                                this.player
                             );
                     }
                 }
@@ -1492,11 +1839,27 @@
                     : 0
                 );
 
+                const eixoY = (
+                    this.controles
+                    ? this.controles
+                        .obterMovimentoY()
+                    : 0
+                );
+
+                const descer = eixoY > 0.55;
+
+                this.atualizarAgachamento(
+                    noChao,
+                    podeControlar,
+                    descer
+                );
+
                 const esquerda = eixoX < -0.16;
                 const direita = eixoX > 0.16;
 
                 if (
                     podeControlar
+                    && !this.player.estaAgachado
                     && esquerda
                     && !direita
                 ) {
@@ -1506,6 +1869,7 @@
                             Math.abs(eixoX)
                         )
                     );
+
                     this.player.setFlipX(true);
 
                     if (
@@ -1520,6 +1884,7 @@
                     }
                 } else if (
                     podeControlar
+                    && !this.player.estaAgachado
                     && direita
                     && !esquerda
                 ) {
@@ -1529,6 +1894,7 @@
                             Math.abs(eixoX)
                         )
                     );
+
                     this.player.setFlipX(false);
 
                     if (
@@ -1541,7 +1907,10 @@
                             true
                         );
                     }
-                } else if (podeControlar) {
+                } else if (
+                    podeControlar
+                    && !this.player.estaAgachado
+                ) {
                     this.player.setVelocityX(0);
 
                     if (
@@ -1554,6 +1923,11 @@
                             true
                         );
                     }
+                } else if (
+                    podeControlar
+                    && this.player.estaAgachado
+                ) {
+                    this.player.setVelocityX(0);
                 }
 
                 if (this.tutorial) {
@@ -1561,12 +1935,6 @@
                         this.player.x
                     );
                 }
-
-                const descer = Boolean(
-                    this.controles
-                    && this.controles
-                        .obterMovimentoY() > 0.55
-                );
 
                 if (
                     podeControlar
@@ -1588,6 +1956,7 @@
                     pediuPulo
                     && podeControlar
                 ) {
+                    this.sairAgachamento(true);
                     this.executarPulo(noChao);
                 }
 
@@ -1601,6 +1970,7 @@
                     pediuAtaque
                     && podeControlar
                 ) {
+                    this.sairAgachamento(true);
                     this.executarAtaque();
                 }
 
@@ -1610,6 +1980,7 @@
                     && !this.player.giroDuploAtivo
                     && !this.player.estaEmPoeira
                     && !this.player.estaMachucado
+                    && !this.player.estaAgachado
                 ) {
                     const animacaoPulo = (
                         this.player
@@ -1641,10 +2012,15 @@
                     );
                 }
 
+                if (this.player.estaAgachado) {
+                    this.sincronizarAgachamento();
+                }
+
                 this.player.estavaNoChao = noChao;
             }
 
             executarPulo(noChao) {
+                this.sairAgachamento(true);
                 this.cancelarPoeira();
 
                 if (noChao) {
@@ -1696,6 +2072,7 @@
                     return;
                 }
 
+                this.sairAgachamento(true);
                 this.cancelarGiroDuplo();
                 this.cancelarPoeira();
 
@@ -1772,6 +2149,7 @@
                 if (
                     this.player.estaAtacando
                     || this.player.estaMachucado
+                    || this.player.estaAgachado
                 ) {
                     return;
                 }

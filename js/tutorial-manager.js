@@ -44,6 +44,7 @@
                 distanciaMovida: 0,
                 pulo: false,
                 puloDuplo: false,
+                agachamento: false,
                 danoRobo: false,
                 ataqueRobo: false,
                 cristais: 0
@@ -101,6 +102,23 @@
 
                     concluido: () => {
                         return this.estado.puloDuplo;
+                    }
+                },
+
+                {
+                    id: 'agachamento',
+
+                    titulo:
+                        'AGACHE-SE',
+
+                    dicaMobile:
+                        'Puxe o analógico para baixo.',
+
+                    dicaTeclado:
+                        'Pressione S ou ↓ para se agachar.',
+
+                    concluido: () => {
+                        return this.estado.agachamento;
                     }
                 },
 
@@ -484,6 +502,10 @@
 
                 case 'pulo-duplo':
                     this.estado.puloDuplo = true;
+                    break;
+
+                case 'agachamento':
+                    this.estado.agachamento = true;
                     break;
 
                 case 'dano-robo':
