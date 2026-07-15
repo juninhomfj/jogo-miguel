@@ -1,0 +1,61 @@
+CANDIDATO DE INTEGRAÇÃO DOS FRAMES DO MIGUEL
+=============================================
+
+Fonte funcional histórica: 4e7974b
+Commit-base atual: eb874b957d3d1512637736e606b7d06615af697f
+
+Arquivo candidato:
+integration-preview/miguel-frames-candidate.html
+
+Index ativo alterado:
+não
+
+Frames individuais carregados:
+14
+
+Mapeamento:
+
+00_idle.png             -> miguel_idle
+01_walk_1.png            -> miguel_walk_1
+02_walk_2.png            -> miguel_walk_2
+03_walk_3.png            -> miguel_walk_3
+04_jump.png              -> miguel_jump
+05_double_jump.png       -> miguel_double_jump
+06_punch.png             -> miguel_punch
+07_power_cast.png        -> miguel_power_cast
+08_dust_1.png            -> miguel_dust_1
+09_dust_2.png            -> miguel_dust_2
+10_dust_3.png            -> miguel_dust_3
+11_reserved.png          -> miguel_reserved
+12_hurt.png              -> miguel_hurt
+13_victory_trophy.png    -> miguel_victory
+
+Animações criadas:
+
+idle
+walk
+jump
+jump_double
+attack
+power_cast
+dust_effect
+hurt
+victory
+
+Recursos históricos preservados:
+
+MenuPrincipal
+Fase1
+Fase2
+robô
+cristais
+pontuação
+ataque
+pulo duplo
+controles touch
+tela de vitória
+
+Observação:
+
+O spritesheet histórico do robô permanece provisório.
+Nenhuma substituição definitiva do index.html foi realizada.
