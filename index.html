@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=rotation-hardened-20260715-220936"></script>
-    <script src="js/device-manager.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/phase-config.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/device-manager.js?v=visual-foundation-20260715-221752"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/input-manager.js?v=rotation-hardened-20260715-220936"></script>
-    <script src="js/hud-manager.js?v=rotation-hardened-20260715-220936"></script>
-    <script src="js/health-manager.js?v=rotation-hardened-20260715-220936"></script>
-    <script src="js/tutorial-manager.js?v=rotation-hardened-20260715-220936"></script>
-    <script src="js/rotation-manager.js?v=rotation-hardened-20260715-220936"></script>
+    <script src="js/scene-visuals.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/input-manager.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/hud-manager.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/health-manager.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/tutorial-manager.js?v=visual-foundation-20260715-221752"></script>
+    <script src="js/rotation-manager.js?v=visual-foundation-20260715-221752"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -581,9 +582,9 @@
         </div>
 
         <div id="name-input-container">
-            <label for="player-name-input">Iniciais do Herói</label>
-            <input type="text" id="player-name-input" maxlength="3" placeholder="___" autocomplete="off">
-            <button id="start-button">ENTRAR</button>
+            <label for="player-name-input">Nome do Herói</label>
+            <input type="text" id="player-name-input" maxlength="3" placeholder="MIG" autocomplete="off">
+            <button id="start-button">INICIAR TUTORIAL</button>
         </div>
     </div>
 
@@ -598,7 +599,7 @@
 
         GERENCIADOR_DISPOSITIVO.inicializar();
 
-        window.__MIGUEL_BUILD_ID__ = 'rotation-hardened-20260715-220936';
+        window.__MIGUEL_BUILD_ID__ = 'visual-foundation-20260715-221752';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -728,13 +729,16 @@
                 GERENCIADOR_DISPOSITIVO
                     .desativarFase();
 
-                // Título em Alto Contraste (Amarelo Arcade sobre fundo quase preto)
-                this.add.text(400, 140, 'AS AVENTURAS DO MIGUEL', {
-                    fontSize: '36px',
-                    fill: '#FFCC00',
-                    fontStyle: 'bold',
-                    fontFamily: 'Courier New'
-                }).setOrigin(0.5);
+                this.visualMenu = (
+                    new window.MiguelSceneVisuals(
+                        this,
+                        {
+                            tipo: 'menu'
+                        }
+                    )
+                );
+
+                this.visualMenu.criarMenu();
 
                 // Ativa e exibe a caixa de texto em HTML em cima do canvas
                 const containerNome = document.getElementById('name-input-container');
@@ -786,25 +790,17 @@
                             .Tutorial
                     );
 
-                // Cenário dinâmico ao fundo: nuvens desenhadas por código
-                this.nuvens = [];
-                const dadosNuvens = [
-                    { x: 130, y: 105, escala: 0.9, velocidade: 0.18 },
-                    { x: 360, y: 75, escala: 0.7, velocidade: 0.12 },
-                    { x: 590, y: 135, escala: 1.05, velocidade: 0.16 },
-                    { x: 760, y: 95, escala: 0.8, velocidade: 0.2 }
-                ];
+                this.visualCenario = (
+                    new window.MiguelSceneVisuals(
+                        this,
+                        {
+                            tipo: 'tutorial'
+                        }
+                    )
+                );
 
-                dadosNuvens.forEach((dados) => {
-                    const nuvem = this.add.container(dados.x, dados.y).setDepth(-10);
-                    const brilho = 0xFFFFFF;
-                    nuvem.add(this.add.ellipse(-28, 8, 70, 28, brilho, 0.7));
-                    nuvem.add(this.add.ellipse(12, 0, 82, 34, brilho, 0.82));
-                    nuvem.add(this.add.ellipse(42, 10, 62, 24, brilho, 0.68));
-                    nuvem.setScale(dados.escala);
-                    nuvem.velocidade = dados.velocidade;
-                    this.nuvens.push(nuvem);
-                });
+                this.visualCenario
+                    .criarTutorial();
 
                 // Estado exibido pelo HUD consolidado.
                 this.nome = (
@@ -826,18 +822,75 @@
                 // PLATAFORMAS (Alto contraste)
                 this.plataformas = this.physics.add.staticGroup();
 
-                // Chão Principal (Verde Neon gritante para contrastar com o uniforme vermelho/azul)
-                let chao = this.add.rectangle(400, 460, 800, 40, 0x00FF66);
-                this.physics.add.existing(chao, true);
+                // Chão tecnológico.
+                let chao = this.add.rectangle(
+                    400,
+                    460,
+                    800,
+                    40,
+                    0x16464a
+                );
+
+                this.visualCenario
+                    .decorarPlataforma(
+                        chao,
+                        {
+                            tipo: 'chao'
+                        }
+                    );
+
+                this.physics.add.existing(
+                    chao,
+                    true
+                );
+
                 this.plataformas.add(chao);
 
-                // Plataformas flutuantes (Branco Puro para total destaque no fundo escuro)
-                let plat1 = this.add.rectangle(600, 300, 180, 24, 0xFFFFFF);
-                this.physics.add.existing(plat1, true);
+                // Plataformas flutuantes do treinamento.
+                let plat1 = this.add.rectangle(
+                    600,
+                    300,
+                    180,
+                    24,
+                    0x1b5061
+                );
+
+                this.visualCenario
+                    .decorarPlataforma(
+                        plat1,
+                        {
+                            tipo: 'flutuante'
+                        }
+                    );
+
+                this.physics.add.existing(
+                    plat1,
+                    true
+                );
+
                 this.plataformas.add(plat1);
 
-                let plat2 = this.add.rectangle(200, 200, 180, 24, 0xFFFFFF);
-                this.physics.add.existing(plat2, true);
+                let plat2 = this.add.rectangle(
+                    200,
+                    200,
+                    180,
+                    24,
+                    0x1b5061
+                );
+
+                this.visualCenario
+                    .decorarPlataforma(
+                        plat2,
+                        {
+                            tipo: 'flutuante'
+                        }
+                    );
+
+                this.physics.add.existing(
+                    plat2,
+                    true
+                );
+
                 this.plataformas.add(plat2);
 
                 // INIMIGO: robô vilão animado pelo spritesheet novo
@@ -1341,14 +1394,16 @@
                 }
             }
 
-            update() {
-                this.nuvens.forEach((nuvem) => {
-                    nuvem.x -= nuvem.velocidade;
-
-                    if (nuvem.x < -120) {
-                        nuvem.x = 920;
-                    }
-                });
+            update(time, delta) {
+                if (this.visualCenario) {
+                    this.visualCenario.atualizar(
+                        time,
+                        delta,
+                        this.player
+                        ? this.player.x
+                        : 400
+                    );
+                }
 
                 if (this.controles) {
                     this.controles.atualizar();
