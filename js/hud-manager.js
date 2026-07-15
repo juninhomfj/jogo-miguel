@@ -20,7 +20,7 @@
 
             this.totalEtapas = Math.max(
                 1,
-                Number(options.totalEtapas || 6)
+                Number(options.totalEtapas || 7)
             );
 
             this.vida = 100;
@@ -62,6 +62,9 @@
 
             this.eventoToast = null;
             this.revisaoToast = 0;
+
+            this.hudSuavizado = false;
+            this.alphaHud = 1;
         }
 
         iniciar() {
@@ -143,53 +146,53 @@
             const painel = (
                 this.scene.add.rectangle(
                     400,
-                    59,
-                    776,
-                    102,
+                    42,
+                    780,
+                    74,
                     0x07111f,
-                    0.92
+                    0.86
                 )
             );
 
             painel.setStrokeStyle(
                 2,
                 0x35d9ff,
-                0.72
+                0.68
             );
 
             const divisorEsquerdo = (
                 this.scene.add.rectangle(
-                    213,
-                    59,
+                    208,
+                    42,
                     2,
-                    82,
+                    58,
                     0x35d9ff,
-                    0.35
+                    0.32
                 )
             );
 
             const divisorDireito = (
                 this.scene.add.rectangle(
-                    651,
-                    59,
+                    652,
+                    42,
                     2,
-                    82,
+                    58,
                     0x35d9ff,
-                    0.35
+                    0.32
                 )
             );
 
             this.textoNome = (
                 this.scene.add.text(
-                    26,
-                    16,
+                    20,
+                    9,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '16px',
+                            '13px',
 
                         color:
                             '#ffcc00',
@@ -202,15 +205,15 @@
 
             this.textoPontos = (
                 this.scene.add.text(
-                    26,
-                    38,
+                    20,
+                    27,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '13px',
+                            '11px',
 
                         color:
                             '#ffffff',
@@ -223,15 +226,15 @@
 
             this.textoVida = (
                 this.scene.add.text(
-                    26,
-                    59,
+                    20,
+                    45,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '11px',
+                            '9px',
 
                         color:
                             '#dff8ff',
@@ -244,10 +247,10 @@
 
             this.fundoVida = (
                 this.scene.add.rectangle(
-                    26,
-                    78,
-                    158,
-                    13,
+                    20,
+                    61,
+                    120,
+                    10,
                     0x101820,
                     1
                 )
@@ -258,15 +261,15 @@
                 .setStrokeStyle(
                     1,
                     0xffffff,
-                    0.8
+                    0.76
                 );
 
             this.barraVida = (
                 this.scene.add.rectangle(
-                    29,
-                    81,
-                    152,
-                    7,
+                    23,
+                    64,
+                    114,
+                    4,
                     0x28ff72,
                     1
                 )
@@ -276,15 +279,15 @@
 
             this.textoCoracoes = (
                 this.scene.add.text(
-                    190,
-                    75,
+                    194,
+                    55,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '15px',
+                            '12px',
 
                         color:
                             '#ff496c',
@@ -297,15 +300,15 @@
 
             this.textoEtapa = (
                 this.scene.add.text(
-                    232,
-                    15,
+                    224,
+                    8,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '12px',
+                            '10px',
 
                         color:
                             '#8fe9ff',
@@ -318,15 +321,15 @@
 
             this.textoObjetivo = (
                 this.scene.add.text(
-                    432,
-                    39,
+                    430,
+                    28,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '19px',
+                            '16px',
 
                         color:
                             '#ffcc00',
@@ -342,15 +345,15 @@
 
             this.textoDica = (
                 this.scene.add.text(
-                    432,
-                    63,
+                    430,
+                    47,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '11px',
+                            '9px',
 
                         color:
                             '#ffffff',
@@ -367,15 +370,15 @@
 
             this.textoFase = (
                 this.scene.add.text(
-                    777,
-                    20,
+                    780,
+                    12,
                     this.tipoFase,
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '13px',
+                            '10px',
 
                         color:
                             '#8fe9ff',
@@ -391,15 +394,15 @@
 
             this.textoDispositivo = (
                 this.scene.add.text(
-                    777,
-                    49,
+                    780,
+                    39,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '12px',
+                            '9px',
 
                         color:
                             '#ffffff',
@@ -435,8 +438,8 @@
         }
 
         criarSegmentos() {
-            const largura = 54;
-            const espaco = 8;
+            const largura = 45;
+            const espaco = 7;
 
             const larguraTotal = (
                 this.totalEtapas * largura
@@ -446,7 +449,7 @@
             );
 
             const inicioX = (
-                432
+                430
                 - larguraTotal / 2
                 + largura / 2
             );
@@ -464,10 +467,10 @@
                             largura + espaco
                         ),
 
-                        92,
+                        68,
 
                         largura,
-                        6,
+                        5,
 
                         0x29405a,
                         1
@@ -488,9 +491,9 @@
             this.toastFundo = (
                 this.scene.add.rectangle(
                     400,
-                    142,
-                    500,
-                    46,
+                    104,
+                    460,
+                    38,
                     0x062b23,
                     0.96
                 )
@@ -507,14 +510,14 @@
             this.toastTexto = (
                 this.scene.add.text(
                     400,
-                    142,
+                    104,
                     '',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '15px',
+                            '13px',
 
                         color:
                             '#ffffff',
@@ -526,7 +529,7 @@
                             'center',
 
                         wordWrap: {
-                            width: 455
+                            width: 420
                         }
                     }
                 )
@@ -634,7 +637,7 @@
             this.barraVida.displayWidth = (
                 Math.max(
                     0.5,
-                    152 * proporcao
+                    114 * proporcao
                 )
             );
 
@@ -855,6 +858,60 @@
             );
         }
 
+        atualizarVisibilidade(player) {
+            if (
+                !this.container
+                || !player
+                || !player.active
+            ) {
+                return;
+            }
+
+            const toastVisivel = Boolean(
+                this.toastFundo
+                && this.toastFundo.visible
+            );
+
+            const topoPlayer = (
+                player.body
+                ? player.body.top
+                : player.y - 70
+            );
+
+            const suavizar = Boolean(
+                !toastVisivel
+                && topoPlayer < 112
+            );
+
+            if (
+                suavizar
+                === this.hudSuavizado
+            ) {
+                return;
+            }
+
+            this.hudSuavizado = suavizar;
+
+            const alphaAlvo = (
+                suavizar
+                ? 0.28
+                : 1
+            );
+
+            this.alphaHud = alphaAlvo;
+
+            this.scene.tweens.killTweensOf(
+                this.container
+            );
+
+            this.scene.tweens.add({
+                targets: this.container,
+                alpha: alphaAlvo,
+                duration: 150,
+                ease: 'Sine.easeOut'
+            });
+        }
+
         obterEstado() {
             return {
                 nome: this.nome,
@@ -881,7 +938,13 @@
                     this.tutorialConcluido,
 
                 dispositivo:
-                    this.dispositivo
+                    this.dispositivo,
+
+                hudSuavizado:
+                    this.hudSuavizado,
+
+                alphaHud:
+                    this.alphaHud
             };
         }
 

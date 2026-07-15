@@ -403,6 +403,13 @@
             this.resetarControles(cena);
 
             if (
+                typeof cena.sairAgachamento
+                    === 'function'
+            ) {
+                cena.sairAgachamento(true);
+            }
+
+            if (
                 typeof cena.cancelarGiroDuplo
                     === 'function'
             ) {
@@ -422,6 +429,12 @@
                     .setAngle(0);
             }
 
+            if (cena.crouchVisual) {
+                cena.crouchVisual
+                    .setVisible(false)
+                    .setAngle(0);
+            }
+
             if (cena.poeira) {
                 cena.poeira.anims.stop();
                 cena.poeira.setVisible(false);
@@ -436,6 +449,7 @@
             player.estaAtacando = false;
             player.giroDuploAtivo = false;
             player.estaEmPoeira = false;
+            player.estaAgachado = false;
 
             player.off(
                 'animationcomplete-attack'

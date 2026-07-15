@@ -348,6 +348,13 @@
 
         prepararPlayerParaDano(contexto) {
             if (
+                typeof this.scene.sairAgachamento
+                    === 'function'
+            ) {
+                this.scene.sairAgachamento(true);
+            }
+
+            if (
                 typeof this.scene.cancelarGiroDuplo
                     === 'function'
             ) {

@@ -32,6 +32,7 @@
 - transparência alta;
 - botão visual de pulo;
 - botão visual de golpe;
+- agachamento puxando o analógico para baixo;
 - multitouch;
 - vibração opcional.
 
@@ -39,6 +40,7 @@
 
 - A/D ou setas;
 - W ou seta para cima;
+- S ou seta para baixo para agachar;
 - X ou espaço;
 - dicas pequenas e temporárias;
 - ausência dos controles grandes de mobile.
@@ -58,9 +60,10 @@
 1. mover Miguel;
 2. pular;
 3. usar o pulo duplo;
-4. receber dano do robô;
-5. derrotar o robô com golpe;
-6. coletar cristais.
+4. agachar-se;
+5. receber dano do robô;
+6. derrotar o robô com golpe;
+7. coletar cristais.
 
 Ao terminar:
 

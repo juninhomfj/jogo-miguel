@@ -39,7 +39,7 @@
             this.filaPausa = 0;
             this.filaReiniciar = 0;
 
-            this.joystickPointerId = null;
+
 
             this.joystickCentro = {
                 x: 0,
@@ -48,13 +48,7 @@
 
             this.raioJoystick = 72;
 
-            this.interfaceMobile = null;
-            this.zonaJoystick = null;
-            this.baseJoystick = null;
-            this.botaoJoystick = null;
-
-            this.botaoPulo = null;
-            this.botaoAtaque = null;
+            this.mobileControls = null;
 
             this.dicaDesktop = null;
             this.eventoOcultarDica = null;
@@ -75,17 +69,8 @@
 
             this.gamepadAtual = null;
 
-            this.aoMoverPointer = (
-                this.aoMoverPointer.bind(this)
-            );
-
-            this.aoSoltarPointer = (
-                this.aoSoltarPointer.bind(this)
-            );
-
-            this.aoSairDoJogo = (
-                this.aoSairDoJogo.bind(this)
-            );
+            // Os eventos mobile são tratados por uma
+            // camada DOM que cobre a tela física inteira.
         }
 
         iniciar() {
@@ -102,26 +87,6 @@
             } else {
                 this.criarDicaDesktop();
             }
-
-            this.scene.input.on(
-                'pointermove',
-                this.aoMoverPointer
-            );
-
-            this.scene.input.on(
-                'pointerup',
-                this.aoSoltarPointer
-            );
-
-            this.scene.input.on(
-                'pointerupoutside',
-                this.aoSoltarPointer
-            );
-
-            this.scene.input.on(
-                'gameout',
-                this.aoSairDoJogo
-            );
 
             this.scene.events.once(
                 Phaser.Scenes.Events.SHUTDOWN,
@@ -265,258 +230,46 @@
         }
 
         criarInterfaceMobile() {
-            this.interfaceMobile = (
-                this.scene.add.container(
-                    0,
-                    0
-                )
-            );
+            if (
+                typeof window.MiguelMobileControls
+                    !== 'function'
+            ) {
+                throw new Error(
+                    'MiguelMobileControls indisponível.'
+                );
+            }
 
-            this.interfaceMobile
-                .setDepth(1100)
-                .setScrollFactor(0);
+            this.mobileControls = (
+                new window.MiguelMobileControls({
+                    container:
+                        document.getElementById(
+                            'game-container'
+                        ),
 
-            // A área ocupa praticamente toda a metade
-            // esquerda, mas é invisível.
-            this.zonaJoystick = (
-                this.scene.add.zone(
-                    0,
-                    110,
-                    430,
-                    490
-                )
-            );
+                    onAxis: (x, y) => {
+                        this.eixoTouchX = x;
+                        this.eixoTouchY = y;
+                    },
 
-            this.zonaJoystick
-                .setOrigin(0, 0)
-                .setDepth(1090)
-                .setScrollFactor(0)
-                .setInteractive();
+                    onAction: (tipo) => {
+                        this.usarDispositivo(
+                            'touch'
+                        );
 
-            this.baseJoystick = (
-                this.scene.add.circle(
-                    0,
-                    0,
-                    this.raioJoystick,
-                    0x0a1a2c,
-                    0.24
-                )
-            );
+                        this.solicitarAcao(
+                            tipo
+                        );
+                    },
 
-            this.baseJoystick
-                .setStrokeStyle(
-                    3,
-                    0x8fe9ff,
-                    0.36
-                )
-                .setVisible(false);
-
-            this.botaoJoystick = (
-                this.scene.add.circle(
-                    0,
-                    0,
-                    31,
-                    0x8fe9ff,
-                    0.46
-                )
-            );
-
-            this.botaoJoystick
-                .setStrokeStyle(
-                    3,
-                    0xffffff,
-                    0.52
-                )
-                .setVisible(false);
-
-            this.interfaceMobile.add([
-                this.baseJoystick,
-                this.botaoJoystick
-            ]);
-
-            this.criarBotaoPulo();
-            this.criarBotaoAtaque();
-
-            this.zonaJoystick.on(
-                'pointerdown',
-                (pointer) => {
-                    this.iniciarJoystick(pointer);
-                }
-            );
-        }
-
-        criarBotaoPulo() {
-            const container = (
-                this.scene.add.container(
-                    718,
-                    474
-                )
-            );
-
-            const fundo = (
-                this.scene.add.circle(
-                    0,
-                    0,
-                    53,
-                    0x168cff,
-                    0.34
-                )
-            );
-
-            fundo
-                .setStrokeStyle(
-                    4,
-                    0xaee5ff,
-                    0.72
-                )
-                .setInteractive();
-
-            const icone = (
-                this.scene.add.text(
-                    0,
-                    -10,
-                    '↑',
-                    {
-                        fontFamily:
-                            'Courier New',
-
-                        fontSize:
-                            '58px',
-
-                        color:
-                            '#ffffff',
-
-                        fontStyle:
-                            'bold'
+                    onDevice: () => {
+                        this.usarDispositivo(
+                            'touch'
+                        );
                     }
-                )
-            ).setOrigin(0.5);
-
-            const legenda = (
-                this.scene.add.text(
-                    0,
-                    30,
-                    'PULAR',
-                    {
-                        fontFamily:
-                            'Courier New',
-
-                        fontSize:
-                            '11px',
-
-                        color:
-                            '#ffffff',
-
-                        fontStyle:
-                            'bold'
-                    }
-                )
-            ).setOrigin(0.5);
-
-            container.add([
-                fundo,
-                icone,
-                legenda
-            ]);
-
-            this.interfaceMobile.add(container);
-            this.botaoPulo = container;
-
-            fundo.on(
-                'pointerdown',
-                () => {
-                    this.usarDispositivo('touch');
-                    this.solicitarAcao('pulo');
-                    this.animarBotao(container);
-                }
-            );
-        }
-
-        criarBotaoAtaque() {
-            const container = (
-                this.scene.add.container(
-                    615,
-                    520
-                )
+                })
             );
 
-            const fundo = (
-                this.scene.add.circle(
-                    0,
-                    0,
-                    45,
-                    0xff304f,
-                    0.35
-                )
-            );
-
-            fundo
-                .setStrokeStyle(
-                    4,
-                    0xffffff,
-                    0.66
-                )
-                .setInteractive();
-
-            const icone = (
-                this.scene.add.text(
-                    0,
-                    -8,
-                    '✦',
-                    {
-                        fontFamily:
-                            'Courier New',
-
-                        fontSize:
-                            '44px',
-
-                        color:
-                            '#ffffff',
-
-                        fontStyle:
-                            'bold'
-                    }
-                )
-            ).setOrigin(0.5);
-
-            const legenda = (
-                this.scene.add.text(
-                    0,
-                    27,
-                    'GOLPE',
-                    {
-                        fontFamily:
-                            'Courier New',
-
-                        fontSize:
-                            '10px',
-
-                        color:
-                            '#ffffff',
-
-                        fontStyle:
-                            'bold'
-                    }
-                )
-            ).setOrigin(0.5);
-
-            container.add([
-                fundo,
-                icone,
-                legenda
-            ]);
-
-            this.interfaceMobile.add(container);
-            this.botaoAtaque = container;
-
-            fundo.on(
-                'pointerdown',
-                () => {
-                    this.usarDispositivo('touch');
-                    this.solicitarAcao('ataque');
-                    this.animarBotao(container);
-                }
-            );
+            this.mobileControls.iniciar();
         }
 
         criarDicaDesktop() {
@@ -535,8 +288,8 @@
                 this.scene.add.rectangle(
                     0,
                     0,
-                    570,
-                    38,
+                    620,
+                    48,
                     0x07101e,
                     0.76
                 )
@@ -553,14 +306,21 @@
                     0,
                     0,
                     'A/D ou ←→ MOVER  ·  '
-                    + 'W/↑ PULAR  ·  '
+                    + 'W/↑ PULAR\n'
+                    + 'S/↓ AGACHAR  ·  '
                     + 'X/ESPAÇO GOLPE',
                     {
                         fontFamily:
                             'Courier New',
 
                         fontSize:
-                            '13px',
+                            '12px',
+
+                        align:
+                            'center',
+
+                        lineSpacing:
+                            3,
 
                         color:
                             '#dff8ff',
@@ -584,147 +344,6 @@
                     }
                 )
             );
-        }
-
-        iniciarJoystick(pointer) {
-            if (
-                this.joystickPointerId !== null
-                || pointer.x > 430
-            ) {
-                return;
-            }
-
-            this.usarDispositivo('touch');
-
-            this.joystickPointerId = pointer.id;
-
-            this.joystickCentro.x = (
-                Phaser.Math.Clamp(
-                    pointer.x,
-                    72,
-                    350
-                )
-            );
-
-            this.joystickCentro.y = (
-                Phaser.Math.Clamp(
-                    pointer.y,
-                    230,
-                    520
-                )
-            );
-
-            this.baseJoystick
-                .setPosition(
-                    this.joystickCentro.x,
-                    this.joystickCentro.y
-                )
-                .setVisible(true);
-
-            this.botaoJoystick
-                .setPosition(
-                    this.joystickCentro.x,
-                    this.joystickCentro.y
-                )
-                .setVisible(true);
-
-            this.atualizarJoystick(pointer);
-        }
-
-        atualizarJoystick(pointer) {
-            if (
-                pointer.id
-                    !== this.joystickPointerId
-                || this.joystickPointerId === null
-            ) {
-                return;
-            }
-
-            const deltaX = (
-                pointer.x
-                - this.joystickCentro.x
-            );
-
-            const deltaY = (
-                pointer.y
-                - this.joystickCentro.y
-            );
-
-            const distancia = Math.sqrt(
-                deltaX * deltaX
-                + deltaY * deltaY
-            );
-
-            const proporcao = (
-                distancia > this.raioJoystick
-                ? this.raioJoystick / distancia
-                : 1
-            );
-
-            const limitadoX = (
-                deltaX * proporcao
-            );
-
-            const limitadoY = (
-                deltaY * proporcao
-            );
-
-            this.botaoJoystick.setPosition(
-                this.joystickCentro.x
-                    + limitadoX,
-
-                this.joystickCentro.y
-                    + limitadoY
-            );
-
-            this.eixoTouchX = Phaser.Math.Clamp(
-                limitadoX / this.raioJoystick,
-                -1,
-                1
-            );
-
-            this.eixoTouchY = Phaser.Math.Clamp(
-                limitadoY / this.raioJoystick,
-                -1,
-                1
-            );
-        }
-
-        liberarJoystick(pointerId = null) {
-            if (
-                pointerId !== null
-                && pointerId
-                    !== this.joystickPointerId
-            ) {
-                return;
-            }
-
-            this.joystickPointerId = null;
-
-            this.eixoTouchX = 0;
-            this.eixoTouchY = 0;
-
-            if (this.baseJoystick) {
-                this.baseJoystick
-                    .setVisible(false);
-            }
-
-            if (this.botaoJoystick) {
-                this.botaoJoystick
-                    .setVisible(false);
-            }
-        }
-
-        aoMoverPointer(pointer) {
-            this.atualizarJoystick(pointer);
-        }
-
-        aoSoltarPointer(pointer) {
-            this.liberarJoystick(pointer.id);
-        }
-
-        aoSairDoJogo() {
-            this.liberarJoystick();
         }
 
         animarBotao(container) {
@@ -836,7 +455,8 @@
             this.atualizarGamepad();
 
             const touchAtivo = Boolean(
-                this.joystickPointerId !== null
+                Math.abs(this.eixoTouchX) > 0.01
+                || Math.abs(this.eixoTouchY) > 0.01
             );
 
             const gamepadAtivo = Boolean(
@@ -1255,11 +875,9 @@
                 this.ocultarDicaDesktop();
             }
 
-            if (this.interfaceMobile) {
-                this.interfaceMobile.setAlpha(
+            if (this.mobileControls) {
+                this.mobileControls.setGamepadMode(
                     tipo === 'gamepad'
-                    ? 0.48
-                    : 1
                 );
             }
         }
@@ -1290,7 +908,9 @@
         }
 
         resetarEstado() {
-            this.liberarJoystick();
+            if (this.mobileControls) {
+                this.mobileControls.reset();
+            }
 
             this.eixoTouchX = 0;
             this.eixoTouchY = 0;
@@ -1347,14 +967,12 @@
                     )
                 },
 
-                joystick: {
-                    ativo:
-                        this.joystickPointerId
-                            !== null,
-
-                    pointerId:
-                        this.joystickPointerId
-                },
+                joystick: (
+                    this.mobileControls
+                    ? this.mobileControls
+                        .snapshot()
+                    : null
+                ),
 
                 gamepad: (
                     this.gamepadAtual
@@ -1388,45 +1006,14 @@
             this.destruido = true;
             this.ativo = false;
 
-            this.liberarJoystick();
-
-            this.scene.input.off(
-                'pointermove',
-                this.aoMoverPointer
-            );
-
-            this.scene.input.off(
-                'pointerup',
-                this.aoSoltarPointer
-            );
-
-            this.scene.input.off(
-                'pointerupoutside',
-                this.aoSoltarPointer
-            );
-
-            this.scene.input.off(
-                'gameout',
-                this.aoSairDoJogo
-            );
+            if (this.mobileControls) {
+                this.mobileControls.destroy();
+                this.mobileControls = null;
+            }
 
             if (this.eventoOcultarDica) {
                 this.eventoOcultarDica
                     .remove(false);
-            }
-
-            if (
-                this.interfaceMobile
-                && this.interfaceMobile.active
-            ) {
-                this.interfaceMobile.destroy(true);
-            }
-
-            if (
-                this.zonaJoystick
-                && this.zonaJoystick.active
-            ) {
-                this.zonaJoystick.destroy();
             }
 
             if (
