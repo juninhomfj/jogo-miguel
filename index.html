@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=20260715a"></script>
-    <script src="js/device-manager.js?v=20260715a"></script>
+    <script src="js/phase-config.js?v=orientation-physical-20260715-195510"></script>
+    <script src="js/device-manager.js?v=orientation-physical-20260715-195510"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
@@ -352,6 +352,19 @@
             justify-self: center;
         }
 
+
+        #game-container > canvas {
+            opacity: 1;
+
+            transition:
+                opacity 140ms linear;
+        }
+
+        #game-container.layout-settling > canvas,
+        #game-container.orientation-blocked > canvas {
+            opacity: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -415,6 +428,13 @@
         );
 
         GERENCIADOR_DISPOSITIVO.inicializar();
+
+        window.__MIGUEL_BUILD_ID__ = 'orientation-physical-20260715-195510';
+
+        console.info(
+            '[MIGUEL BUILD]',
+            window.__MIGUEL_BUILD_ID__
+        );
 
         window.__MIGUEL_PHASES__ = (
             CONFIGURACAO_FASES
@@ -1835,19 +1855,52 @@
             };
         };
 
+        let timerLayoutEstavel = null;
+
         const agendarRecalculoJogo = () => {
+            const container = (
+                document.getElementById(
+                    'game-container'
+                )
+            );
+
+            if (container) {
+                container.classList.add(
+                    'layout-settling'
+                );
+            }
+
+            window.clearTimeout(
+                timerLayoutEstavel
+            );
+
             [
                 0,
-                60,
-                160,
-                320,
-                650
+                70,
+                170,
+                340,
+                680
             ].forEach((atraso) => {
                 window.setTimeout(
                     recalcularLayoutJogo,
                     atraso
                 );
             });
+
+            timerLayoutEstavel = (
+                window.setTimeout(
+                    () => {
+                        recalcularLayoutJogo();
+
+                        if (container) {
+                            container.classList.remove(
+                                'layout-settling'
+                            );
+                        }
+                    },
+                    760
+                )
+            );
         };
 
         window.addEventListener(
@@ -1904,6 +1957,76 @@
                 );
             }
         };
+
+
+        window.addEventListener(
+            'miguel:orientation-state',
+            (evento) => {
+                const estado = (
+                    evento.detail || {}
+                );
+
+                const bloqueado = Boolean(
+                    estado.modoJogoAtivo
+                    && !estado.orientacaoCorreta
+                );
+
+                const container = (
+                    document.getElementById(
+                        'game-container'
+                    )
+                );
+
+                if (container) {
+                    container.classList.toggle(
+                        'orientation-blocked',
+                        bloqueado
+                    );
+                }
+
+                if (
+                    game
+                    && game.scene
+                ) {
+                    const fase1 = (
+                        game.scene.getScene('Fase1')
+                    );
+
+                    if (bloqueado) {
+                        if (fase1) {
+                            fase1.toquesEsquerda
+                                ?.clear();
+
+                            fase1.toquesDireita
+                                ?.clear();
+
+                            fase1.filaPulos = 0;
+                            fase1.filaAtaques = 0;
+                        }
+
+                        if (
+                            game.scene.isActive(
+                                'Fase1'
+                            )
+                        ) {
+                            game.scene.pause(
+                                'Fase1'
+                            );
+                        }
+                    } else if (
+                        game.scene.isPaused(
+                            'Fase1'
+                        )
+                    ) {
+                        game.scene.resume(
+                            'Fase1'
+                        );
+                    }
+                }
+
+                agendarRecalculoJogo();
+            }
+        );
 
         agendarRecalculoJogo();
 
