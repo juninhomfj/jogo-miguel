@@ -256,6 +256,15 @@
 
             this.atualizarInterface();
 
+            // O navegador pode atualizar a viewport em
+            // etapas depois do fullscreen e do lock.
+            if (
+                window.__MIGUEL_LAYOUT__
+                && window.__MIGUEL_LAYOUT__.refresh
+            ) {
+                window.__MIGUEL_LAYOUT__.refresh();
+            }
+
             return this.obterEstado();
         }
 
@@ -267,12 +276,10 @@
                 return true;
             }
 
-            const alvo = (
-                document.getElementById(
-                    'game-container'
-                )
-                || document.documentElement
-            );
+            // A página inteira entra em tela cheia.
+            // Isso evita que o container mantenha
+            // dimensões calculadas antes da rotação.
+            const alvo = document.documentElement;
 
             const solicitar = (
                 alvo.requestFullscreen
