@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
+
+    <script src="js/phase-config.js?v=20260715a"></script>
+    <script src="js/device-manager.js?v=20260715a"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
         * {
@@ -101,11 +105,223 @@
             transform: translateY(2px);
             box-shadow: 0 2px 0 #CC9900;
         }
+
+        #orientation-overlay {
+            position: fixed;
+            inset: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding:
+                max(20px, env(safe-area-inset-top))
+                max(20px, env(safe-area-inset-right))
+                max(20px, env(safe-area-inset-bottom))
+                max(20px, env(safe-area-inset-left));
+
+            background:
+                rgba(6, 10, 18, 0.97);
+
+            z-index: 1000;
+
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            transition:
+                opacity 160ms ease,
+                visibility 160ms ease;
+        }
+
+        #orientation-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .orientation-card {
+            width: min(92vw, 460px);
+
+            padding: 28px 22px;
+
+            border: 4px solid #FFCC00;
+            border-radius: 18px;
+
+            background: #101621;
+
+            text-align: center;
+
+            box-shadow:
+                0 0 32px
+                rgba(255, 204, 0, 0.38);
+        }
+
+        .orientation-icon {
+            display: block;
+
+            margin-bottom: 12px;
+
+            color: #FFCC00;
+
+            font-size: 68px;
+            line-height: 1;
+        }
+
+        .orientation-card h2 {
+            margin: 0 0 12px;
+
+            color: #FFCC00;
+
+            font-size: clamp(24px, 7vw, 38px);
+            letter-spacing: 2px;
+        }
+
+        .orientation-card p {
+            margin: 0 auto 18px;
+
+            max-width: 380px;
+
+            color: #FFFFFF;
+
+            font-size: clamp(15px, 4vw, 19px);
+            line-height: 1.45;
+        }
+
+        .orientation-actions {
+            display: grid;
+            gap: 12px;
+        }
+
+        .orientation-actions button {
+            width: 100%;
+
+            padding: 14px 16px;
+
+            border: 0;
+            border-radius: 8px;
+
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        #orientation-action {
+            color: #101621;
+            background: #FFCC00;
+
+            box-shadow: 0 4px 0 #B88A00;
+        }
+
+        #sensor-action {
+            color: #FFFFFF;
+
+            border: 2px solid #00E5FF;
+
+            background: #183244;
+        }
+
+        #sensor-action:disabled {
+            opacity: 0.65;
+            cursor: default;
+        }
+
+        #orientation-status {
+            display: block;
+
+            margin-top: 16px;
+
+            color: #8FE9FF;
+
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        canvas {
+            display: block;
+
+            max-width: 100%;
+            max-height: 100%;
+
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        @media (
+            orientation: landscape
+        ) and (
+            max-height: 520px
+        ) {
+            #name-input-container {
+                width: min(82vw, 320px);
+                padding: 14px;
+            }
+
+            #name-input-container label {
+                margin-bottom: 7px;
+                font-size: 15px;
+            }
+
+            #player-name-input {
+                padding: 8px;
+                font-size: 21px;
+            }
+
+            #start-button {
+                margin-top: 10px;
+                padding: 10px;
+                font-size: 17px;
+            }
+        }
+
     </style>
 </head>
 <body>
 
     <div id="game-container">
+        <div
+            id="orientation-overlay"
+            aria-hidden="true"
+        >
+            <div class="orientation-card">
+                <span
+                    class="orientation-icon"
+                    aria-hidden="true"
+                >↻</span>
+
+                <h2 id="orientation-title">
+                    GIRE PARA HORIZONTAL
+                </h2>
+
+                <p id="orientation-message">
+                    Esta fase foi criada para jogar
+                    com o celular deitado.
+                </p>
+
+                <div class="orientation-actions">
+                    <button
+                        id="orientation-action"
+                        type="button"
+                    >
+                        TELA CHEIA E GIRAR
+                    </button>
+
+                    <button
+                        id="sensor-action"
+                        type="button"
+                    >
+                        ATIVAR SENSOR
+                    </button>
+                </div>
+
+                <small id="orientation-status">
+                    Verificando o aparelho...
+                </small>
+            </div>
+        </div>
+
         <div id="name-input-container">
             <label for="player-name-input">Iniciais do Herói</label>
             <input type="text" id="player-name-input" maxlength="3" placeholder="___" autocomplete="off">
@@ -114,6 +330,20 @@
     </div>
 
     <script>
+        const CONFIGURACAO_FASES = (
+            window.MIGUEL_PHASE_CONFIG
+        );
+
+        const GERENCIADOR_DISPOSITIVO = (
+            window.MIGUEL_DEVICE_MANAGER
+        );
+
+        GERENCIADOR_DISPOSITIVO.inicializar();
+
+        window.__MIGUEL_PHASES__ = (
+            CONFIGURACAO_FASES
+        );
+
         // ==========================================
         // CENA 1: MENU PRINCIPAL
         // ==========================================
@@ -230,6 +460,9 @@
             }
 
             create() {
+                GERENCIADOR_DISPOSITIVO
+                    .desativarFase();
+
                 // Título em Alto Contraste (Amarelo Arcade sobre fundo quase preto)
                 this.add.text(400, 140, 'AS AVENTURAS DO MIGUEL', {
                     fontSize: '36px',
@@ -245,13 +478,22 @@
 
                 // Lógica ao clicar no botão "ENTRAR"
                 const botaoEntrar = document.getElementById('start-button');
-                botaoEntrar.onclick = () => {
+                botaoEntrar.onclick = async () => {
                     let nome = document.getElementById('player-name-input').value.trim();
                     if (!nome) nome = "MIG";
                     nome = nome.substring(0, 3).toUpperCase();
 
                     this.registry.set('nomeJogador', nome);
                     this.registry.set('pontuacao', 0);
+
+                    // A ação do usuário permite solicitar
+                    // tela cheia e orientação quando suportado.
+                    await GERENCIADOR_DISPOSITIVO
+                        .entrarModoJogo(
+                            CONFIGURACAO_FASES
+                                .fases
+                                .Fase1
+                        );
 
                     // Inicia a fase e garante que a camada HTML não bloqueie o canvas.
                     this.scene.start('Fase1');
@@ -271,6 +513,13 @@
 
             create() {
                 console.log('Fase1 iniciada');
+
+                GERENCIADOR_DISPOSITIVO
+                    .ativarFase(
+                        CONFIGURACAO_FASES
+                            .fases
+                            .Fase1
+                    );
 
                 // Cenário dinâmico ao fundo: nuvens desenhadas por código
                 this.nuvens = [];
@@ -300,6 +549,17 @@
                     fill: '#FFCC00',
                     fontStyle: 'bold'
                 });
+
+                this.textoTipoFase = this.add.text(
+                    780,
+                    22,
+                    'FASE 1 · TREINAMENTO',
+                    {
+                        fontSize: '16px',
+                        fill: '#8FE9FF',
+                        fontStyle: 'bold'
+                    }
+                ).setOrigin(1, 0);
 
                 // PLATAFORMAS (Alto contraste)
                 this.plataformas = this.physics.add.staticGroup();
@@ -338,9 +598,6 @@
                 this.vilao.limiteDireita = plat1.x + (plat1.width / 2) - (this.vilao.displayWidth / 2);
                 this.vilao.direcao = 1;
                 this.ultimoDanoVilao = 0;
-
-                // CAIXA INDICADORA DE TESTES (Fica atrás do sprite. Se o sprite sumir, você verá este bloco se mexendo!)
-                this.indicadorPosicao = this.add.rectangle(50, 320, 60, 80, 0x333333);
 
                 // CRIANDO O MIGUEL
                 this.player = this.physics.add.sprite(50, 320, 'miguel_idle');
@@ -933,14 +1190,6 @@
                     }
                 });
 
-                this.indicadorPosicao.x = (
-                    this.player.x
-                );
-
-                this.indicadorPosicao.y = (
-                    this.player.y
-                );
-
                 const noChao = Boolean(
                     this.player.body.blocked.down
                     || this.player.body.touching.down
@@ -1318,6 +1567,13 @@
             }
 
             create() {
+                GERENCIADOR_DISPOSITIVO
+                    .ativarFase(
+                        CONFIGURACAO_FASES
+                            .fases
+                            .Fase2
+                    );
+
                 let nome = this.registry.get('nomeJogador');
                 let pontosFinal = this.registry.get('pontuacao');
 
