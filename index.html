@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
@@ -13,6 +13,14 @@
             margin: 0;
             padding: 0;
         }
+
+        html,
+        body,
+        #game-container,
+        canvas {
+            touch-action: none;
+            overscroll-behavior: none;
+        }
         body {
             background-color: #0d1117;
             color: #fff;
@@ -21,12 +29,14 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
         }
         #game-container {
             position: relative;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -339,6 +349,8 @@
                 this.player.body.setOffset(101, 108);
                 this.player.pulosDisponiveis = 2;
                 this.player.estaAtacando = false;
+                this.player.estaEmPoeira = false;
+                this.player.giroDuploAtivo = false;
                 this.player.estavaNoChao = false;
                 this.player.setDepth(10);
                 this.player.setCollideWorldBounds(true);
@@ -347,8 +359,48 @@
                 this.physics.add.collider(this.vilao, this.plataformas);
                 this.physics.add.collider(this.player, this.vilao, this.acertarVilao, null, this);
 
-                this.poeira = this.add.sprite(0, 0, 'miguel_dust_1').setVisible(false).setDepth(9);
-                this.poeira.setScale(0.95);
+                // Os frames de poeira contêm o Miguel completo.
+                // Por isso o efeito substitui visualmente o jogador
+                // durante alguns milissegundos, em vez de criar um
+                // segundo Miguel abaixo da linha do chão.
+                this.poeira = this.add.sprite(
+                    0,
+                    0,
+                    'miguel_dust_1'
+                );
+
+                this.poeira
+                    .setVisible(false)
+                    .setDepth(11)
+                    .setScale(0.95);
+
+                // Visual separado para a cambalhota.
+                // O corpo físico permanece no player original.
+                this.doubleJumpVisual = this.add.image(
+                    0,
+                    0,
+                    'miguel_double_jump'
+                );
+
+                // Centro aproximado do corpo recolhido:
+                // bbox do frame: 81,126 até 174,200.
+                this.doubleJumpVisual.setOrigin(
+                    127.5 / 256,
+                    163 / 256
+                );
+
+                // A pose é comprimida verticalmente para parecer
+                // mais agachada e recolhida durante o giro.
+                this.doubleJumpVisual.setScale(
+                    1.02,
+                    0.82
+                );
+
+                this.doubleJumpVisual
+                    .setVisible(false)
+                    .setDepth(12);
+
+                this.tweenGiroDuplo = null;
 
                 // CRISTAIS TECNOLÓGICOS COLETÁVEIS
                 this.cristais = this.physics.add.group({
@@ -494,136 +546,641 @@
                     true
                 );
 
-                // CONTROLES DE TECLADO (Para testes em PC)
-                this.cursors = this.input.keyboard.createCursorKeys();
-                this.teclaAtaque = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+                // CONTROLES DE TECLADO
+                this.cursors = (
+                    this.input.keyboard
+                        .createCursorKeys()
+                );
 
-                // CONTROLES VIRTUAIS NA TELA (MOBILE FIRST - TOUCH)
-                this.moveEsquerda = false;
-                this.moveDireita = false;
-                this.querPular = false;
-                this.querAtacar = false;
+                this.teclas = (
+                    this.input.keyboard.addKeys({
+                        esquerda:
+                            Phaser.Input.Keyboard
+                                .KeyCodes.A,
 
-                // Botão Direcional Esquerda
-                this.btnEsq = this.add.rectangle(90, 530, 140, 110, 0x222222, 0.85).setInteractive();
-                this.btnEsq.setStrokeStyle(4, 0xFFCC00);
-                this.add.text(90, 530, '◀', { fontSize: '56px', fill: '#FFCC00' }).setOrigin(0.5);
+                        direita:
+                            Phaser.Input.Keyboard
+                                .KeyCodes.D,
 
-                // Botão Direcional Direita
-                this.btnDir = this.add.rectangle(270, 530, 140, 110, 0x222222, 0.85).setInteractive();
-                this.btnDir.setStrokeStyle(4, 0xFFCC00);
-                this.add.text(270, 530, '▶', { fontSize: '56px', fill: '#FFCC00' }).setOrigin(0.5);
+                        pulo:
+                            Phaser.Input.Keyboard
+                                .KeyCodes.W,
 
-                // Botão de Pulo (Amarelo bem visível)
-                this.btnPulo = this.add.rectangle(625, 530, 130, 110, 0xFFCC00, 0.95).setInteractive();
-                this.add.text(625, 530, 'PULO', { fontSize: '26px', fill: '#0d1117', fontStyle: 'bold' }).setOrigin(0.5);
+                        descer:
+                            Phaser.Input.Keyboard
+                                .KeyCodes.S,
 
-                // Botão de Ataque (novo botão virtual mobile)
-                this.btnAtaque = this.add.rectangle(745, 530, 90, 110, 0xFF3333, 0.95).setInteractive();
-                this.btnAtaque.setStrokeStyle(4, 0xFFFFFF);
-                this.add.text(745, 530, 'BATER', { fontSize: '18px', fill: '#FFFFFF', fontStyle: 'bold' }).setOrigin(0.5);
+                        reiniciar:
+                            Phaser.Input.Keyboard
+                                .KeyCodes.R,
 
-                // Vinculando os eventos de toque do Celular
-                this.btnEsq.on('pointerdown', () => this.moveEsquerda = true);
-                this.btnEsq.on('pointerup', () => this.moveEsquerda = false);
-                this.btnEsq.on('pointerout', () => this.moveEsquerda = false);
+                        ataque:
+                            Phaser.Input.Keyboard
+                                .KeyCodes.X
+                    })
+                );
 
-                this.btnDir.on('pointerdown', () => this.moveDireita = true);
-                this.btnDir.on('pointerup', () => this.moveDireita = false);
-                this.btnDir.on('pointerout', () => this.moveDireita = false);
+                this.teclaAtaque = (
+                    this.input.keyboard.addKey(
+                        Phaser.Input.Keyboard
+                            .KeyCodes.SPACE
+                    )
+                );
 
-                this.btnPulo.on('pointerdown', () => this.querPular = true);
-                this.btnPulo.on('pointerup', () => this.querPular = false);
-                this.btnPulo.on('pointerout', () => this.querPular = false);
+                this.input.keyboard.addCapture([
+                    Phaser.Input.Keyboard.KeyCodes.UP,
+                    Phaser.Input.Keyboard.KeyCodes.DOWN,
+                    Phaser.Input.Keyboard.KeyCodes.LEFT,
+                    Phaser.Input.Keyboard.KeyCodes.RIGHT,
+                    Phaser.Input.Keyboard.KeyCodes.W,
+                    Phaser.Input.Keyboard.KeyCodes.A,
+                    Phaser.Input.Keyboard.KeyCodes.S,
+                    Phaser.Input.Keyboard.KeyCodes.D,
+                    Phaser.Input.Keyboard.KeyCodes.R,
+                    Phaser.Input.Keyboard.KeyCodes.X,
+                    Phaser.Input.Keyboard.KeyCodes.SPACE
+                ]);
 
-                this.btnAtaque.on('pointerdown', () => this.querAtacar = true);
+                // O Phaser possui um ponteiro principal.
+                // Cinco adicionais permitem até seis toques.
+                this.input.addPointer(5);
+
+                this.toquesEsquerda = new Set();
+                this.toquesDireita = new Set();
+
+                this.filaPulos = 0;
+                this.filaAtaques = 0;
+
+                // CONTROLES VIRTUAIS
+                this.btnEsq = this.add.rectangle(
+                    90,
+                    530,
+                    140,
+                    110,
+                    0x222222,
+                    0.85
+                ).setInteractive();
+
+                this.btnEsq.setStrokeStyle(
+                    4,
+                    0xFFCC00
+                );
+
+                this.add.text(
+                    90,
+                    530,
+                    '◀',
+                    {
+                        fontSize: '56px',
+                        fill: '#FFCC00'
+                    }
+                ).setOrigin(0.5);
+
+                this.btnDir = this.add.rectangle(
+                    270,
+                    530,
+                    140,
+                    110,
+                    0x222222,
+                    0.85
+                ).setInteractive();
+
+                this.btnDir.setStrokeStyle(
+                    4,
+                    0xFFCC00
+                );
+
+                this.add.text(
+                    270,
+                    530,
+                    '▶',
+                    {
+                        fontSize: '56px',
+                        fill: '#FFCC00'
+                    }
+                ).setOrigin(0.5);
+
+                this.btnPulo = this.add.rectangle(
+                    625,
+                    530,
+                    130,
+                    110,
+                    0xFFCC00,
+                    0.95
+                ).setInteractive();
+
+                this.add.text(
+                    625,
+                    530,
+                    'PULO',
+                    {
+                        fontSize: '26px',
+                        fill: '#0d1117',
+                        fontStyle: 'bold'
+                    }
+                ).setOrigin(0.5);
+
+                this.btnAtaque = this.add.rectangle(
+                    745,
+                    530,
+                    90,
+                    110,
+                    0xFF3333,
+                    0.95
+                ).setInteractive();
+
+                this.btnAtaque.setStrokeStyle(
+                    4,
+                    0xFFFFFF
+                );
+
+                this.add.text(
+                    745,
+                    530,
+                    'BATER',
+                    {
+                        fontSize: '18px',
+                        fill: '#FFFFFF',
+                        fontStyle: 'bold'
+                    }
+                ).setOrigin(0.5);
+
+                const vincularDirecional = (
+                    botao,
+                    conjunto
+                ) => {
+                    const pressionar = (pointer) => {
+                        conjunto.add(pointer.id);
+                    };
+
+                    const liberar = (pointer) => {
+                        conjunto.delete(pointer.id);
+                    };
+
+                    botao.on(
+                        'pointerdown',
+                        pressionar
+                    );
+
+                    botao.on(
+                        'pointerup',
+                        liberar
+                    );
+
+                    botao.on(
+                        'pointerout',
+                        liberar
+                    );
+
+                    botao.on(
+                        'pointerupoutside',
+                        liberar
+                    );
+                };
+
+                vincularDirecional(
+                    this.btnEsq,
+                    this.toquesEsquerda
+                );
+
+                vincularDirecional(
+                    this.btnDir,
+                    this.toquesDireita
+                );
+
+                this.btnPulo.on(
+                    'pointerdown',
+                    () => {
+                        this.filaPulos = Math.min(
+                            this.filaPulos + 1,
+                            2
+                        );
+                    }
+                );
+
+                this.btnAtaque.on(
+                    'pointerdown',
+                    () => {
+                        this.filaAtaques = Math.min(
+                            this.filaAtaques + 1,
+                            2
+                        );
+                    }
+                );
+
+                this.input.on(
+                    'pointerup',
+                    (pointer) => {
+                        this.toquesEsquerda.delete(
+                            pointer.id
+                        );
+
+                        this.toquesDireita.delete(
+                            pointer.id
+                        );
+                    }
+                );
+
+                this.input.on(
+                    'gameout',
+                    () => {
+                        this.toquesEsquerda.clear();
+                        this.toquesDireita.clear();
+                    }
+                );
+            }
+
+            sincronizarGiroDuplo() {
+                if (
+                    !this.player.giroDuploAtivo
+                    || !this.doubleJumpVisual.visible
+                ) {
+                    return;
+                }
+
+                const escalaBase = 0.95;
+
+                const deslocamentoX = (
+                    (127.5 - 128)
+                    * escalaBase
+                );
+
+                const deslocamentoY = (
+                    (163 - 128)
+                    * escalaBase
+                );
+
+                this.doubleJumpVisual.setPosition(
+                    this.player.x + deslocamentoX,
+                    this.player.y + deslocamentoY
+                );
+
+                this.doubleJumpVisual.setFlipX(
+                    this.player.flipX
+                );
+            }
+
+            cancelarGiroDuplo() {
+                if (this.tweenGiroDuplo) {
+                    this.tweenGiroDuplo.stop();
+                    this.tweenGiroDuplo = null;
+                }
+
+                this.player.giroDuploAtivo = false;
+
+                this.doubleJumpVisual
+                    .setVisible(false)
+                    .setAngle(0)
+                    .setScale(1.02, 0.82);
+
+                if (!this.player.estaEmPoeira) {
+                    this.player.setVisible(true);
+                }
+
+                this.player.setAngle(0);
+            }
+
+            iniciarGiroDuplo() {
+                this.cancelarGiroDuplo();
+
+                this.player.giroDuploAtivo = true;
+                this.player.setVisible(false);
+
+                this.doubleJumpVisual
+                    .setVisible(true)
+                    .setAngle(0)
+                    .setAlpha(1)
+                    .setScale(1.02, 0.82)
+                    .setFlipX(this.player.flipX);
+
+                this.sincronizarGiroDuplo();
+
+                const direcao = (
+                    this.player.flipX
+                    ? -1
+                    : 1
+                );
+
+                this.tweenGiroDuplo = (
+                    this.tweens.add({
+                        targets:
+                            this.doubleJumpVisual,
+
+                        angle:
+                            direcao * 360,
+
+                        duration: 440,
+
+                        ease:
+                            'Cubic.easeInOut',
+
+                        onUpdate: () => {
+                            this.sincronizarGiroDuplo();
+                        },
+
+                        onComplete: () => {
+                            this.player
+                                .giroDuploAtivo = false;
+
+                            this.tweenGiroDuplo = null;
+
+                            this.doubleJumpVisual
+                                .setVisible(false)
+                                .setAngle(0)
+                                .setScale(1.02, 0.82);
+
+                            if (
+                                !this.player
+                                    .estaEmPoeira
+                            ) {
+                                this.player
+                                    .setVisible(true);
+                            }
+
+                            this.player.setAngle(0);
+                        }
+                    })
+                );
+            }
+
+            cancelarPoeira() {
+                if (!this.player.estaEmPoeira) {
+                    return;
+                }
+
+                this.poeira.anims.stop();
+
+                this.poeira.off(
+                    'animationcomplete-dust_effect'
+                );
+
+                this.poeira.setVisible(false);
+                this.player.estaEmPoeira = false;
+
+                if (
+                    !this.player.giroDuploAtivo
+                ) {
+                    this.player.setVisible(true);
+                }
             }
 
             update() {
-                // Move as nuvens lentamente para a esquerda e recicla no lado direito
                 this.nuvens.forEach((nuvem) => {
                     nuvem.x -= nuvem.velocidade;
+
                     if (nuvem.x < -120) {
                         nuvem.x = 920;
                     }
                 });
 
-                // Sincroniza o bloco cinza de testes com a posição do Miguel
-                this.indicadorPosicao.x = this.player.x;
-                this.indicadorPosicao.y = this.player.y;
+                this.indicadorPosicao.x = (
+                    this.player.x
+                );
 
-                let noChao = this.player.body.blocked.down || this.player.body.touching.down;
+                this.indicadorPosicao.y = (
+                    this.player.y
+                );
 
-                if (noChao && !this.player.estavaNoChao) {
+                const noChao = Boolean(
+                    this.player.body.blocked.down
+                    || this.player.body.touching.down
+                );
+
+                if (
+                    Phaser.Input.Keyboard.JustDown(
+                        this.teclas.reiniciar
+                    )
+                ) {
+                    this.registry.set(
+                        'pontuacao',
+                        0
+                    );
+
+                    this.scene.restart();
+                    return;
+                }
+
+                if (
+                    noChao
+                    && !this.player.estavaNoChao
+                ) {
                     this.player.pulosDisponiveis = 2;
+
+                    this.cancelarGiroDuplo();
                     this.tocarPoeira();
-                }
-                else if (noChao) {
+                } else if (noChao) {
                     this.player.pulosDisponiveis = 2;
                 }
 
-                if (this.vilao && this.vilao.active) {
-                    if (this.vilao.x <= this.vilao.limiteEsquerda) {
-                        this.vilao.x = this.vilao.limiteEsquerda;
+                if (
+                    this.vilao
+                    && this.vilao.active
+                ) {
+                    if (
+                        this.vilao.x
+                        <= this.vilao.limiteEsquerda
+                    ) {
+                        this.vilao.x = (
+                            this.vilao
+                                .limiteEsquerda
+                        );
+
                         this.vilao.direcao = 1;
                         this.vilao.setVelocityX(90);
-                    }
-                    else if (this.vilao.x >= this.vilao.limiteDireita) {
-                        this.vilao.x = this.vilao.limiteDireita;
+                    } else if (
+                        this.vilao.x
+                        >= this.vilao.limiteDireita
+                    ) {
+                        this.vilao.x = (
+                            this.vilao
+                                .limiteDireita
+                        );
+
                         this.vilao.direcao = -1;
                         this.vilao.setVelocityX(-90);
                     }
                 }
 
-                // Lógica de Movimentação Unificada (Teclado ou Botão Touch)
-                if (this.cursors.left.isDown || this.moveEsquerda) {
+                const esquerda = Boolean(
+                    this.cursors.left.isDown
+                    || this.teclas.esquerda.isDown
+                    || this.toquesEsquerda.size > 0
+                );
+
+                const direita = Boolean(
+                    this.cursors.right.isDown
+                    || this.teclas.direita.isDown
+                    || this.toquesDireita.size > 0
+                );
+
+                if (esquerda && !direita) {
                     this.player.setVelocityX(-220);
-                    this.player.flipX = true;
-                    if (noChao && !this.player.estaAtacando) this.player.anims.play('walk', true);
-                }
-                else if (this.cursors.right.isDown || this.moveDireita) {
+                    this.player.setFlipX(true);
+
+                    if (
+                        noChao
+                        && !this.player.estaAtacando
+                        && !this.player.estaEmPoeira
+                    ) {
+                        this.player.anims.play(
+                            'walk',
+                            true
+                        );
+                    }
+                } else if (
+                    direita
+                    && !esquerda
+                ) {
                     this.player.setVelocityX(220);
-                    this.player.flipX = false;
-                    if (noChao && !this.player.estaAtacando) this.player.anims.play('walk', true);
-                }
-                else {
+                    this.player.setFlipX(false);
+
+                    if (
+                        noChao
+                        && !this.player.estaAtacando
+                        && !this.player.estaEmPoeira
+                    ) {
+                        this.player.anims.play(
+                            'walk',
+                            true
+                        );
+                    }
+                } else {
                     this.player.setVelocityX(0);
-                    if (noChao && !this.player.estaAtacando) this.player.anims.play('idle', true);
+
+                    if (
+                        noChao
+                        && !this.player.estaAtacando
+                        && !this.player.estaEmPoeira
+                    ) {
+                        this.player.anims.play(
+                            'idle',
+                            true
+                        );
+                    }
                 }
 
-                // Lógica do Pulo Duplo Unificada
-                if (Phaser.Input.Keyboard.JustDown(this.cursors.up) || this.querPular) {
+                const descer = Boolean(
+                    this.cursors.down.isDown
+                    || this.teclas.descer.isDown
+                );
+
+                if (
+                    descer
+                    && !noChao
+                    && this.player.body.velocity.y
+                        < 360
+                ) {
+                    this.player.setVelocityY(360);
+                }
+
+                const pediuPulo = Boolean(
+                    Phaser.Input.Keyboard.JustDown(
+                        this.cursors.up
+                    )
+                    || Phaser.Input.Keyboard.JustDown(
+                        this.teclas.pulo
+                    )
+                    || this.filaPulos > 0
+                );
+
+                if (pediuPulo) {
+                    if (this.filaPulos > 0) {
+                        this.filaPulos -= 1;
+                    }
+
                     this.executarPulo(noChao);
-                    this.querPular = false;
                 }
 
-                if (Phaser.Input.Keyboard.JustDown(this.teclaAtaque) || this.querAtacar) {
+                const pediuAtaque = Boolean(
+                    Phaser.Input.Keyboard.JustDown(
+                        this.teclaAtaque
+                    )
+                    || Phaser.Input.Keyboard.JustDown(
+                        this.teclas.ataque
+                    )
+                    || this.filaAtaques > 0
+                );
+
+                if (pediuAtaque) {
+                    if (this.filaAtaques > 0) {
+                        this.filaAtaques -= 1;
+                    }
+
                     this.executarAtaque();
-                    this.querAtacar = false;
                 }
 
-                if (!noChao && !this.player.estaAtacando) {
-                    this.player.anims.play(this.player.pulosDisponiveis === 0 ? 'jump_double' : 'jump', true);
+                if (
+                    !noChao
+                    && !this.player.estaAtacando
+                    && !this.player.giroDuploAtivo
+                    && !this.player.estaEmPoeira
+                ) {
+                    const animacaoPulo = (
+                        this.player
+                            .pulosDisponiveis === 0
+                        ? 'jump_double'
+                        : 'jump'
+                    );
+
+                    this.player.anims.play(
+                        animacaoPulo,
+                        true
+                    );
+                }
+
+                if (
+                    this.player.giroDuploAtivo
+                ) {
+                    this.sincronizarGiroDuplo();
+                }
+
+                if (this.player.estaEmPoeira) {
+                    this.poeira.setPosition(
+                        this.player.x,
+                        this.player.y
+                    );
+
+                    this.poeira.setFlipX(
+                        this.player.flipX
+                    );
                 }
 
                 this.player.estavaNoChao = noChao;
             }
 
             executarPulo(noChao) {
+                this.cancelarPoeira();
+
                 if (noChao) {
                     this.player.pulosDisponiveis = 1;
+
                     this.player.setVelocityY(-520);
-                    this.player.anims.play('jump', true);
+
+                    if (!this.player.estaAtacando) {
+                        this.player.anims.play(
+                            'jump',
+                            true
+                        );
+                    }
+
+                    return;
                 }
-                else if (this.player.pulosDisponiveis > 0) {
+
+                if (
+                    this.player.pulosDisponiveis > 0
+                ) {
                     this.player.pulosDisponiveis = 0;
                     this.player.setVelocityY(-500);
-                    this.player.anims.play('jump_double', true);
+
+                    this.iniciarGiroDuplo();
                 }
             }
 
             executarAtaque() {
                 if (this.player.estaAtacando) return;
+
+                this.cancelarGiroDuplo();
+                this.cancelarPoeira();
 
                 this.player.estaAtacando = true;
                 this.player.anims.play('attack', true);
@@ -646,11 +1203,58 @@
             }
 
             tocarPoeira() {
-                this.poeira.setPosition(this.player.x, this.player.body.bottom - 18);
-                this.poeira.setFlipX(this.player.flipX);
+                if (this.player.estaAtacando) {
+                    return;
+                }
+
+                this.cancelarPoeira();
+
+                this.player.estaEmPoeira = true;
+
+                // Mesma posição, escala e orientação do player.
+                // Não utiliza body.bottom porque os frames de
+                // poeira possuem canvas completo de 256x256.
+                this.poeira.setPosition(
+                    this.player.x,
+                    this.player.y
+                );
+
+                this.poeira.setScale(
+                    this.player.scaleX,
+                    this.player.scaleY
+                );
+
+                this.poeira.setFlipX(
+                    this.player.flipX
+                );
+
+                this.player.setVisible(false);
                 this.poeira.setVisible(true);
-                this.poeira.anims.play('dust_effect', true);
-                this.poeira.once('animationcomplete-dust_effect', () => this.poeira.setVisible(false));
+
+                this.poeira.anims.play(
+                    'dust_effect',
+                    true
+                );
+
+                this.poeira.off(
+                    'animationcomplete-dust_effect'
+                );
+
+                this.poeira.once(
+                    'animationcomplete-dust_effect',
+                    () => {
+                        this.poeira.setVisible(false);
+                        this.player.estaEmPoeira = false;
+
+                        if (
+                            !this.player
+                                .giroDuploAtivo
+                        ) {
+                            this.player
+                                .setVisible(true);
+                        }
+                    }
+                );
             }
 
             destruirVilao(vilao) {
