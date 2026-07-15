@@ -1,69 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="
-            width=device-width,
-            initial-scale=1,
-            maximum-scale=1,
-            user-scalable=no,
-            viewport-fit=cover
-        "
-    >
-
-    <title>Laboratório de Frames — Miguel</title>
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"
-    ></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            height: 100dvh;
-            margin: 0;
-            overflow: hidden;
-            background: #070b14;
-            font-family: "Courier New", monospace;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #game-container {
-            width: 100%;
-            height: 100%;
-            height: 100dvh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        canvas {
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="game-container"></div>
-
-    <script>
-        const params = new URLSearchParams(
+const params = new URLSearchParams(
             window.location.search
         );
 
@@ -1488,6 +1423,3 @@
         window.__MIGUEL_LAB_GAME__ = new Phaser.Game(
             config
         );
-    </script>
-</body>
-</html>
