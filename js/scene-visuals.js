@@ -10,6 +10,18 @@
                 options.tipo || 'tutorial'
             );
 
+            this.gerenciadorConfiguracoes = (
+                window.MIGUEL_SETTINGS_MANAGER
+                || null
+            );
+
+            this.fatorQualidade = (
+                this.gerenciadorConfiguracoes
+                ? this.gerenciadorConfiguracoes
+                    .obterFatorVisual()
+                : 0.8
+            );
+
             this.objetos = [];
             this.estrelas = [];
             this.nuvens = [];
@@ -509,8 +521,14 @@
                 }
             );
 
-            const quantidade = Number(
-                opcoes.estrelas || 45
+            const quantidade = Math.max(
+                12,
+                Math.round(
+                    Number(
+                        opcoes.estrelas || 45
+                    )
+                    * this.fatorQualidade
+                )
             );
 
             for (
@@ -791,6 +809,14 @@
         }
 
         criarNuvens(quantidade) {
+            quantidade = Math.max(
+                2,
+                Math.round(
+                    Number(quantidade || 2)
+                    * this.fatorQualidade
+                )
+            );
+
             for (
                 let indice = 0;
                 indice < quantidade;
@@ -886,6 +912,14 @@
             quantidade,
             opcoes = {}
         ) {
+            quantidade = Math.max(
+                4,
+                Math.round(
+                    Number(quantidade || 4)
+                    * this.fatorQualidade
+                )
+            );
+
             for (
                 let indice = 0;
                 indice < quantidade;

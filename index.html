@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/device-manager.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/phase-config.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/device-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/settings-manager.js?v=settings-foundation-20260715-225834"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/mobile-controls.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/input-manager.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/hud-manager.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/health-manager.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/tutorial-manager.js?v=physical-controls-crouch-20260715-223914"></script>
-    <script src="js/rotation-manager.js?v=physical-controls-crouch-20260715-223914"></script>
+    <script src="js/scene-visuals.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/mobile-controls.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/input-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/hud-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/health-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/tutorial-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/rotation-manager.js?v=settings-foundation-20260715-225834"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -730,9 +731,14 @@
             window.MIGUEL_DEVICE_MANAGER
         );
 
-        GERENCIADOR_DISPOSITIVO.inicializar();
+        const GERENCIADOR_CONFIGURACOES = (
+            window.MIGUEL_SETTINGS_MANAGER
+        );
 
-        window.__MIGUEL_BUILD_ID__ = 'physical-controls-crouch-20260715-223914';
+        GERENCIADOR_DISPOSITIVO.inicializar();
+        GERENCIADOR_CONFIGURACOES.aplicar();
+
+        window.__MIGUEL_BUILD_ID__ = 'settings-foundation-20260715-225834';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -878,9 +884,63 @@
                 containerNome.style.display = 'flex';
                 containerNome.style.visibility = 'visible';
 
+                const botaoConfiguracoes = (
+                    this.add.text(
+                        22,
+                        22,
+                        '⚙ AJUSTES',
+                        {
+                            fontFamily:
+                                'Courier New',
+
+                            fontSize:
+                                '16px',
+
+                            color:
+                                '#8fe9ff',
+
+                            backgroundColor:
+                                '#07111f',
+
+                            padding: {
+                                x: 12,
+                                y: 8
+                            },
+
+                            fontStyle:
+                                'bold'
+                        }
+                    )
+                )
+                    .setDepth(30)
+                    .setInteractive({
+                        useHandCursor: true
+                    });
+
+                botaoConfiguracoes.on(
+                    'pointerdown',
+                    () => {
+                        GERENCIADOR_CONFIGURACOES
+                            .marcarInteracaoUsuario();
+
+                        containerNome.style.visibility =
+                            'hidden';
+
+                        containerNome.style.display =
+                            'none';
+
+                        this.scene.start(
+                            'Configuracoes'
+                        );
+                    }
+                );
+
                 // Lógica ao clicar no botão "ENTRAR"
                 const botaoEntrar = document.getElementById('start-button');
                 botaoEntrar.onclick = async () => {
+                    GERENCIADOR_CONFIGURACOES
+                        .marcarInteracaoUsuario();
+
                     let nome = document.getElementById('player-name-input').value.trim();
                     if (!nome) nome = "MIG";
                     nome = nome.substring(0, 3).toUpperCase();
@@ -906,7 +966,580 @@
         }
 
         // ==========================================
-        // CENA 2: TUTORIAL
+        // CENA 2: CONFIGURAÇÕES
+        // ==========================================
+        class Configuracoes
+            extends Phaser.Scene
+        {
+            constructor() {
+                super('Configuracoes');
+
+                this.linhas = [];
+            }
+
+            create() {
+                GERENCIADOR_DISPOSITIVO
+                    .desativarFase();
+
+                const containerNome = (
+                    document.getElementById(
+                        'name-input-container'
+                    )
+                );
+
+                containerNome.style.visibility =
+                    'hidden';
+
+                containerNome.style.display =
+                    'none';
+
+                this.cameras.main.setBackgroundColor(
+                    '#06101e'
+                );
+
+                for (
+                    let indice = 0;
+                    indice < 42;
+                    indice += 1
+                ) {
+                    this.add.circle(
+                        Phaser.Math.Between(
+                            15,
+                            785
+                        ),
+
+                        Phaser.Math.Between(
+                            12,
+                            580
+                        ),
+
+                        indice % 8 === 0
+                        ? 2
+                        : 1,
+
+                        indice % 6 === 0
+                        ? 0x8fe9ff
+                        : 0xffffff,
+
+                        Phaser.Math.FloatBetween(
+                            0.25,
+                            0.75
+                        )
+                    );
+                }
+
+                const painel = (
+                    this.add.rectangle(
+                        400,
+                        305,
+                        690,
+                        540,
+                        0x071624,
+                        0.94
+                    )
+                );
+
+                painel.setStrokeStyle(
+                    3,
+                    0x35d9ff,
+                    0.72
+                );
+
+                this.add.text(
+                    400,
+                    55,
+                    'CONFIGURAÇÕES',
+                    {
+                        fontFamily:
+                            'Courier New',
+
+                        fontSize:
+                            '34px',
+
+                        color:
+                            '#ffcc00',
+
+                        fontStyle:
+                            'bold'
+                    }
+                ).setOrigin(0.5);
+
+                this.add.text(
+                    400,
+                    88,
+                    'As preferências são salvas '
+                    + 'automaticamente neste aparelho.',
+                    {
+                        fontFamily:
+                            'Courier New',
+
+                        fontSize:
+                            '12px',
+
+                        color:
+                            '#dff8ff'
+                    }
+                ).setOrigin(0.5);
+
+                const definicoes = [
+                    {
+                        chave:
+                            'musicaAtiva',
+
+                        titulo:
+                            'MÚSICA',
+
+                        valor: () => {
+                            return (
+                                GERENCIADOR_CONFIGURACOES
+                                    .obter(
+                                        'musicaAtiva'
+                                    )
+                                ? 'LIGADA'
+                                : 'DESLIGADA'
+                            );
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .alternar(
+                                    'musicaAtiva'
+                                );
+                        }
+                    },
+
+                    {
+                        chave:
+                            'volumeMusica',
+
+                        titulo:
+                            'VOLUME DA MÚSICA',
+
+                        valor: () => {
+                            return (
+                                Math.round(
+                                    GERENCIADOR_CONFIGURACOES
+                                        .obter(
+                                            'volumeMusica'
+                                        )
+                                    * 100
+                                )
+                                + '%'
+                            );
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .avancarVolume(
+                                    'volumeMusica'
+                                );
+                        }
+                    },
+
+                    {
+                        chave:
+                            'efeitosAtivos',
+
+                        titulo:
+                            'EFEITOS',
+
+                        valor: () => {
+                            return (
+                                GERENCIADOR_CONFIGURACOES
+                                    .obter(
+                                        'efeitosAtivos'
+                                    )
+                                ? 'LIGADOS'
+                                : 'DESLIGADOS'
+                            );
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .alternar(
+                                    'efeitosAtivos'
+                                );
+                        }
+                    },
+
+                    {
+                        chave:
+                            'volumeEfeitos',
+
+                        titulo:
+                            'VOLUME DOS EFEITOS',
+
+                        valor: () => {
+                            return (
+                                Math.round(
+                                    GERENCIADOR_CONFIGURACOES
+                                        .obter(
+                                            'volumeEfeitos'
+                                        )
+                                    * 100
+                                )
+                                + '%'
+                            );
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .avancarVolume(
+                                    'volumeEfeitos'
+                                );
+                        }
+                    },
+
+                    {
+                        chave:
+                            'vibracaoAtiva',
+
+                        titulo:
+                            'VIBRAÇÃO',
+
+                        valor: () => {
+                            return (
+                                GERENCIADOR_CONFIGURACOES
+                                    .obter(
+                                        'vibracaoAtiva'
+                                    )
+                                ? 'LIGADA'
+                                : 'DESLIGADA'
+                            );
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .alternar(
+                                    'vibracaoAtiva'
+                                );
+
+                            GERENCIADOR_CONFIGURACOES
+                                .vibrar(24);
+                        }
+                    },
+
+                    {
+                        chave:
+                            'qualidade',
+
+                        titulo:
+                            'QUALIDADE GRÁFICA',
+
+                        valor: () => {
+                            const nomes = {
+                                auto:
+                                    'AUTOMÁTICA',
+
+                                low:
+                                    'BAIXA',
+
+                                normal:
+                                    'NORMAL',
+
+                                high:
+                                    'ALTA'
+                            };
+
+                            return nomes[
+                                GERENCIADOR_CONFIGURACOES
+                                    .obter(
+                                        'qualidade'
+                                    )
+                            ];
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .avancarQualidade();
+                        }
+                    },
+
+                    {
+                        chave:
+                            'mostrarDicas',
+
+                        titulo:
+                            'DICAS DO JOGO',
+
+                        valor: () => {
+                            return (
+                                GERENCIADOR_CONFIGURACOES
+                                    .obter(
+                                        'mostrarDicas'
+                                    )
+                                ? 'EXIBIR'
+                                : 'OCULTAR'
+                            );
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .alternar(
+                                    'mostrarDicas'
+                                );
+                        }
+                    },
+
+                    {
+                        chave:
+                            'modoControle',
+
+                        titulo:
+                            'TIPO DE CONTROLE',
+
+                        valor: () => {
+                            const nomes = {
+                                auto:
+                                    'AUTOMÁTICO',
+
+                                touch:
+                                    'TOQUE',
+
+                                keyboard:
+                                    'TECLADO',
+
+                                gamepad:
+                                    'GAMEPAD'
+                            };
+
+                            return nomes[
+                                GERENCIADOR_CONFIGURACOES
+                                    .obter(
+                                        'modoControle'
+                                    )
+                            ];
+                        },
+
+                        acao: () => {
+                            GERENCIADOR_CONFIGURACOES
+                                .avancarModoControle();
+                        }
+                    }
+                ];
+
+                definicoes.forEach(
+                    (definicao, indice) => {
+                        this.criarLinha(
+                            132 + indice * 46,
+                            definicao
+                        );
+                    }
+                );
+
+                const botaoResetar = (
+                    this.add.text(
+                        275,
+                        535,
+                        '[ RESTAURAR ]',
+                        {
+                            fontFamily:
+                                'Courier New',
+
+                            fontSize:
+                                '15px',
+
+                            color:
+                                '#ff8298',
+
+                            backgroundColor:
+                                '#28101a',
+
+                            padding: {
+                                x: 13,
+                                y: 9
+                            },
+
+                            fontStyle:
+                                'bold'
+                        }
+                    )
+                )
+                    .setOrigin(0.5)
+                    .setInteractive({
+                        useHandCursor: true
+                    });
+
+                botaoResetar.on(
+                    'pointerdown',
+                    () => {
+                        GERENCIADOR_CONFIGURACOES
+                            .marcarInteracaoUsuario();
+
+                        GERENCIADOR_CONFIGURACOES
+                            .resetar();
+
+                        this.atualizarLinhas();
+
+                        GERENCIADOR_CONFIGURACOES
+                            .vibrar([18, 35, 18]);
+                    }
+                );
+
+                const botaoVoltar = (
+                    this.add.text(
+                        525,
+                        535,
+                        '[ VOLTAR AO MENU ]',
+                        {
+                            fontFamily:
+                                'Courier New',
+
+                            fontSize:
+                                '15px',
+
+                            color:
+                                '#07111f',
+
+                            backgroundColor:
+                                '#28ff9b',
+
+                            padding: {
+                                x: 13,
+                                y: 9
+                            },
+
+                            fontStyle:
+                                'bold'
+                        }
+                    )
+                )
+                    .setOrigin(0.5)
+                    .setInteractive({
+                        useHandCursor: true
+                    });
+
+                botaoVoltar.on(
+                    'pointerdown',
+                    () => {
+                        GERENCIADOR_CONFIGURACOES
+                            .marcarInteracaoUsuario();
+
+                        this.scene.start(
+                            'MenuPrincipal'
+                        );
+                    }
+                );
+            }
+
+            criarLinha(
+                y,
+                definicao
+            ) {
+                const fundo = (
+                    this.add.rectangle(
+                        400,
+                        y,
+                        600,
+                        38,
+                        0x0b2434,
+                        0.92
+                    )
+                );
+
+                fundo.setStrokeStyle(
+                    1,
+                    0x35d9ff,
+                    0.36
+                );
+
+                this.add.text(
+                    125,
+                    y,
+                    definicao.titulo,
+                    {
+                        fontFamily:
+                            'Courier New',
+
+                        fontSize:
+                            '14px',
+
+                        color:
+                            '#ffffff',
+
+                        fontStyle:
+                            'bold'
+                    }
+                ).setOrigin(0, 0.5);
+
+                const valor = (
+                    this.add.text(
+                        670,
+                        y,
+                        '',
+                        {
+                            fontFamily:
+                                'Courier New',
+
+                            fontSize:
+                                '14px',
+
+                            color:
+                                '#ffcc00',
+
+                            fontStyle:
+                                'bold',
+
+                            align:
+                                'right'
+                        }
+                    )
+                )
+                    .setOrigin(1, 0.5)
+                    .setInteractive({
+                        useHandCursor: true
+                    });
+
+                fundo.setInteractive({
+                    useHandCursor: true
+                });
+
+                const ativar = () => {
+                    GERENCIADOR_CONFIGURACOES
+                        .marcarInteracaoUsuario();
+
+                    definicao.acao();
+
+                    GERENCIADOR_CONFIGURACOES
+                        .vibrar(14);
+
+                    this.atualizarLinhas();
+                };
+
+                fundo.on(
+                    'pointerdown',
+                    ativar
+                );
+
+                valor.on(
+                    'pointerdown',
+                    ativar
+                );
+
+                this.linhas.push({
+                    valor,
+                    obterValor:
+                        definicao.valor
+                });
+
+                valor.setText(
+                    definicao.valor()
+                );
+            }
+
+            atualizarLinhas() {
+                this.linhas.forEach(
+                    (linha) => {
+                        linha.valor.setText(
+                            linha.obterValor()
+                        );
+                    }
+                );
+            }
+        }
+
+        // ==========================================
+        // CENA 3: TUTORIAL
         // ==========================================
         class Tutorial extends Phaser.Scene {
             constructor() {
@@ -2667,6 +3300,7 @@
             },
             scene: [
                 MenuPrincipal,
+                Configuracoes,
                 Tutorial,
                 ResultadoTutorial,
                 Fase1
