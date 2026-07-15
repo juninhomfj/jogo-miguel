@@ -1,8 +1,8 @@
 (() => {
     const fases = {
-        Fase1: Object.freeze({
-            id: 'fase-1',
-            scene: 'Fase1',
+        Tutorial: Object.freeze({
+            id: 'tutorial',
+            scene: 'Tutorial',
 
             titulo: 'Treinamento do Herói',
             tipo: 'tutorial',
@@ -38,12 +38,13 @@
                 'coletar-cristais'
             ]),
 
-            proximaCena: 'Fase2'
+            proximaCena:
+                'ResultadoTutorial'
         }),
 
-        Fase2: Object.freeze({
-            id: 'resultado-fase-1',
-            scene: 'Fase2',
+        ResultadoTutorial: Object.freeze({
+            id: 'resultado-tutorial',
+            scene: 'ResultadoTutorial',
 
             titulo: 'Treinamento Concluído',
             tipo: 'resultado',
@@ -58,12 +59,56 @@
             tema: 'resultado-noturno',
 
             controles: Object.freeze([
-                'reiniciar'
+                'continuar',
+                'voltar-menu'
             ]),
 
-            camadasDinamicas: Object.freeze([]),
+            camadasDinamicas:
+                Object.freeze([]),
 
-            proximaCena: 'MenuPrincipal'
+            proximaCena: 'Fase1'
+        }),
+
+        Fase1: Object.freeze({
+            id: 'fase-1',
+            scene: 'Fase1',
+
+            titulo: 'Primeira Aventura',
+            tipo: 'fase',
+
+            orientacao: 'landscape',
+
+            tamanhoLogico: Object.freeze({
+                width: 800,
+                height: 600
+            }),
+
+            tema: 'mundo-1',
+
+            controles: Object.freeze([
+                'movimento',
+                'pulo',
+                'pulo-duplo',
+                'ataque',
+                'pausa'
+            ]),
+
+            camadasDinamicas: Object.freeze([
+                'cenario',
+                'plataformas',
+                'inimigos',
+                'coletaveis',
+                'chefe'
+            ]),
+
+            objetivos: Object.freeze([
+                'atravessar-fase',
+                'coletar-itens',
+                'derrotar-chefe'
+            ]),
+
+            proximaCena:
+                'ResultadoFase1'
         })
     };
 
@@ -117,7 +162,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 1,
+        versao: 2,
 
         fases: Object.freeze(fases),
 
