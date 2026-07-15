@@ -16,6 +16,9 @@
 
             this.sensorInstalado = false;
 
+            this.ultimaOrientacaoFisica = null;
+            this.ultimaOrientacaoFisicaEm = 0;
+
             this.estadoSensor = {
                 disponivel: (
                     'DeviceOrientationEvent'
@@ -171,7 +174,67 @@
             );
         }
 
+
+        obterOrientacaoFisica() {
+            if (
+                this.estadoSensor.permissao
+                    !== 'ativa'
+                || !Number.isFinite(
+                    this.estadoSensor.beta
+                )
+                || !Number.isFinite(
+                    this.estadoSensor.gamma
+                )
+                || !this.estadoSensor.atualizadoEm
+                || (
+                    Date.now()
+                    - this.estadoSensor.atualizadoEm
+                ) > 2200
+            ) {
+                return null;
+            }
+
+            const beta = Math.abs(
+                this.estadoSensor.beta
+            );
+
+            const gamma = Math.abs(
+                this.estadoSensor.gamma
+            );
+
+            // Aparelho em paisagem:
+            // inclinação lateral predominante.
+            if (
+                gamma >= 38
+                && gamma > beta + 10
+            ) {
+                return 'landscape';
+            }
+
+            // Aparelho em retrato:
+            // inclinação frontal predominante.
+            if (
+                beta >= 38
+                && beta > gamma + 10
+            ) {
+                return 'portrait';
+            }
+
+            // Posição plana ou ambígua.
+            return null;
+        }
+
         obterOrientacaoAtual() {
+            if (this.modoJogoAtivo) {
+                const orientacaoFisica = (
+                    this.obterOrientacaoFisica()
+                );
+
+                if (orientacaoFisica) {
+                    return orientacaoFisica;
+                }
+            }
+
             if (
                 screen.orientation
                 && screen.orientation.type
@@ -248,6 +311,10 @@
             if (!this.ehDispositivoMovel()) {
                 return this.obterEstado();
             }
+
+            // O clique em ENTRAR é uma ação direta
+            // do usuário e permite solicitar o sensor.
+            await this.habilitarSensor(true);
 
             await this.solicitarTelaCheia();
             await this.bloquearOrientacao(
@@ -333,6 +400,13 @@
         async habilitarSensor(
             pedirPermissao
         ) {
+            if (
+                this.estadoSensor.permissao
+                    === 'ativa'
+            ) {
+                return true;
+            }
+
             const EventoOrientacao = (
                 window.DeviceOrientationEvent
             );
@@ -433,7 +507,26 @@
                 Date.now()
             );
 
-            this.atualizarStatus();
+            const orientacaoFisica = (
+                this.obterOrientacaoFisica()
+            );
+
+            if (
+                orientacaoFisica
+                !== this.ultimaOrientacaoFisica
+            ) {
+                this.ultimaOrientacaoFisica = (
+                    orientacaoFisica
+                );
+
+                this.ultimaOrientacaoFisicaEm = (
+                    Date.now()
+                );
+
+                this.atualizarInterface();
+            } else {
+                this.atualizarStatus();
+            }
         }
 
         aoMudarOrientacao() {
@@ -511,6 +604,15 @@
             }
 
             this.atualizarStatus();
+
+            window.dispatchEvent(
+                new CustomEvent(
+                    'miguel:orientation-state',
+                    {
+                        detail: this.obterEstado()
+                    }
+                )
+            );
         }
 
         atualizarStatus() {
@@ -542,10 +644,16 @@
                 this.estadoSensor.permissao
             );
 
+            const fisica = (
+                this.obterOrientacaoFisica()
+                || 'indefinida'
+            );
+
             this.statusOverlay.textContent = (
                 `Tela: ${tipoTela} · `
                 + `Ângulo: ${angulo}° · `
-                + `Sensor: ${sensor}`
+                + `Sensor: ${sensor} · `
+                + `Física: ${fisica}`
             );
         }
 
@@ -567,6 +675,9 @@
                     ? this.faseAtiva.orientacao
                     : null
                 ),
+
+                orientacaoFisica:
+                    this.obterOrientacaoFisica(),
 
                 orientacaoAtual:
                     this.obterOrientacaoAtual(),
