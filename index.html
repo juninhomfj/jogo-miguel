@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/device-manager.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/settings-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/phase-config.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/device-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/settings-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/mobile-controls.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/input-manager.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/hud-manager.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/health-manager.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/tutorial-manager.js?v=settings-foundation-20260715-225834"></script>
-    <script src="js/rotation-manager.js?v=settings-foundation-20260715-225834"></script>
+    <script src="js/scene-visuals.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/mobile-controls.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/input-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/hud-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/health-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/tutorial-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/rotation-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -667,6 +667,24 @@
             }
         }
 
+
+        /*
+         * O jogo bloqueia zoom, seleção e gestos
+         * do navegador durante a jogabilidade.
+         */
+        html,
+        body,
+        #game-container,
+        #game-container canvas {
+            touch-action: none !important;
+            -ms-touch-action: none !important;
+
+            overscroll-behavior: none;
+
+            -webkit-touch-callout: none;
+            -webkit-user-drag: none;
+        }
+
     </style>
 </head>
 <body>
@@ -738,7 +756,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'settings-foundation-20260715-225834';
+        window.__MIGUEL_BUILD_ID__ = 'mobile-gesture-fix-20260715-231338';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -2350,9 +2368,19 @@
                 podeControlar,
                 descer
             ) {
+                const apoioEstavel = Boolean(
+                    noChao
+                    || (
+                        this.player.estaAgachado
+                        && Math.abs(
+                            this.player.body.velocity.y
+                        ) < 42
+                    )
+                );
+
                 const podeAgachar = Boolean(
                     podeControlar
-                    && noChao
+                    && apoioEstavel
                     && !this.player.estaAtacando
                     && !this.player.estaMachucado
                 );
@@ -2479,7 +2507,15 @@
                     : 0
                 );
 
-                const descer = eixoY > 0.55;
+                const descer = Boolean(
+                    this.controles
+                    && this.controles
+                        .estaAgachando()
+                );
+
+                const quedaRapida = (
+                    eixoY > 0.62
+                );
 
                 this.atualizarAgachamento(
                     noChao,
@@ -2571,7 +2607,7 @@
 
                 if (
                     podeControlar
-                    && descer
+                    && quedaRapida
                     && !noChao
                     && this.player.body.velocity.y
                         < 360
@@ -2605,6 +2641,33 @@
                 ) {
                     this.sairAgachamento(true);
                     this.executarAtaque();
+                }
+
+                const pediuPoder = Boolean(
+                    this.controles
+                    && this.controles
+                        .consumirPoder()
+                );
+
+                if (
+                    pediuPoder
+                    && podeControlar
+                ) {
+                    if (this.hudJogo) {
+                        this.hudJogo
+                            .mostrarMensagem(
+                                'PODER BLOQUEADO — '
+                                + 'COMPLETE O TREINAMENTO',
+                                1550
+                            );
+                    }
+
+                    GERENCIADOR_CONFIGURACOES
+                        .vibrar([
+                            10,
+                            35,
+                            10
+                        ]);
                 }
 
                 if (

@@ -35,6 +35,13 @@
 
             this.jumpButton = null;
             this.attackButton = null;
+            this.powerButton = null;
+
+            this.powerUnlocked = Boolean(
+                options.powerUnlocked
+            );
+
+            this.ultimoTouchEnd = 0;
 
             this.pointerId = null;
 
@@ -319,7 +326,7 @@
 
                     height:
                         calc(
-                            var(--action-size) * 1.45
+                            var(--action-size) * 1.85
                         );
 
                     pointer-events: none;
@@ -412,6 +419,91 @@
                             68,
                             0.38
                         );
+                }
+
+
+                .miguel-action-button.power {
+                    left:
+                        calc(
+                            50%
+                            - var(--action-size) * 0.36
+                        );
+
+                    top: 0;
+
+                    width:
+                        calc(
+                            var(--action-size) * 0.72
+                        );
+
+                    height:
+                        calc(
+                            var(--action-size) * 0.72
+                        );
+
+                    border:
+                        3px solid
+                        rgba(
+                            216,
+                            170,
+                            255,
+                            0.66
+                        );
+
+                    background:
+                        rgba(
+                            117,
+                            52,
+                            177,
+                            0.38
+                        );
+                }
+
+                .miguel-action-button.power
+                .miguel-action-icon {
+                    margin-top: -12%;
+
+                    font-size:
+                        clamp(
+                            25px,
+                            6vmin,
+                            43px
+                        );
+                }
+
+                .miguel-action-button.power
+                .miguel-action-label {
+                    bottom: 7%;
+
+                    font-size:
+                        clamp(
+                            7px,
+                            1.5vmin,
+                            10px
+                        );
+                }
+
+                .miguel-action-button.power.is-locked {
+                    opacity: 0.52;
+                }
+
+                .miguel-action-button.power.is-locked::after {
+                    content: '×';
+
+                    position: absolute;
+                    right: 5%;
+                    top: 0;
+
+                    color: #ffffff;
+
+                    font-size:
+                        clamp(
+                            14px,
+                            3vmin,
+                            22px
+                        );
+
+                    font-weight: bold;
                 }
 
                 .miguel-action-icon {
@@ -563,8 +655,33 @@
                 )
             );
 
+            const powerButton = (
+                this.criarBotao(
+                    'power',
+                    '◆',
+                    'PODER',
+                    'poder'
+                )
+            );
+
+            powerButton.classList.toggle(
+                'is-locked',
+                !this.powerUnlocked
+            );
+
+            powerButton.setAttribute(
+                'aria-label',
+                this.powerUnlocked
+                ? 'PODER'
+                : 'PODER BLOQUEADO'
+            );
+
             actions.appendChild(
                 attackButton
+            );
+
+            actions.appendChild(
+                powerButton
             );
 
             actions.appendChild(
@@ -585,6 +702,7 @@
             this.actions = actions;
             this.jumpButton = jumpButton;
             this.attackButton = attackButton;
+            this.powerButton = powerButton;
         }
 
         criarBotao(
@@ -645,6 +763,55 @@
                 this.abortController.signal
             );
 
+            const bloquearGestoNavegador = (
+                evento
+            ) => {
+                if (evento.cancelable) {
+                    evento.preventDefault();
+                }
+            };
+
+            [
+                'gesturestart',
+                'gesturechange',
+                'gestureend',
+                'dblclick'
+            ].forEach((tipo) => {
+                this.container.addEventListener(
+                    tipo,
+                    bloquearGestoNavegador,
+                    {
+                        signal,
+                        passive: false
+                    }
+                );
+            });
+
+            this.container.addEventListener(
+                'touchend',
+                (evento) => {
+                    const agora = performance.now();
+
+                    const intervalo = (
+                        agora - this.ultimoTouchEnd
+                    );
+
+                    if (
+                        intervalo > 0
+                        && intervalo < 360
+                        && evento.cancelable
+                    ) {
+                        evento.preventDefault();
+                    }
+
+                    this.ultimoTouchEnd = agora;
+                },
+                {
+                    signal,
+                    passive: false
+                }
+            );
+
             this.zone.addEventListener(
                 'pointerdown',
                 (evento) => {
@@ -688,7 +855,8 @@
 
             [
                 this.jumpButton,
-                this.attackButton
+                this.attackButton,
+                this.powerButton
             ].forEach((button) => {
                 button.addEventListener(
                     'pointerdown',
@@ -1013,6 +1181,28 @@
             elemento.style.top = `${y}px`;
         }
 
+        setPowerUnlocked(ativo) {
+            this.powerUnlocked = Boolean(
+                ativo
+            );
+
+            if (!this.powerButton) {
+                return;
+            }
+
+            this.powerButton.classList.toggle(
+                'is-locked',
+                !this.powerUnlocked
+            );
+
+            this.powerButton.setAttribute(
+                'aria-label',
+                this.powerUnlocked
+                ? 'PODER'
+                : 'PODER BLOQUEADO'
+            );
+        }
+
         setGamepadMode(ativo) {
             if (!this.root) {
                 return;
@@ -1027,9 +1217,12 @@
         reset() {
             this.liberarJoystick();
 
+            this.ultimoTouchEnd = 0;
+
             [
                 this.jumpButton,
-                this.attackButton
+                this.attackButton,
+                this.powerButton
             ].forEach((button) => {
                 if (button) {
                     button.classList.remove(
@@ -1057,6 +1250,9 @@
                 raio: Math.round(
                     this.radius
                 ),
+
+                powerUnlocked:
+                    this.powerUnlocked,
 
                 viewport:
                     this.obterViewport()
