@@ -36,8 +36,18 @@
             // Histerese: entra e sai do agachamento
             // usando limites diferentes.
             this.agachamentoSolicitado = false;
+
+            this.agachamentoBloqueadoAteRecentrar =
+                false;
+
             this.limiarAgacharEntrada = 0.62;
             this.limiarAgacharSaida = 0.30;
+
+            this.limiarSoltarAgachamentoLateral =
+                0.38;
+
+            this.limiarRecentrarAgachamento =
+                0.22;
 
             // O pulo ocorre somente ao atravessar
             // o limite superior do analógico.
@@ -524,20 +534,61 @@
         }
 
         atualizarGestosDirecionais() {
+            const eixoX = Math.abs(
+                this.eixoFinalX
+            );
+
             const eixoY = this.eixoFinalY;
 
-            if (
-                !this.agachamentoSolicitado
-                && eixoY
-                    >= this.limiarAgacharEntrada
-            ) {
-                this.agachamentoSolicitado = true;
-            } else if (
-                this.agachamentoSolicitado
+            const recentralizado = Boolean(
+                eixoX
+                    <= this
+                        .limiarRecentrarAgachamento
                 && eixoY
                     <= this.limiarAgacharSaida
+            );
+
+            const movimentoLateral = Boolean(
+                eixoX
+                    >= this
+                        .limiarSoltarAgachamentoLateral
+            );
+
+            if (
+                this
+                    .agachamentoBloqueadoAteRecentrar
+                && recentralizado
             ) {
-                this.agachamentoSolicitado = false;
+                this
+                    .agachamentoBloqueadoAteRecentrar =
+                    false;
+            }
+
+            if (this.agachamentoSolicitado) {
+                if (
+                    eixoY
+                        <= this.limiarAgacharSaida
+                    || movimentoLateral
+                ) {
+                    this.agachamentoSolicitado =
+                        false;
+
+                    if (movimentoLateral) {
+                        this
+                            .agachamentoBloqueadoAteRecentrar =
+                            true;
+                    }
+                }
+            } else if (
+                !this
+                    .agachamentoBloqueadoAteRecentrar
+                && eixoY
+                    >= this.limiarAgacharEntrada
+                && eixoX
+                    < this
+                        .limiarSoltarAgachamentoLateral
+            ) {
+                this.agachamentoSolicitado = true;
             }
 
             const direcionalPodePular = Boolean(
@@ -1004,6 +1055,10 @@
             this.eixoFinalY = 0;
 
             this.agachamentoSolicitado = false;
+
+            this.agachamentoBloqueadoAteRecentrar =
+                false;
+
             this.puloAnalogicoArmado = true;
 
             this.filaPulo = 0;
@@ -1052,6 +1107,10 @@
                 gestos: {
                     agachamento:
                         this.agachamentoSolicitado,
+
+                    agachamentoBloqueado:
+                        this
+                            .agachamentoBloqueadoAteRecentrar,
 
                     puloAnalogicoArmado:
                         this.puloAnalogicoArmado
