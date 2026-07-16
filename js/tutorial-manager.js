@@ -192,6 +192,8 @@
             this.eventoAvanco = null;
             this.eventoToast = null;
             this.eventoFinal = null;
+            this.timerFinalFallback = null;
+            this.transicaoFinalExecutada = false;
 
             this.revisaoToast = 0;
         }
@@ -605,6 +607,35 @@
                         this.indiceAtual += 1;
                         this.avancoAgendado = false;
 
+                        /*
+                         * Ações já realizadas fora da ordem
+                         * são consumidas de uma vez. Isso
+                         * evita uma cadeia de temporizadores.
+                         */
+                        while (
+                            this.indiceAtual
+                            < this.objetivos.length
+                            && this.objetivos[
+                                this.indiceAtual
+                            ].concluido()
+                        ) {
+                            const barraAntecipada = (
+                                this.barras[
+                                    this.indiceAtual
+                                ]
+                            );
+
+                            if (barraAntecipada) {
+                                barraAntecipada
+                                    .setFillStyle(
+                                        0x28ff9b,
+                                        1
+                                    );
+                            }
+
+                            this.indiceAtual += 1;
+                        }
+
                         if (
                             this.indiceAtual
                             >= this.objetivos.length
@@ -614,10 +645,6 @@
                         }
 
                         this.atualizarHUD();
-
-                        // Uma ação pode ter ocorrido antes
-                        // de a instrução correspondente.
-                        this.avaliarObjetivoAtual();
                     }
                 )
             );
@@ -690,18 +717,37 @@
                 this.obterEstado()
             );
 
+            const concluirTransicao = () => {
+                if (
+                    !this.ativo
+                    || this.transicaoFinalExecutada
+                ) {
+                    return;
+                }
+
+                this.transicaoFinalExecutada = true;
+
+                this.onComplete(
+                    this.obterEstado()
+                );
+            };
+
             this.eventoFinal = (
                 this.scene.time.delayedCall(
-                    950,
-                    () => {
-                        if (!this.ativo) {
-                            return;
-                        }
+                    700,
+                    concluirTransicao
+                )
+            );
 
-                        this.onComplete(
-                            this.obterEstado()
-                        );
-                    }
+            /*
+             * Caso o relógio da cena fique pausado durante
+             * uma mudança de viewport, o navegador ainda
+             * garante a abertura da tela de resultado.
+             */
+            this.timerFinalFallback = (
+                window.setTimeout(
+                    concluirTransicao,
+                    1200
                 )
             );
         }
@@ -916,6 +962,14 @@
             }
 
             this.ativo = false;
+
+            if (this.timerFinalFallback !== null) {
+                window.clearTimeout(
+                    this.timerFinalFallback
+                );
+
+                this.timerFinalFallback = null;
+            }
 
             [
                 this.eventoAvanco,
