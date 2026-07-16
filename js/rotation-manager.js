@@ -725,8 +725,7 @@
             );
 
             const efetiva = (
-                fisica
-                || estado.orientacaoAtual
+                estado.orientacaoAtual
                 || logica
             );
 
@@ -740,7 +739,7 @@
 
             this.atualizarGeometria(
                 logica,
-                fisica
+                efetiva
             );
 
             if (this.overlay) {
