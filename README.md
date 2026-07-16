@@ -1,45 +1,79 @@
 # ⚡ As Aventuras do Miguel
 
-Bem-vindo ao repositório oficial de **As Aventuras do Miguel**! 
-Este é um jogo de plataforma 2D lúdico, criado como um presente especial, onde o próprio Miguel é o herói da aventura. 
+Jogo de plataforma e ação em pixel art 8-bits estrito, criado para transformar Miguel no herói de suas próprias aventuras.
 
-O projeto foi desenhado para ser leve, rodar diretamente no navegador (Web) e ser perfeitamente jogável em dispositivos móveis (Mobile-First) através de controles por toque na tela.
+O jogo roda diretamente no navegador e possui foco mobile-first, com suporte progressivo para celular, tablet, computador e gamepad.
 
----
+## Jogar
 
-## 🎮 Como Jogar
+Acesse:
 
-Acesse o jogo diretamente pelo seu navegador (no celular ou computador):
-👉 **[Jogue As Aventuras do Miguel aqui](https://juninhomfj.github.io/jogo-miguel/)**
+**https://juninhomfj.github.io/jogo-miguel/**
 
-**Controles:**
-* **No Computador:** Setas direcionais do teclado (Esquerda, Direita, Cima para pular).
-* **No Celular:** Botões virtuais de toque na tela (◀, ▶ e PULO).
+## Controles atuais
 
----
+### Mobile
 
-## 🛠️ Tecnologias Utilizadas
+- analógico virtual;
+- pulo;
+- ataque;
+- poder;
+- agachamento pelo movimento para baixo;
+- multitouch.
 
-Este projeto foi construído utilizando tecnologias modernas e focadas em performance na web:
+### Computador
 
-* **HTML5, CSS3 e JavaScript (ES6):** A base estrutural do jogo.
-* **Phaser 3:** O motor gráfico 2D (Game Engine) super leve e focado em física arcade.
-* **Design Responsivo:** O jogo se autoajusta para caber em telas de diferentes tamanhos, garantindo a melhor experiência no smartphone.
-* **GitHub Pages:** Hospedagem gratuita e contínua do projeto.
+- setas ou A/D para movimento;
+- W ou seta para cima para pular;
+- S ou seta para baixo para agachar;
+- teclas de ação conforme as instruções do jogo.
 
----
+### Gamepad
 
-## 🗺️ Roadmap do Projeto (O que vem por aí!)
+- analógico ou direcional;
+- pulo;
+- ataque;
+- poder;
+- pausa.
 
-Nosso jogo está em constante evolução. Aqui estão os próximos passos planejados para a aventura do Miguel:
+## Estado atual
 
-- [x] **Fase 1: O Protótipo Visual** (Movimentação, Spritesheet 8-bits original, Motor de Física).
-- [x] **Fase 2: Mobile-First** (Controles virtuais na tela e adaptação responsiva).
-- [x] **Fase 3: O Objetivo** (Sistema de pontuação, coleta de moedas e telas de transição).
-- [ ] **Fase 4: A Voz do Herói** (Integração de arquivos `.mp3` com frases gravadas pelo próprio Miguel ao pular, coletar itens e vencer).
-- [ ] **Fase 5: Inteligência e Desafio** (Implementação de Dificuldade Dinâmica - Inimigos que se ajustam à habilidade do jogador).
-- [ ] **Fase 6: O App Android** (Empacotamento do jogo web para formato `.apk` permitindo instalação direta no celular).
+Estado protegido em 16/07/2026:
 
----
+- produção: `100d4853d32b907ef40a09b40a0b70a66b0cf58e`;
+- trabalho: `62cd3cb8382a7607c63c8dcb4dfae2cfdeb15253`;
+- build: `crouch-physics-stable-20260716-005908`.
 
-*Desenvolvido com carinho para o super-herói Miguel.*
+A física do agachamento foi publicada e aguarda nova validação no dispositivo real. A pose visual ainda possui ajuste pendente.
+
+## Documentação
+
+- [Roadmap do produto](docs/roadmap-produto.md)
+- [Estado atual e retomada](docs/estado-atual-e-retomada.md)
+- [Próximas sprints](docs/proximos-passos-e-sprints.md)
+- [Pipeline de sprites em magenta](docs/pipeline-producao-sprites-magenta.md)
+- [Instruções operacionais](AGENTS.md)
+
+## Tecnologias
+
+- HTML5;
+- CSS3;
+- JavaScript;
+- Phaser 3;
+- GitHub Pages;
+- armazenamento local planejado;
+- PWA planejada.
+
+## Próximas frentes
+
+- finalizar o agachamento;
+- manter a tela ligada;
+- persistir progresso;
+- corrigir o robô;
+- implementar fases reais;
+- criar novos personagens;
+- adicionar bicicleta, hoverboard, patins e patinete;
+- construir a loja;
+- criar recordes e ranking compartilhável.
+
+Desenvolvido com carinho para o super-herói Miguel.
