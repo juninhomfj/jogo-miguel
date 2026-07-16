@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/device-manager.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/settings-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/phase-config.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/device-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/settings-manager.js?v=crouch-physics-stable-20260716-005908"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/mobile-controls.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/input-manager.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/hud-manager.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/health-manager.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/tutorial-manager.js?v=crouch-visual-right-20260716-002347"></script>
-    <script src="js/rotation-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/scene-visuals.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/mobile-controls.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/input-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/hud-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/health-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/tutorial-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/rotation-manager.js?v=crouch-physics-stable-20260716-005908"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -756,7 +756,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'crouch-visual-right-20260716-002347';
+        window.__MIGUEL_BUILD_ID__ = 'crouch-physics-stable-20260716-005908';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -2298,13 +2298,36 @@
                 this.cancelarPoeira();
                 this.cancelarGiroDuplo();
 
+                const corpo = this.player.body;
+
+                if (
+                    typeof corpo.updateFromGameObject
+                        === 'function'
+                ) {
+                    corpo.updateFromGameObject();
+                }
+
+                const baseAntes = corpo.bottom;
+
                 this.player.estaAgachado = true;
 
-                this.player.setVelocityX(0);
+                /*
+                 * Enquanto agachado, o corpo não deve
+                 * receber gravidade nem velocidade
+                 * vertical. Isso impede a alternância
+                 * entre agachar e levantar.
+                 */
+                this.player.setVelocity(
+                    0,
+                    0
+                );
+
+                corpo.allowGravity = false;
+
                 this.player.anims.stop();
                 this.player.setVisible(false);
 
-                this.player.body.setSize(
+                corpo.setSize(
                     this.player.corpoAgachado
                         .largura,
 
@@ -2312,7 +2335,7 @@
                         .altura
                 );
 
-                this.player.body.setOffset(
+                corpo.setOffset(
                     this.player.corpoAgachado
                         .offsetX,
 
@@ -2321,12 +2344,35 @@
                 );
 
                 if (
-                    typeof this.player.body
-                        .updateFromGameObject
+                    typeof corpo.updateFromGameObject
                         === 'function'
                 ) {
-                    this.player.body
-                        .updateFromGameObject();
+                    corpo.updateFromGameObject();
+                }
+
+                /*
+                 * Alterar altura e offset muda a posição
+                 * inferior do corpo no Phaser. Corrigimos
+                 * o Y do sprite pela diferença real,
+                 * preservando exatamente a linha dos pés.
+                 */
+                const ajusteBase = (
+                    baseAntes - corpo.bottom
+                );
+
+                if (
+                    Number.isFinite(ajusteBase)
+                    && Math.abs(ajusteBase) > 0.01
+                ) {
+                    this.player.y += ajusteBase;
+
+                    if (
+                        typeof corpo
+                            .updateFromGameObject
+                            === 'function'
+                    ) {
+                        corpo.updateFromGameObject();
+                    }
                 }
 
                 this.crouchVisual
@@ -2349,12 +2395,33 @@
             sairAgachamento(
                 forcar = false
             ) {
+                const estavaAgachado = Boolean(
+                    this.player.estaAgachado
+                );
+
                 if (
-                    !this.player.estaAgachado
+                    !estavaAgachado
                     && !forcar
                 ) {
                     return;
                 }
+
+                const corpo = this.player.body;
+
+                if (
+                    corpo
+                    && typeof corpo
+                        .updateFromGameObject
+                        === 'function'
+                ) {
+                    corpo.updateFromGameObject();
+                }
+
+                const baseAntes = (
+                    corpo
+                    ? corpo.bottom
+                    : null
+                );
 
                 this.player.estaAgachado = false;
 
@@ -2364,8 +2431,19 @@
                         .setAngle(90);
                 }
 
-                if (this.player.body) {
-                    this.player.body.setSize(
+                if (corpo) {
+                    /*
+                     * Só zeramos a velocidade vertical
+                     * quando o jogador estava realmente
+                     * agachado. Chamadas forçadas durante
+                     * ataque ou pulo não devem congelar
+                     * um personagem que já estava no ar.
+                     */
+                    if (estavaAgachado) {
+                        this.player.setVelocityY(0);
+                    }
+
+                    corpo.setSize(
                         this.player.corpoPadrao
                             .largura,
 
@@ -2373,7 +2451,7 @@
                             .altura
                     );
 
-                    this.player.body.setOffset(
+                    corpo.setOffset(
                         this.player.corpoPadrao
                             .offsetX,
 
@@ -2382,13 +2460,35 @@
                     );
 
                     if (
-                        typeof this.player.body
+                        typeof corpo
                             .updateFromGameObject
                             === 'function'
                     ) {
-                        this.player.body
-                            .updateFromGameObject();
+                        corpo.updateFromGameObject();
                     }
+
+                    const ajusteBase = (
+                        Number.isFinite(baseAntes)
+                        ? baseAntes - corpo.bottom
+                        : 0
+                    );
+
+                    if (
+                        Number.isFinite(ajusteBase)
+                        && Math.abs(ajusteBase) > 0.01
+                    ) {
+                        this.player.y += ajusteBase;
+
+                        if (
+                            typeof corpo
+                                .updateFromGameObject
+                                === 'function'
+                        ) {
+                            corpo.updateFromGameObject();
+                        }
+                    }
+
+                    corpo.allowGravity = true;
                 }
 
                 if (
@@ -2406,25 +2506,46 @@
                 podeControlar,
                 descer
             ) {
-                const apoioEstavel = Boolean(
-                    noChao
-                    || (
-                        this.player.estaAgachado
-                        && Math.abs(
-                            this.player.body.velocity.y
-                        ) < 42
-                    )
-                );
-
-                const podeAgachar = Boolean(
+                const estadoPermiteAgachar = Boolean(
                     podeControlar
-                    && apoioEstavel
                     && !this.player.estaAtacando
                     && !this.player.estaMachucado
                 );
 
+                /*
+                 * Depois de entrar, o estado não depende
+                 * mais de blocked.down ou velocity.y.
+                 * Esses valores podem oscilar durante a
+                 * troca do tamanho do corpo.
+                 */
+                if (this.player.estaAgachado) {
+                    if (
+                        estadoPermiteAgachar
+                        && descer
+                    ) {
+                        this.player.setVelocity(
+                            0,
+                            0
+                        );
+
+                        this.player.body.allowGravity =
+                            false;
+
+                        this.sincronizarAgachamento();
+                        return;
+                    }
+
+                    this.sairAgachamento();
+                    return;
+                }
+
+                /*
+                 * O chão é exigido somente para iniciar
+                 * o agachamento, nunca para mantê-lo.
+                 */
                 if (
-                    podeAgachar
+                    estadoPermiteAgachar
+                    && noChao
                     && descer
                 ) {
                     this.entrarAgachamento();
@@ -2646,6 +2767,7 @@
                 if (
                     podeControlar
                     && quedaRapida
+                    && !this.player.estaAgachado
                     && !noChao
                     && this.player.body.velocity.y
                         < 360
