@@ -1,0 +1,57 @@
+{
+  "character": "robot_enemy_basic",
+  "format": "individual_png_frames",
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "pixelArt": true,
+  "transparent": true,
+  "animations": {
+    "idle": {
+      "frames": [
+        "robot_idle_1.png",
+        "robot_idle_2.png"
+      ],
+      "frameRate": 2,
+      "repeat": -1
+    },
+    "walk": {
+      "frames": [
+        "robot_walk_1.png",
+        "robot_walk_2.png",
+        "robot_walk_3.png",
+        "robot_walk_4.png"
+      ],
+      "frameRate": 7,
+      "repeat": -1
+    },
+    "attack": {
+      "frames": [
+        "robot_attack_charge.png",
+        "robot_attack_fire.png",
+        "robot_attack_recover.png"
+      ],
+      "frameRate": 6,
+      "repeat": 0
+    },
+    "hit": {
+      "frames": [
+        "robot_hit_1.png",
+        "robot_hit_2.png"
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    "explode": {
+      "frames": [
+        "robot_explode_1.png",
+        "robot_explode_2.png",
+        "robot_explode_3.png",
+        "robot_explode_4.png"
+      ],
+      "frameRate": 6,
+      "repeat": 0
+    }
+  }
+}
