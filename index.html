@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/device-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/settings-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/phase-config.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/device-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/settings-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/mobile-controls.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/input-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/hud-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/health-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/tutorial-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
-    <script src="js/rotation-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/scene-visuals.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/mobile-controls.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/input-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/hud-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/health-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/tutorial-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/rotation-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'orientation-viewport-hotfix-20260716-033030';
+        window.__MIGUEL_BUILD_ID__ = 'tutorial-finish-crouch-stable-20260716-035646';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -1753,6 +1753,7 @@
                 this.player.estaEmPoeira = false;
                 this.player.giroDuploAtivo = false;
                 this.player.estaAgachado = false;
+                this.player.agachamentoMantidoAte = 0;
                 this.player.estavaNoChao = false;
                 this.player.estaMachucado = false;
                 this.player.setDepth(10);
@@ -2087,6 +2088,29 @@
                                     .countActive(true),
 
                             onComplete: () => {
+                                if (
+                                    this
+                                        .transicaoTutorialEmAndamento
+                                ) {
+                                    return;
+                                }
+
+                                this
+                                    .transicaoTutorialEmAndamento =
+                                    true;
+
+                                this.sairAgachamento(true);
+
+                                if (
+                                    this.controles
+                                    && typeof this.controles
+                                        .resetarEstado
+                                        === 'function'
+                                ) {
+                                    this.controles
+                                        .resetarEstado();
+                                }
+
                                 this.registry.set(
                                     'tutorialConcluido',
                                     true
@@ -2238,12 +2262,17 @@
             }
 
             sincronizarAgachamento() {
-                if (
-                    !this.player.estaAgachado
-                    || !this.crouchVisual.visible
-                ) {
+                if (!this.player.estaAgachado) {
                     return;
                 }
+
+                /*
+                 * Nenhum callback de animação pode exibir
+                 * o sprite em pé durante o agachamento.
+                 */
+                this.player.setVisible(false);
+
+                this.crouchVisual.setVisible(true);
 
                 /*
                  * BBox transparente do frame:
@@ -2681,6 +2710,27 @@
                         .estaAgachando()
                 );
 
+                const movimentoLateralAgachamento = (
+                    Math.abs(eixoX) >= 0.38
+                );
+
+                if (descer) {
+                    this.player
+                        .agachamentoMantidoAte = (
+                            time + 180
+                        );
+                }
+
+                const descerEstavel = Boolean(
+                    descer
+                    || (
+                        this.player.estaAgachado
+                        && !movimentoLateralAgachamento
+                        && time <= this.player
+                            .agachamentoMantidoAte
+                    )
+                );
+
                 const quedaRapida = (
                     eixoY > 0.62
                 );
@@ -2688,7 +2738,7 @@
                 this.atualizarAgachamento(
                     noChao,
                     podeControlar,
-                    descer
+                    descerEstavel
                 );
 
                 const esquerda = eixoX < -0.16;
