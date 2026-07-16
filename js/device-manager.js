@@ -238,38 +238,28 @@
         }
 
         obterOrientacaoAtual() {
-            if (this.modoJogoAtivo) {
-                const orientacaoFisica = (
-                    this.obterOrientacaoFisica()
-                );
+            const visual = window.visualViewport;
 
-                if (orientacaoFisica) {
-                    return orientacaoFisica;
-                }
-            }
+            const largura = Math.max(
+                1,
+                Math.round(
+                    visual
+                    ? visual.width
+                    : window.innerWidth
+                )
+            );
 
-            if (
-                screen.orientation
-                && screen.orientation.type
-            ) {
-                if (
-                    screen.orientation.type
-                        .startsWith('landscape')
-                ) {
-                    return 'landscape';
-                }
-
-                if (
-                    screen.orientation.type
-                        .startsWith('portrait')
-                ) {
-                    return 'portrait';
-                }
-            }
+            const altura = Math.max(
+                1,
+                Math.round(
+                    visual
+                    ? visual.height
+                    : window.innerHeight
+                )
+            );
 
             return (
-                window.innerWidth
-                >= window.innerHeight
+                largura >= altura
                 ? 'landscape'
                 : 'portrait'
             );
@@ -325,9 +315,8 @@
                 return this.obterEstado();
             }
 
-            // O clique em ENTRAR é uma ação direta
-            // do usuário e permite solicitar o sensor.
-            await this.habilitarSensor(true);
+            // A orientação da partida é definida pela
+            // viewport. O sensor não bloqueia o jogo.
 
             await this.solicitarTelaCheia();
             await this.bloquearOrientacao(

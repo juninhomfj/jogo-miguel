@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/device-manager.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/settings-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/phase-config.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/device-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/settings-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/mobile-controls.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/input-manager.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/hud-manager.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/health-manager.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/tutorial-manager.js?v=crouch-physics-stable-20260716-005908"></script>
-    <script src="js/rotation-manager.js?v=crouch-physics-stable-20260716-005908"></script>
+    <script src="js/scene-visuals.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/mobile-controls.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/input-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/hud-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/health-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/tutorial-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
+    <script src="js/rotation-manager.js?v=orientation-viewport-hotfix-20260716-033030"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -234,6 +234,15 @@
         #sensor-action:disabled {
             opacity: 0.65;
             cursor: default;
+        }
+
+        /*
+         * O sensor físico é apenas diagnóstico.
+         * Ele não é necessário para liberar o tutorial.
+         */
+        #sensor-action,
+        #orientation-status {
+            display: none !important;
         }
 
         #orientation-status {
@@ -756,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'crouch-physics-stable-20260716-005908';
+        window.__MIGUEL_BUILD_ID__ = 'orientation-viewport-hotfix-20260716-033030';
 
         console.info(
             '[MIGUEL BUILD]',
