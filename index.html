@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/device-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/settings-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/phase-config.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/device-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/settings-manager.js?v=tutorial-result-transition-20260716-141021"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/mobile-controls.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/input-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/hud-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/health-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/tutorial-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
-    <script src="js/rotation-manager.js?v=tutorial-finish-crouch-stable-20260716-035646"></script>
+    <script src="js/scene-visuals.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/mobile-controls.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/input-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/hud-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/health-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/tutorial-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/rotation-manager.js?v=tutorial-result-transition-20260716-141021"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'tutorial-finish-crouch-stable-20260716-035646';
+        window.__MIGUEL_BUILD_ID__ = 'tutorial-result-transition-20260716-141021';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -2099,26 +2099,105 @@
                                     .transicaoTutorialEmAndamento =
                                     true;
 
-                                this.sairAgachamento(true);
-
-                                if (
-                                    this.controles
-                                    && typeof this.controles
-                                        .resetarEstado
-                                        === 'function'
-                                ) {
-                                    this.controles
-                                        .resetarEstado();
+                                /*
+                                 * Falhas de limpeza não podem
+                                 * impedir a tela de resultado.
+                                 */
+                                try {
+                                    this.sairAgachamento(
+                                        true
+                                    );
+                                } catch (erro) {
+                                    console.error(
+                                        '[TUTORIAL]',
+                                        'falha ao restaurar '
+                                        + 'agachamento',
+                                        erro
+                                    );
                                 }
 
-                                this.registry.set(
-                                    'tutorialConcluido',
-                                    true
-                                );
+                                try {
+                                    if (
+                                        this.controles
+                                        && typeof this
+                                            .controles
+                                            .resetarEstado
+                                            === 'function'
+                                    ) {
+                                        this.controles
+                                            .resetarEstado();
+                                    }
+                                } catch (erro) {
+                                    console.error(
+                                        '[TUTORIAL]',
+                                        'falha ao limpar '
+                                        + 'controles',
+                                        erro
+                                    );
+                                }
 
-                                this.scene.start(
-                                    'ResultadoTutorial'
-                                );
+                                try {
+                                    this.registry.set(
+                                        'tutorialConcluido',
+                                        true
+                                    );
+                                } catch (erro) {
+                                    console.error(
+                                        '[TUTORIAL]',
+                                        'falha ao salvar '
+                                        + 'conclusão',
+                                        erro
+                                    );
+                                }
+
+                                let iniciouResultado = false;
+
+                                try {
+                                    this.scene.start(
+                                        'ResultadoTutorial'
+                                    );
+
+                                    iniciouResultado = true;
+                                } catch (erro) {
+                                    console.error(
+                                        '[TUTORIAL]',
+                                        'ScenePlugin não abriu '
+                                        + 'o resultado',
+                                        erro
+                                    );
+                                }
+
+                                if (
+                                    !iniciouResultado
+                                    && this.game
+                                    && this.game.scene
+                                ) {
+                                    try {
+                                        this.game.scene.start(
+                                            'ResultadoTutorial'
+                                        );
+
+                                        iniciouResultado = true;
+                                    } catch (erro) {
+                                        console.error(
+                                            '[TUTORIAL]',
+                                            'SceneManager não '
+                                            + 'abriu o resultado',
+                                            erro
+                                        );
+                                    }
+                                }
+
+                                if (!iniciouResultado) {
+                                    this
+                                        .transicaoTutorialEmAndamento =
+                                        false;
+
+                                    console.error(
+                                        '[TUTORIAL]',
+                                        'transição final falhou'
+                                    );
+                                }
                             }
                         }
                     )
