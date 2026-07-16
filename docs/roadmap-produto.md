@@ -2,12 +2,11 @@
 
 ## Identidade do jogo
 
-- plataforma e ação em pixel art estilo 16-bits;
+- plataforma e ação em pixel art 8-bits estrito;
 - visual retrô nítido, sem antialiasing;
 - experiência infantil, intuitiva e acessível;
 - suporte a celular, tablet, computador e gamepad;
-- conteúdo inspirado em Miguel, sua família,
-  seus cachorros, sua bicicleta e suas aventuras.
+- conteúdo inspirado em Miguel, sua família, seus cachorros e suas aventuras.
 
 ## Estrutura principal
 
@@ -19,6 +18,7 @@
 - resultados;
 - progressão;
 - loja;
+- recordes;
 - créditos;
 - instalação como PWA.
 
@@ -26,24 +26,24 @@
 
 ### Mobile
 
-- analógico flutuante na área esquerda;
-- origem criada no primeiro toque;
+- analógico flutuante;
 - movimento por eixos;
-- transparência alta;
-- botão visual de pulo;
-- botão visual de golpe;
+- pulo;
+- golpe;
+- poder;
 - agachamento puxando o analógico para baixo;
+- reinício mobile planejado;
 - multitouch;
-- vibração opcional.
+- vibração opcional;
+- Wake Lock durante a partida.
 
 ### Computador
 
 - A/D ou setas;
 - W ou seta para cima;
 - S ou seta para baixo para agachar;
-- X ou espaço;
-- dicas pequenas e temporárias;
-- ausência dos controles grandes de mobile.
+- teclas de ação;
+- dicas temporárias.
 
 ### Gamepad
 
@@ -60,9 +60,9 @@
 1. mover Miguel;
 2. pular;
 3. usar o pulo duplo;
-4. agachar-se;
+4. agachar;
 5. receber dano do robô;
-6. derrotar o robô com golpe;
+6. derrotar o robô;
 7. coletar cristais.
 
 Ao terminar:
@@ -73,7 +73,7 @@ Ao terminar:
 ## Vida e dano
 
 - barra de vida;
-- vidas representadas por corações;
+- corações;
 - dano leve, médio e alto;
 - invulnerabilidade temporária;
 - recuo;
@@ -103,6 +103,26 @@ Cada inimigo poderá configurar:
 - modo de derrota;
 - recompensa.
 
+## Robô
+
+O robô atual precisa ser corrigido antes da expansão de inimigos.
+
+Separar:
+
+- máquina de estados;
+- patrulha;
+- direção;
+- colisão;
+- dano de contato;
+- recebimento de dano;
+- invulnerabilidade temporária;
+- derrota;
+- explosão;
+- recompensa;
+- arte definitiva.
+
+Primeiro estabilizar comportamento e colisões. Depois criar o novo lote visual em magenta.
+
 ## Chefes
 
 - chefe no final das fases principais;
@@ -125,7 +145,23 @@ Cada inimigo poderá configurar:
 - poderes;
 - cosméticos;
 - veículos;
+- recordes locais;
+- ranking compartilhável com validação;
 - desbloqueios.
+
+## Persistência
+
+Salvar com formato versionado:
+
+- tutorial concluído;
+- fases desbloqueadas;
+- melhor pontuação por fase;
+- moedas;
+- cristais;
+- veículos adquiridos;
+- veículo equipado;
+- configurações;
+- recordes locais.
 
 ## Tipos de fase
 
@@ -136,21 +172,120 @@ Cada inimigo poderá configurar:
 - corrida automática;
 - bicicleta;
 - hoverboard;
+- patins;
+- patinete;
 - combate;
 - fases com companheiros;
 - desafios com os cachorros.
+
+## Arquitetura de fases
+
+Cada fase deverá configurar:
+
+- identificador;
+- nome;
+- tema;
+- cenário;
+- música;
+- posição inicial;
+- objetivo;
+- inimigos;
+- colecionáveis;
+- checkpoints;
+- condição de vitória;
+- condição de derrota;
+- recompensa;
+- próxima fase.
+
+O tutorial permanece separado da Fase 1 real.
 
 ## Personagens e animações futuras
 
 - Miguel em novas ações;
 - Miguel de bicicleta;
 - Miguel de hoverboard;
-- cachorros baseados em fotografias reais;
+- Miguel de patins;
+- Miguel de patinete;
+- cachorros baseados em referências autorizadas;
 - aliados;
 - personagens convidados;
 - NPCs;
 - inimigos comuns;
 - chefes.
+
+## Pipeline de arte
+
+Todos os novos personagens e veículos seguirão produção em lote:
+
+1. manifesto completo;
+2. ficha visual;
+3. todos os frames em magenta;
+4. folha de inspeção;
+5. correção de identidade;
+6. correção de escala e alinhamento;
+7. correção do movimento;
+8. contorno;
+9. paleta final;
+10. transparência e exportação;
+11. hashes e checkpoint;
+12. integração no jogo.
+
+Nenhum frame será finalizado isoladamente antes de o conjunto completo existir.
+
+## Veículos
+
+Veículos planejados:
+
+- bicicleta;
+- hoverboard;
+- patins;
+- patinete.
+
+Cada veículo deverá possuir:
+
+- entrada e saída;
+- movimento;
+- aceleração;
+- frenagem;
+- salto ou obstáculo;
+- dano;
+- queda;
+- vitória;
+- miniatura para a loja;
+- versão de Miguel usando o item.
+
+## Loja
+
+Primeira versão com moedas ou cristais do próprio jogo:
+
+- catálogo;
+- miniatura;
+- descrição;
+- preço;
+- estado bloqueado;
+- estado disponível;
+- estado adquirido;
+- estado equipado;
+- confirmação de compra;
+- persistência local.
+
+Não usar dinheiro real na primeira versão.
+
+## Recordes e compartilhamento
+
+### Local
+
+- melhor pontuação por fase;
+- melhor tempo;
+- maior quantidade de cristais;
+- tela de recordes;
+- cartão compartilhável como imagem.
+
+### Online
+
+Somente depois de existir backend, autenticação adequada, apelido público seguro, validação da pontuação, proteção contra fraude, moderação e política de privacidade.
+
+Não armazenar dados pessoais de crianças no ranking público.
 
 ## Áudio
 
@@ -166,7 +301,7 @@ Cada inimigo poderá configurar:
 - interface;
 - música e efeitos configuráveis;
 - preferências salvas localmente;
-- início mudo até a interação do usuário.
+- início mudo até interação do usuário.
 
 ## Configurações
 
@@ -179,17 +314,6 @@ Cada inimigo poderá configurar:
 - tipo de controle;
 - acessibilidade;
 - orientação quando a fase possuir layout compatível.
-
-## Menu principal
-
-- logotipo As Aventuras do Miguel;
-- Miguel miniaturizado e animado;
-- cenário em movimento;
-- iniciar;
-- seleção de fases;
-- configurações;
-- som;
-- créditos.
 
 ## PWA
 
@@ -204,13 +328,24 @@ Cada inimigo poderá configurar:
 
 ## Ordem de desenvolvimento
 
-1. fundação e tutorial;
-2. HUD, vida e dano;
-3. controles mobile, teclado e gamepad;
-4. rotação robusta;
-5. menu e configurações;
-6. áudio e persistência;
-7. primeira fase real;
-8. chefe;
-9. progressão e loja;
-10. novos mundos, veículos e personagens.
+1. validar a física atual do agachamento;
+2. corrigir a pose visual;
+3. adicionar reinício mobile e Wake Lock;
+4. criar persistência local versionada;
+5. corrigir completamente o robô;
+6. criar arquitetura reutilizável de fases;
+7. implementar a primeira fase real;
+8. implantar o pipeline de arte em magenta;
+9. criar novos personagens e inimigos;
+10. implementar veículos;
+11. criar progressão e loja;
+12. criar recordes locais;
+13. avaliar ranking compartilhável;
+14. expandir mundos, chefes, áudio e PWA.
+
+## Documentos operacionais
+
+- [Estado atual e retomada](estado-atual-e-retomada.md)
+- [Próximas sprints](proximos-passos-e-sprints.md)
+- [Pipeline de sprites em magenta](pipeline-producao-sprites-magenta.md)
+- [Instruções para agentes](../AGENTS.md)
