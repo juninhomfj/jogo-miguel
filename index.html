@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/device-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/settings-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/phase-config.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/device-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/settings-manager.js?v=crouch-visual-right-20260716-002347"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/mobile-controls.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/input-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/hud-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/health-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/tutorial-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
-    <script src="js/rotation-manager.js?v=mobile-gesture-fix-20260715-231338"></script>
+    <script src="js/scene-visuals.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/mobile-controls.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/input-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/hud-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/health-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/tutorial-manager.js?v=crouch-visual-right-20260716-002347"></script>
+    <script src="js/rotation-manager.js?v=crouch-visual-right-20260716-002347"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -756,7 +756,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'mobile-gesture-fix-20260715-231338';
+        window.__MIGUEL_BUILD_ID__ = 'crouch-visual-right-20260716-002347';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -1813,6 +1813,7 @@
                         1.02,
                         0.72
                     )
+                    .setAngle(90)
                     .setVisible(false)
                     .setDepth(12);
 
@@ -2235,16 +2236,53 @@
                     return;
                 }
 
-                // O ponto inferior do frame recolhido
-                // permanece alinhado aos pés do sprite idle.
-                this.crouchVisual.setPosition(
-                    this.player.x,
+                /*
+                 * BBox transparente do frame:
+                 * x 81..174 = 93 px
+                 * y 126..200 = 74 px
+                 *
+                 * Depois da rotação de 90 graus:
+                 * - a altura visual passa a usar
+                 *   a largura original;
+                 * - a largura visual passa a usar
+                 *   a altura original.
+                 *
+                 * Os deslocamentos mantêm o visual
+                 * centralizado e com a base na mesma
+                 * linha dos pés.
+                 */
+                const larguraFrame = 93;
+                const alturaFrame = 74;
+
+                const escalaX = 1.02;
+                const escalaY = 0.72;
+
+                const metadeLarguraRotacionada = (
+                    alturaFrame
+                    * escalaY
+                    / 2
+                );
+
+                const metadeAlturaRotacionada = (
+                    larguraFrame
+                    * escalaX
+                    / 2
+                );
+
+                const linhaDosPes = (
                     this.player.y + 91
                 );
 
-                this.crouchVisual.setFlipX(
-                    this.player.flipX
-                );
+                this.crouchVisual
+                    .setPosition(
+                        this.player.x
+                        - metadeLarguraRotacionada,
+
+                        linhaDosPes
+                        - metadeAlturaRotacionada
+                    )
+                    .setAngle(90)
+                    .setFlipX(false);
             }
 
             entrarAgachamento() {
@@ -2293,7 +2331,7 @@
 
                 this.crouchVisual
                     .setVisible(true)
-                    .setAngle(0)
+                    .setAngle(90)
                     .setScale(
                         1.02,
                         0.72
@@ -2323,7 +2361,7 @@
                 if (this.crouchVisual) {
                     this.crouchVisual
                         .setVisible(false)
-                        .setAngle(0);
+                        .setAngle(90);
                 }
 
                 if (this.player.body) {
