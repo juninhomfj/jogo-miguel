@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/device-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/settings-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/phase-config.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/device-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/settings-manager.js?v=miguel-fall-upright-20260717-041425"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/mobile-controls.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/input-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/hud-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/health-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/tutorial-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
-    <script src="js/rotation-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/scene-visuals.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/mobile-controls.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/input-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/hud-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/health-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/tutorial-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/rotation-manager.js?v=miguel-fall-upright-20260717-041425"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-footline-20260717-035752';
+        window.__MIGUEL_BUILD_ID__ = 'miguel-fall-upright-20260717-041425';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -3091,6 +3091,23 @@
                         ]);
                 }
 
+                /*
+                 * A cambalhota pertence somente à subida.
+                 * Assim que a queda começa, o giro termina
+                 * e Miguel retorna para uma pose vertical.
+                 */
+                const estaDescendo = Boolean(
+                    !noChao
+                    && this.player.body.velocity.y > 40
+                );
+
+                if (
+                    estaDescendo
+                    && this.player.giroDuploAtivo
+                ) {
+                    this.cancelarGiroDuplo();
+                }
+
                 if (
                     !noChao
                     && !this.player.estaAtacando
@@ -3099,11 +3116,20 @@
                     && !this.player.estaMachucado
                     && !this.player.estaAgachado
                 ) {
+                    /*
+                     * Durante a descida usamos o frame
+                     * vertical de pulo, mesmo depois de
+                     * um pulo duplo.
+                     */
                     const animacaoPulo = (
-                        this.player
-                            .pulosDisponiveis === 0
-                        ? 'jump_double'
-                        : 'jump'
+                        estaDescendo
+                        ? 'jump'
+                        : (
+                            this.player
+                                .pulosDisponiveis === 0
+                            ? 'jump_double'
+                            : 'jump'
+                        )
                     );
 
                     this.player.anims.play(
