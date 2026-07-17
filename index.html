@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/device-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/settings-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/phase-config.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/device-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/settings-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/mobile-controls.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/input-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/hud-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/health-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/tutorial-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
-    <script src="js/rotation-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/scene-visuals.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/mobile-controls.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/input-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/hud-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/health-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/tutorial-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/rotation-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-scale-20260717-033747';
+        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-ground-20260717-034819';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -2456,15 +2456,31 @@
                 }
 
                 /*
-                 * O frame exclusivo é ampliado para manter
-                 * a mesma escala visual de cabeça e corpo
-                 * do Miguel em pé.
+                 * A linha dos pés é obtida diretamente
+                 * da base do corpo físico.
                  *
-                 * A compensação vertical preserva a linha
-                 * dos pés após o aumento da escala.
+                 * BBox do frame agachado:
+                 * y 144..223.
+                 * Origem padrão do canvas: y 128.
                  */
                 const escalaAgachamento = 1.18;
-                const compensacaoPes = 22;
+
+                const deslocamentoPesNoFrame = (
+                    223
+                    - 128
+                );
+
+                const linhaDosPes = (
+                    this.player.body.bottom
+                );
+
+                const centroVisualY = (
+                    linhaDosPes
+                    - (
+                        deslocamentoPesNoFrame
+                        * escalaAgachamento
+                    )
+                );
 
                 this.player.setVisible(false);
 
@@ -2472,8 +2488,7 @@
                     .setVisible(true)
                     .setPosition(
                         this.player.x,
-                        this.player.y
-                        - compensacaoPes
+                        centroVisualY
                     )
                     .setAngle(0)
                     .setScale(
