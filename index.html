@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/device-manager.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/settings-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/phase-config.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/device-manager.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/settings-manager.js?v=robot-states-base-20260717-042932"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/mobile-controls.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/input-manager.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/hud-manager.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/health-manager.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/tutorial-manager.js?v=miguel-fall-upright-20260717-041425"></script>
-    <script src="js/rotation-manager.js?v=miguel-fall-upright-20260717-041425"></script>
+    <script src="js/scene-visuals.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/mobile-controls.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/input-manager.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/hud-manager.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/health-manager.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/tutorial-manager.js?v=robot-states-base-20260717-042932"></script>
+    <script src="js/rotation-manager.js?v=robot-states-base-20260717-042932"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'miguel-fall-upright-20260717-041425';
+        window.__MIGUEL_BUILD_ID__ = 'robot-states-base-20260717-042932';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -1764,7 +1764,7 @@
                  */
                 this.vilao.setScale(0.154);
                 this.vilao.setCollideWorldBounds(false);
-                this.vilao.setVelocityX(90);
+                this.vilao.setVelocityX(0);
                 this.vilao.setBounce(0);
                 this.vilao.setFlipX(false);
 
@@ -1806,6 +1806,30 @@
                 this.vilao.danoPisao = 20;
 
                 this.ultimoDanoVilao = 0;
+
+                /*
+                 * Máquina de estados do robô.
+                 *
+                 * As capacidades de perseguição e ataque
+                 * ficam independentes da fase, permitindo
+                 * reutilizar o mesmo inimigo futuramente.
+                 */
+                this.vilao.estadoRobo = 'IDLE';
+                this.vilao.estadoRoboDesde = 0;
+
+                this.vilao.capacidades = {
+                    detectar: true,
+                    perseguir: true,
+                    atacar: false
+                };
+
+                this.vilao.configuracaoComportamento = {
+                    distanciaDeteccao: 230,
+                    distanciaPerdaAlvo: 290,
+                    distanciaParada: 135,
+                    duracaoAlerta: 350,
+                    velocidadePerseguicao: 120
+                };
 
                 // CRIANDO O MIGUEL
                 this.player = this.physics.add.sprite(50, 320, 'miguel_idle');
@@ -2077,7 +2101,7 @@
                 }
 
                 this.vilao.anims.play(
-                    'robo_patrol',
+                    'robo_idle',
                     true
                 );
 
@@ -2794,6 +2818,256 @@
                 this.sairAgachamento();
             }
 
+            trocarEstadoRobo(
+                novoEstado,
+                time = 0
+            ) {
+                if (
+                    !this.vilao
+                    || !this.vilao.active
+                    || this.vilao.estadoRobo
+                        === novoEstado
+                ) {
+                    return;
+                }
+
+                this.vilao.estadoRobo = novoEstado;
+                this.vilao.estadoRoboDesde = time;
+
+                if (novoEstado === 'IDLE') {
+                    this.vilao.setVelocityX(0);
+                    this.vilao.clearTint();
+
+                    this.vilao.anims.play(
+                        'robo_idle',
+                        true
+                    );
+
+                    return;
+                }
+
+                if (novoEstado === 'ALERTA') {
+                    this.vilao.setVelocityX(0);
+                    this.vilao.clearTint();
+
+                    /*
+                     * O frame de carregamento também
+                     * funciona como postura de alerta.
+                     * Ainda não existe disparo nesta etapa.
+                     */
+                    this.vilao.anims.stop();
+                    this.vilao.setTexture(
+                        'robo_attack_charge'
+                    );
+
+                    return;
+                }
+
+                if (
+                    novoEstado === 'PERSEGUICAO'
+                ) {
+                    this.vilao.clearTint();
+
+                    this.vilao.anims.play(
+                        'robo_patrol',
+                        true
+                    );
+                }
+            }
+
+            atualizarComportamentoRobo(time) {
+                if (
+                    !this.vilao
+                    || !this.vilao.active
+                    || !this.vilao.body
+                    || !this.vilao.body.enable
+                    || !this.player
+                    || !this.player.active
+                ) {
+                    return;
+                }
+
+                const animacaoAtual = (
+                    this.vilao.anims
+                    && this.vilao.anims.currentAnim
+                    ? this.vilao.anims
+                        .currentAnim.key
+                    : null
+                );
+
+                /*
+                 * Dano e explosão possuem prioridade.
+                 * A máquina não deve interromper essas
+                 * animações nem reativar o movimento.
+                 */
+                if (
+                    animacaoAtual === 'robo_damage'
+                    || animacaoAtual
+                        === 'robo_explosion'
+                ) {
+                    this.vilao.setVelocityX(0);
+                    return;
+                }
+
+                const configuracao = (
+                    this.vilao
+                        .configuracaoComportamento
+                );
+
+                const distanciaX = Math.abs(
+                    this.player.x - this.vilao.x
+                );
+
+                const direcaoAlvo = (
+                    this.player.x < this.vilao.x
+                    ? -1
+                    : 1
+                );
+
+                const estado = (
+                    this.vilao.estadoRobo
+                );
+
+                if (
+                    !this.vilao.capacidades.detectar
+                ) {
+                    this.trocarEstadoRobo(
+                        'IDLE',
+                        time
+                    );
+
+                    return;
+                }
+
+                if (estado === 'IDLE') {
+                    this.vilao.setVelocityX(0);
+
+                    if (
+                        distanciaX
+                        <= configuracao
+                            .distanciaDeteccao
+                    ) {
+                        this.vilao.setFlipX(
+                            direcaoAlvo < 0
+                        );
+
+                        this.trocarEstadoRobo(
+                            'ALERTA',
+                            time
+                        );
+                    }
+
+                    return;
+                }
+
+                if (estado === 'ALERTA') {
+                    this.vilao.setVelocityX(0);
+                    this.vilao.setFlipX(
+                        direcaoAlvo < 0
+                    );
+
+                    if (
+                        distanciaX
+                        > configuracao
+                            .distanciaPerdaAlvo
+                    ) {
+                        this.trocarEstadoRobo(
+                            'IDLE',
+                            time
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        this.vilao
+                            .capacidades.perseguir
+                        && time
+                            - this.vilao
+                                .estadoRoboDesde
+                            >= configuracao
+                                .duracaoAlerta
+                    ) {
+                        this.trocarEstadoRobo(
+                            'PERSEGUICAO',
+                            time
+                        );
+                    }
+
+                    return;
+                }
+
+                if (
+                    estado === 'PERSEGUICAO'
+                ) {
+                    if (
+                        distanciaX
+                        > configuracao
+                            .distanciaPerdaAlvo
+                    ) {
+                        this.trocarEstadoRobo(
+                            'IDLE',
+                            time
+                        );
+
+                        return;
+                    }
+
+                    this.vilao.setFlipX(
+                        direcaoAlvo < 0
+                    );
+
+                    if (
+                        distanciaX
+                        <= configuracao
+                            .distanciaParada
+                    ) {
+                        this.vilao.setVelocityX(0);
+                        return;
+                    }
+
+                    const tentandoSairPelaEsquerda = (
+                        direcaoAlvo < 0
+                        && this.vilao.x
+                            <= this.vilao
+                                .limiteEsquerda
+                    );
+
+                    const tentandoSairPelaDireita = (
+                        direcaoAlvo > 0
+                        && this.vilao.x
+                            >= this.vilao
+                                .limiteDireita
+                    );
+
+                    if (
+                        tentandoSairPelaEsquerda
+                        || tentandoSairPelaDireita
+                    ) {
+                        this.vilao.setVelocityX(0);
+                        return;
+                    }
+
+                    this.vilao.anims.play(
+                        'robo_patrol',
+                        true
+                    );
+
+                    this.vilao.setVelocityX(
+                        direcaoAlvo
+                        * configuracao
+                            .velocidadePerseguicao
+                    );
+
+                    return;
+                }
+
+                this.trocarEstadoRobo(
+                    'IDLE',
+                    time
+                );
+            }
+
             update(time, delta) {
                 if (this.visualCenario) {
                     this.visualCenario.atualizar(
@@ -2853,36 +3127,9 @@
                     this.player.pulosDisponiveis = 2;
                 }
 
-                if (
-                    this.vilao
-                    && this.vilao.active
-                ) {
-                    if (
-                        this.vilao.x
-                        <= this.vilao.limiteEsquerda
-                    ) {
-                        this.vilao.x = (
-                            this.vilao
-                                .limiteEsquerda
-                        );
-
-                        this.vilao.direcao = 1;
-                        this.vilao.setFlipX(false);
-                        this.vilao.setVelocityX(90);
-                    } else if (
-                        this.vilao.x
-                        >= this.vilao.limiteDireita
-                    ) {
-                        this.vilao.x = (
-                            this.vilao
-                                .limiteDireita
-                        );
-
-                        this.vilao.direcao = -1;
-                        this.vilao.setFlipX(true);
-                        this.vilao.setVelocityX(-90);
-                    }
-                }
+                this.atualizarComportamentoRobo(
+                    time
+                );
 
                 const podeControlar = Boolean(
                     !this.player.estaMachucado
