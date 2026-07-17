@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/device-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/settings-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/phase-config.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/device-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/settings-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/mobile-controls.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/input-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/hud-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/health-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/tutorial-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
-    <script src="js/rotation-manager.js?v=miguel-crouch-ground-20260717-034819"></script>
+    <script src="js/scene-visuals.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/mobile-controls.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/input-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/hud-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/health-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/tutorial-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
+    <script src="js/rotation-manager.js?v=miguel-crouch-footline-20260717-035752"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-ground-20260717-034819';
+        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-footline-20260717-035752';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -2456,12 +2456,10 @@
                 }
 
                 /*
-                 * A linha dos pés é obtida diretamente
-                 * da base do corpo físico.
-                 *
-                 * BBox do frame agachado:
-                 * y 144..223.
-                 * Origem padrão do canvas: y 128.
+                 * A linha dos pés foi capturada antes da
+                 * troca do corpo físico. Portanto, não
+                 * depende de body.bottom nem do offset
+                 * utilizado durante o agachamento.
                  */
                 const escalaAgachamento = 1.18;
 
@@ -2471,7 +2469,19 @@
                 );
 
                 const linhaDosPes = (
-                    this.player.body.bottom
+                    Number.isFinite(
+                        this.player
+                            .linhaVisualPesAgachamento
+                    )
+                    ? this.player
+                        .linhaVisualPesAgachamento
+                    : (
+                        this.player.y
+                        + (
+                            deslocamentoPesNoFrame
+                            * 0.95
+                        )
+                    )
                 );
 
                 const centroVisualY = (
@@ -2522,6 +2532,21 @@
                 }
 
                 const baseAntes = corpo.bottom;
+
+                /*
+                 * Guarda a linha visual das botas enquanto
+                 * Miguel ainda está usando o sprite em pé.
+                 *
+                 * O frame idle termina no pixel 223,
+                 * com origem central no pixel 128.
+                 */
+                this.player.linhaVisualPesAgachamento = (
+                    this.player.y
+                    + (
+                        (223 - 128)
+                        * 0.95
+                    )
+                );
 
                 this.player.estaAgachado = true;
 
@@ -2635,6 +2660,8 @@
                 );
 
                 this.player.estaAgachado = false;
+
+                this.player.linhaVisualPesAgachamento = null;
 
                 if (this.crouchVisual) {
                     this.crouchVisual
