@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/device-manager.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/settings-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/phase-config.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/device-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/settings-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/mobile-controls.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/input-manager.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/hud-manager.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/health-manager.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/tutorial-manager.js?v=tutorial-result-transition-20260716-141021"></script>
-    <script src="js/rotation-manager.js?v=tutorial-result-transition-20260716-141021"></script>
+    <script src="js/scene-visuals.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/mobile-controls.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/input-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/hud-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/health-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/tutorial-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/rotation-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'tutorial-result-transition-20260716-141021';
+        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-frame-20260717-031535';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -790,7 +790,7 @@
                     alert("AVISO DEV: Não foi possível carregar a imagem '" + file.src + "'. Verifique se o nome está idêntico com letras minúsculas!");
                 });
 
-                // MIGUEL — 14 frames individuais aprovados.
+                // MIGUEL — 15 frames individuais aprovados.
                 // Cada textura possui canvas RGBA de 256x256.
                 this.load.image(
                     'miguel_idle',
@@ -815,6 +815,10 @@
                 this.load.image(
                     'miguel_double_jump',
                     'assets/frames/miguel/05_double_jump.png'
+                );
+                this.load.image(
+                    'miguel_crouch',
+                    'assets/frames/miguel/14_crouch.png'
                 );
                 this.load.image(
                     'miguel_punch',
@@ -849,19 +853,66 @@
                     'assets/frames/miguel/13_victory_trophy.png'
                 );
 
-                // Robô histórico provisório.
-                // Será substituído quando os frames do robô
-                // forem reconstruídos e aprovados.
-                this.load.spritesheet(
-                    'robo',
-                    'assets/legacy/'
-                    + 'sprites-invalidos-2026-07-13/'
-                    + 'robo_sprites_original.png',
-                    {
-                        frameWidth: 215,
-                        frameHeight: 129,
-                        spacing: 0
-                    }
+                // ROBÔ — 15 frames individuais transparentes.
+                this.load.image(
+                    'robo_idle_1',
+                    'assets/frames/robot/robot_idle_1.png'
+                );
+                this.load.image(
+                    'robo_idle_2',
+                    'assets/frames/robot/robot_idle_2.png'
+                );
+                this.load.image(
+                    'robo_walk_1',
+                    'assets/frames/robot/robot_walk_1.png'
+                );
+                this.load.image(
+                    'robo_walk_2',
+                    'assets/frames/robot/robot_walk_2.png'
+                );
+                this.load.image(
+                    'robo_walk_3',
+                    'assets/frames/robot/robot_walk_3.png'
+                );
+                this.load.image(
+                    'robo_walk_4',
+                    'assets/frames/robot/robot_walk_4.png'
+                );
+                this.load.image(
+                    'robo_attack_charge',
+                    'assets/frames/robot/robot_attack_charge.png'
+                );
+                this.load.image(
+                    'robo_attack_fire',
+                    'assets/frames/robot/robot_attack_fire.png'
+                );
+                this.load.image(
+                    'robo_attack_recover',
+                    'assets/frames/robot/robot_attack_recover.png'
+                );
+                this.load.image(
+                    'robo_hit_1',
+                    'assets/frames/robot/robot_hit_1.png'
+                );
+                this.load.image(
+                    'robo_hit_2',
+                    'assets/frames/robot/robot_hit_2.png'
+                );
+                this.load.image(
+                    'robo_explode_1',
+                    'assets/frames/robot/robot_explode_1.png'
+                );
+                this.load.image(
+                    'robo_explode_2',
+                    'assets/frames/robot/robot_explode_2.png'
+                );
+                this.load.image(
+                    'robo_explode_3',
+                    'assets/frames/robot/robot_explode_3.png'
+                );
+                this.load.image(
+                    'robo_explode_4',
+                    'assets/frames/robot/robot_explode_4.png'
                 );
 
 // Gera a textura do cristal tecnológico via código puro
@@ -1574,6 +1625,12 @@
             }
 
             create() {
+                /*
+                 * A instância da cena é reutilizada pelo
+                 * Phaser. A trava pertence somente à
+                 * execução atual do tutorial.
+                 */
+                this.transicaoTutorialEmAndamento = false;
                 console.log('Tutorial iniciado');
 
                 GERENCIADOR_DISPOSITIVO
@@ -1695,15 +1752,50 @@
                     graficoParticula.destroy();
                 }
 
-                this.vilao = this.physics.add.sprite(600, 366, 'robo', 0);
-                this.vilao.setScale(0.45);
+                this.vilao = this.physics.add.sprite(
+                    600,
+                    384,
+                    'robo_idle_1'
+                );
+
+                /*
+                 * O canvas possui 1254x1254, mas o conteúdo
+                 * visual ocupa apenas a região central.
+                 */
+                this.vilao.setScale(0.154);
                 this.vilao.setCollideWorldBounds(false);
                 this.vilao.setVelocityX(90);
                 this.vilao.setBounce(0);
-                this.vilao.body.setSize(78, 92);
-                this.vilao.body.setOffset(25, 24);
-                this.vilao.limiteEsquerda = plat1.x - (plat1.width / 2) + (this.vilao.displayWidth / 2);
-                this.vilao.limiteDireita = plat1.x + (plat1.width / 2) - (this.vilao.displayWidth / 2);
+                this.vilao.setFlipX(false);
+
+                /*
+                 * Corpo físico concentrado no núcleo e nas
+                 * pernas, ignorando antena e transparência.
+                 */
+                this.vilao.body.setSize(
+                    420,
+                    691
+                );
+
+                this.vilao.body.setOffset(
+                    417,
+                    300
+                );
+
+                this.vilao.larguraPatrulha = 90;
+
+                this.vilao.limiteEsquerda = (
+                    plat1.x
+                    - (plat1.width / 2)
+                    + (this.vilao.larguraPatrulha / 2)
+                );
+
+                this.vilao.limiteDireita = (
+                    plat1.x
+                    + (plat1.width / 2)
+                    - (this.vilao.larguraPatrulha / 2)
+                );
+
                 this.vilao.direcao = 1;
 
                 // Configuração reutilizável do inimigo.
@@ -1795,10 +1887,7 @@
 
                 // A pose é comprimida verticalmente para parecer
                 // mais agachada e recolhida durante o giro.
-                this.doubleJumpVisual.setScale(
-                    1.02,
-                    0.82
-                );
+                this.doubleJumpVisual.setScale(0.95);
 
                 this.doubleJumpVisual
                     .setVisible(false)
@@ -1806,24 +1895,20 @@
 
                 this.tweenGiroDuplo = null;
 
-                // A mesma pose recolhida da cambalhota é
-                // reutilizada, sem giro, como agachamento.
+                /*
+                 * Frame exclusivo de agachamento.
+                 * O canvas e a linha dos pés coincidem
+                 * com o frame parado.
+                 */
                 this.crouchVisual = this.add.image(
                     0,
                     0,
-                    'miguel_double_jump'
+                    'miguel_crouch'
                 );
 
                 this.crouchVisual
-                    .setOrigin(
-                        127.5 / 256,
-                        200 / 256
-                    )
-                    .setScale(
-                        1.02,
-                        0.72
-                    )
-                    .setAngle(90)
+                    .setScale(0.95)
+                    .setAngle(0)
                     .setVisible(false)
                     .setDepth(12);
 
@@ -1936,32 +2021,57 @@
                     });
 
                     this.anims.create({
-                        key: 'robo_patrol',
-                        frames: this.anims.generateFrameNumbers(
-                            'robo',
-                            { start: 0, end: 2 }
-                        ),
-                        frameRate: 8,
+                        key: 'robo_idle',
+                        frames: [
+                            { key: 'robo_idle_1' },
+                            { key: 'robo_idle_2' }
+                        ],
+                        frameRate: 2,
                         repeat: -1
                     });
 
                     this.anims.create({
+                        key: 'robo_patrol',
+                        frames: [
+                            { key: 'robo_walk_1' },
+                            { key: 'robo_walk_2' },
+                            { key: 'robo_walk_3' },
+                            { key: 'robo_walk_4' }
+                        ],
+                        frameRate: 7,
+                        repeat: -1
+                    });
+
+                    this.anims.create({
+                        key: 'robo_attack',
+                        frames: [
+                            { key: 'robo_attack_charge' },
+                            { key: 'robo_attack_fire' },
+                            { key: 'robo_attack_recover' }
+                        ],
+                        frameRate: 6,
+                        repeat: 0
+                    });
+
+                    this.anims.create({
                         key: 'robo_damage',
-                        frames: this.anims.generateFrameNumbers(
-                            'robo',
-                            { start: 3, end: 5 }
-                        ),
-                        frameRate: 12,
+                        frames: [
+                            { key: 'robo_hit_1' },
+                            { key: 'robo_hit_2' }
+                        ],
+                        frameRate: 8,
                         repeat: 0
                     });
 
                     this.anims.create({
                         key: 'robo_explosion',
-                        frames: this.anims.generateFrameNumbers(
-                            'robo',
-                            { start: 6, end: 8 }
-                        ),
-                        frameRate: 16,
+                        frames: [
+                            { key: 'robo_explode_1' },
+                            { key: 'robo_explode_2' },
+                            { key: 'robo_explode_3' },
+                            { key: 'robo_explode_4' }
+                        ],
+                        frameRate: 6,
                         repeat: 0
                     });
                 }
@@ -2247,7 +2357,7 @@
                 this.doubleJumpVisual
                     .setVisible(false)
                     .setAngle(0)
-                    .setScale(1.02, 0.82);
+                    .setScale(0.95);
 
                 if (!this.player.estaEmPoeira) {
                     this.player.setVisible(true);
@@ -2266,7 +2376,7 @@
                     .setVisible(true)
                     .setAngle(0)
                     .setAlpha(1)
-                    .setScale(1.02, 0.82)
+                    .setScale(0.95)
                     .setFlipX(this.player.flipX);
 
                 this.sincronizarGiroDuplo();
@@ -2303,7 +2413,7 @@
                             this.doubleJumpVisual
                                 .setVisible(false)
                                 .setAngle(0)
-                                .setScale(1.02, 0.82);
+                                .setScale(0.95);
 
                             if (
                                 !this.player
@@ -2346,60 +2456,22 @@
                 }
 
                 /*
-                 * Nenhum callback de animação pode exibir
-                 * o sprite em pé durante o agachamento.
+                 * O frame agachado usa o mesmo canvas,
+                 * centro e linha dos pés do player.
                  */
                 this.player.setVisible(false);
 
-                this.crouchVisual.setVisible(true);
-
-                /*
-                 * BBox transparente do frame:
-                 * x 81..174 = 93 px
-                 * y 126..200 = 74 px
-                 *
-                 * Depois da rotação de 90 graus:
-                 * - a altura visual passa a usar
-                 *   a largura original;
-                 * - a largura visual passa a usar
-                 *   a altura original.
-                 *
-                 * Os deslocamentos mantêm o visual
-                 * centralizado e com a base na mesma
-                 * linha dos pés.
-                 */
-                const larguraFrame = 93;
-                const alturaFrame = 74;
-
-                const escalaX = 1.02;
-                const escalaY = 0.72;
-
-                const metadeLarguraRotacionada = (
-                    alturaFrame
-                    * escalaY
-                    / 2
-                );
-
-                const metadeAlturaRotacionada = (
-                    larguraFrame
-                    * escalaX
-                    / 2
-                );
-
-                const linhaDosPes = (
-                    this.player.y + 91
-                );
-
                 this.crouchVisual
+                    .setVisible(true)
                     .setPosition(
-                        this.player.x
-                        - metadeLarguraRotacionada,
-
-                        linhaDosPes
-                        - metadeAlturaRotacionada
+                        this.player.x,
+                        this.player.y
                     )
-                    .setAngle(90)
-                    .setFlipX(false);
+                    .setAngle(0)
+                    .setScale(0.95)
+                    .setFlipX(
+                        this.player.flipX
+                    );
             }
 
             entrarAgachamento() {
@@ -2494,11 +2566,8 @@
 
                 this.crouchVisual
                     .setVisible(true)
-                    .setAngle(90)
-                    .setScale(
-                        1.02,
-                        0.72
-                    );
+                    .setAngle(0)
+                    .setScale(0.95);
 
                 this.sincronizarAgachamento();
 
@@ -2545,7 +2614,7 @@
                 if (this.crouchVisual) {
                     this.crouchVisual
                         .setVisible(false)
-                        .setAngle(90);
+                        .setAngle(0);
                 }
 
                 if (corpo) {
@@ -2746,6 +2815,7 @@
                         );
 
                         this.vilao.direcao = 1;
+                        this.vilao.setFlipX(false);
                         this.vilao.setVelocityX(90);
                     } else if (
                         this.vilao.x
@@ -2757,6 +2827,7 @@
                         );
 
                         this.vilao.direcao = -1;
+                        this.vilao.setFlipX(true);
                         this.vilao.setVelocityX(-90);
                     }
                 }
