@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>As Aventuras do Miguel</title>
 
-    <script src="js/phase-config.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/device-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/settings-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/phase-config.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/device-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/settings-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/scene-visuals.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/mobile-controls.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/input-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/hud-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/health-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/tutorial-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
-    <script src="js/rotation-manager.js?v=miguel-crouch-frame-20260717-031535"></script>
+    <script src="js/scene-visuals.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/mobile-controls.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/input-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/hud-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/health-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/tutorial-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
+    <script src="js/rotation-manager.js?v=miguel-crouch-scale-20260717-033747"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -765,7 +765,7 @@
         GERENCIADOR_DISPOSITIVO.inicializar();
         GERENCIADOR_CONFIGURACOES.aplicar();
 
-        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-frame-20260717-031535';
+        window.__MIGUEL_BUILD_ID__ = 'miguel-crouch-scale-20260717-033747';
 
         console.info(
             '[MIGUEL BUILD]',
@@ -1907,7 +1907,7 @@
                 );
 
                 this.crouchVisual
-                    .setScale(0.95)
+                    .setScale(1.18)
                     .setAngle(0)
                     .setVisible(false)
                     .setDepth(12);
@@ -2456,9 +2456,16 @@
                 }
 
                 /*
-                 * O frame agachado usa o mesmo canvas,
-                 * centro e linha dos pés do player.
+                 * O frame exclusivo é ampliado para manter
+                 * a mesma escala visual de cabeça e corpo
+                 * do Miguel em pé.
+                 *
+                 * A compensação vertical preserva a linha
+                 * dos pés após o aumento da escala.
                  */
+                const escalaAgachamento = 1.18;
+                const compensacaoPes = 22;
+
                 this.player.setVisible(false);
 
                 this.crouchVisual
@@ -2466,9 +2473,12 @@
                     .setPosition(
                         this.player.x,
                         this.player.y
+                        - compensacaoPes
                     )
                     .setAngle(0)
-                    .setScale(0.95)
+                    .setScale(
+                        escalaAgachamento
+                    )
                     .setFlipX(
                         this.player.flipX
                     );
@@ -2567,7 +2577,7 @@
                 this.crouchVisual
                     .setVisible(true)
                     .setAngle(0)
-                    .setScale(0.95);
+                    .setScale(1.18);
 
                 this.sincronizarAgachamento();
 
