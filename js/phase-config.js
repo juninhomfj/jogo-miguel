@@ -159,9 +159,22 @@
         'js/robot-attack.js',
         'robot-attack-projectile-v1-20260720'
     );
-    carregarModulo(
-        'phase1',
-        'js/phase1.js',
-        'fase-1-completa-v1-20260720'
-    );
+
+    const carregarFase1 = () => {
+        carregarModulo(
+            'phase1',
+            'js/phase1.js',
+            'fase-1-completa-v1-20260720'
+        );
+    };
+
+    if (document.readyState === 'complete') {
+        carregarFase1();
+    } else {
+        window.addEventListener(
+            'load',
+            carregarFase1,
+            { once: true }
+        );
+    }
 })();
