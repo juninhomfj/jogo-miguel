@@ -142,7 +142,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 14,
+        versao: 15,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -226,7 +226,7 @@
         carregarModulo(
             'phaser-shape-scale-compat',
             'js/phaser-shape-scale-compat.js',
-            'phaser-shape-scale-compat-v1-20260721'
+            'phaser-shape-scale-compat-v2-20260721'
         );
         carregarModulo(
             'phase1-usability-overhaul',
