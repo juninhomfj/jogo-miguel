@@ -162,7 +162,7 @@
     carregarModulo(
         'robot-attack',
         'js/robot-attack.js',
-        'robot-attack-projectile-v1-20260720'
+        'robot-attack-projectile-v2-20260721'
     );
 
     const carregarFase1 = () => {
