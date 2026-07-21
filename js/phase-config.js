@@ -136,7 +136,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 10,
+        versao: 11,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -191,6 +191,11 @@
             'phase1',
             'js/phase1.js',
             'fase-1-completa-v1-20260720'
+        );
+        carregarModulo(
+            'phase1-crouch-guard',
+            'js/phase1-crouch-guard.js',
+            'phase1-crouch-guard-v1-20260721'
         );
         carregarModulo(
             'phase1-polish',
