@@ -63,6 +63,7 @@
                 'agachamento',
                 'ataque',
                 'poder',
+                'interagir',
                 'pausa'
             ]),
             setores: Object.freeze([
@@ -141,7 +142,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 12,
+        versao: 15,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -221,6 +222,16 @@
             'phase1-exploration-loot',
             'js/phase1-exploration-loot.js',
             'phase1-exploration-loot-v1-20260721'
+        );
+        carregarModulo(
+            'phaser-shape-scale-compat',
+            'js/phaser-shape-scale-compat.js',
+            'phaser-shape-scale-compat-v2-20260721'
+        );
+        carregarModulo(
+            'phase1-usability-overhaul',
+            'js/phase1-usability-overhaul.js',
+            'phase1-usability-overhaul-v1-20260721'
         );
     };
 
