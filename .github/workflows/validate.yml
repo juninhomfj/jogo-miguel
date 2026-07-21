@@ -15,7 +15,7 @@ permissions:
 jobs:
   validar:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
 
     steps:
       - name: Baixar repositório
@@ -41,6 +41,12 @@ jobs:
           set -o pipefail
           node scripts/smoke-browser.mjs 2>&1 | tee smoke-output.txt
 
+      - name: Executar smoke test do polimento da fase 1
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/smoke-phase1-polish.mjs 2>&1 | tee smoke-phase1-polish-output.txt
+
       - name: Executar smoke test do disparo no tutorial
         shell: bash
         run: |
@@ -55,6 +61,7 @@ jobs:
           path: |
             validation-output.txt
             smoke-output.txt
+            smoke-phase1-polish-output.txt
             smoke-tutorial-robot-output.txt
           if-no-files-found: error
           retention-days: 3
