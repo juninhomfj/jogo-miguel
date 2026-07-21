@@ -8,6 +8,7 @@
             orientacao: 'landscape',
             tamanhoLogico: Object.freeze({ width: 800, height: 600 }),
             tema: 'ceu-tecnologico-noturno',
+            musica: 'tutorial',
             controles: Object.freeze([
                 'movimento',
                 'pulo',
@@ -135,7 +136,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 6,
+        versao: 7,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -158,6 +159,16 @@
         'audio-manager',
         'js/audio-manager.js',
         'audio-procedural-v1-20260720'
+    );
+    carregarModulo(
+        'audio-feedback-extensions',
+        'js/audio-feedback-extensions.js',
+        'audio-feedback-extensions-v1-20260721'
+    );
+    carregarModulo(
+        'tutorial-audio',
+        'js/tutorial-audio.js',
+        'tutorial-audio-feedback-v1-20260721'
     );
     carregarModulo(
         'robot-attack',
