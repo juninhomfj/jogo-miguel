@@ -136,7 +136,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 9,
+        versao: 10,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -196,6 +196,11 @@
             'phase1-polish',
             'js/phase1-polish.js',
             'phase1-polish-v1-20260721'
+        );
+        carregarModulo(
+            'phase1-combat-feedback',
+            'js/phase1-combat-feedback.js',
+            'phase1-combat-feedback-v1-20260721'
         );
     };
 
