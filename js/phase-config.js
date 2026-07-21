@@ -150,6 +150,11 @@
     };
 
     carregarModulo(
+        'scale-guard',
+        'js/scale-guard.js',
+        'phaser-scale-guard-v1-20260720'
+    );
+    carregarModulo(
         'audio-manager',
         'js/audio-manager.js',
         'audio-procedural-v1-20260720'
