@@ -26,4 +26,16 @@ jobs:
           node-version: '22'
 
       - name: Validar estrutura e sintaxe
-        run: node scripts/validate-project.mjs
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/validate-project.mjs 2>&1 | tee validation-output.txt
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-output
+          path: validation-output.txt
+          if-no-files-found: error
+          retention-days: 3
