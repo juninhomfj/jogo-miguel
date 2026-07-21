@@ -53,8 +53,10 @@ jobs:
           if antigo not in texto:
               raise SystemExit('Bloco de refresh esperado não foi localizado.')
 
-          texto = texto.replace(antigo, novo, 1)
-          arquivo.write_text(texto, encoding='utf-8')
+          arquivo.write_text(
+              texto.replace(antigo, novo, 1),
+              encoding='utf-8'
+          )
           PY
 
       - name: Publicar correção
