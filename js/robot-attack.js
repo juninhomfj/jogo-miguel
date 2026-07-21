@@ -1,5 +1,5 @@
 (() => {
-    const BUILD = 'robot-attack-projectile-v1-20260720';
+    const BUILD = 'robot-attack-projectile-v2-20260721';
     const CFG = Object.freeze({
         ronda: 90,
         perseguicao: 120,
@@ -49,6 +49,14 @@
             : null
     );
 
+    const podeAtacar = (robo) => Boolean(
+        robo
+        && (
+            !robo.capacidades
+            || robo.capacidades.atacar !== false
+        )
+    );
+
     const patrulhar = (robo) => {
         if (animacao(robo) !== 'robo_patrol') {
             robo.anims.play('robo_patrol', true);
@@ -56,9 +64,24 @@
     };
 
     const mostrar = (robo, textura) => {
-        robo.anims.stop();
-        robo.setTexture(textura);
-        robo.setVelocityX(0);
+        const animacaoAtual = animacao(robo);
+        const texturaAtual = robo.texture ? robo.texture.key : null;
+
+        if (animacaoAtual) {
+            robo.anims.stop();
+        }
+
+        if (texturaAtual !== textura) {
+            robo.setTexture(textura);
+        }
+
+        if (
+            robo.body
+            && robo.body.velocity
+            && robo.body.velocity.x !== 0
+        ) {
+            robo.setVelocityX(0);
+        }
     };
 
     const mudar = (robo, estado, agora) => {
@@ -90,14 +113,25 @@
         mostrar(robo, 'robo_attack_fire');
     };
 
+    const removerProjeteis = (cena) => {
+        if (cena.projeteisRoboV3 && cena.projeteisRoboV3.active) {
+            cena.projeteisRoboV3.clear(true, true);
+        }
+    };
+
     const garantirProjeteis = (cena) => {
+        if (!cena || !cena.physics || !cena.player) {
+            return null;
+        }
+
         if (cena.projeteisRoboV3 && cena.projeteisRoboV3.active) {
             return cena.projeteisRoboV3;
         }
 
         const grupo = cena.physics.add.group({
             allowGravity: false,
-            immovable: true
+            immovable: true,
+            maxSize: 4
         });
         cena.projeteisRoboV3 = grupo;
 
@@ -107,28 +141,41 @@
             (projetil, player) => {
                 if (!projetil || !projetil.active || !player.active) return;
 
-                if (cena.sistemaVida) {
+                const direcao = (
+                    projetil.body
+                    && projetil.body.velocity.x < 0
+                    ? -1
+                    : 1
+                );
+
+                projetil.destroy();
+
+                if (
+                    cena.sistemaVida
+                    && typeof cena.sistemaVida.receberDano === 'function'
+                ) {
                     cena.sistemaVida.receberDano(CFG.dano, {
                         origem: 'robo-tutorial-projetil',
                         forma: 'projetil',
-                        direcao: projetil.body.velocity.x < 0 ? -1 : 1,
+                        direcao,
                         impulsoX: 200,
                         impulsoY: -140
                     });
                 }
-                projetil.destroy();
             },
             null,
             cena
         );
 
-        cena.physics.add.collider(
-            grupo,
-            cena.plataformas,
-            (projetil) => {
-                if (projetil && projetil.active) projetil.destroy();
-            }
-        );
+        if (cena.plataformas) {
+            cena.physics.add.collider(
+                grupo,
+                cena.plataformas,
+                (projetil) => {
+                    if (projetil && projetil.active) projetil.destroy();
+                }
+            );
+        }
 
         return grupo;
     };
@@ -148,13 +195,27 @@
     };
 
     const disparar = (cena, robo, player, agora) => {
+        if (
+            !podeAtacar(robo)
+            || !cena.sys
+            || !cena.sys.isActive()
+            || !cena.textures
+            || !cena.textures.exists('particulaVilao')
+        ) {
+            return null;
+        }
+
         const grupo = garantirProjeteis(cena);
+        if (!grupo) return null;
+
         const x = robo.x + (robo.flipX ? -54 : 54);
         const y = robo.y - 24;
         const dx = player.x - x;
         const dy = player.y - 18 - y;
         const tamanho = Math.max(1, Math.hypot(dx, dy));
         const projetil = grupo.create(x, y, 'particulaVilao');
+
+        if (!projetil) return null;
 
         projetil
             .setDepth(13)
@@ -165,6 +226,7 @@
             );
         projetil.body.allowGravity = false;
         projetil.criadoEmV3 = agora;
+        return projetil;
     };
 
     const ronda = (robo, player, agora) => {
@@ -199,7 +261,8 @@
         robo.setFlipX(direcao < 0);
 
         if (
-            distancia <= CFG.atacar
+            podeAtacar(robo)
+            && distancia <= CFG.atacar
             && agora >= (robo.proximoAtaqueV3 || 0)
         ) {
             mudar(robo, 'CARREGANDO', agora);
@@ -229,6 +292,13 @@
     };
 
     const carregar = (cena, robo, player, agora) => {
+        if (!podeAtacar(robo)) {
+            removerProjeteis(cena);
+            robo.proximoAtaqueV3 = Number.POSITIVE_INFINITY;
+            mudar(robo, 'PERSEGUICAO', agora);
+            return;
+        }
+
         const dx = player.x - robo.x;
         const distancia = Math.abs(dx);
         robo.setFlipX(dx < 0);
@@ -245,7 +315,14 @@
         }
 
         mostrar(robo, 'robo_attack_fire');
-        disparar(cena, robo, player, agora);
+        const projetil = disparar(cena, robo, player, agora);
+
+        if (!projetil) {
+            robo.proximoAtaqueV3 = agora + CFG.cooldown;
+            mudar(robo, 'PERSEGUICAO', agora);
+            return;
+        }
+
         robo.proximoAtaqueV3 = agora + CFG.cooldown;
         mudar(robo, 'RECUPERACAO', agora);
     };
@@ -284,10 +361,20 @@
             !robo || !robo.active || !robo.body || !robo.body.enable
             || !player || !player.active
         ) {
-            if (cena.projeteisRoboV3 && cena.projeteisRoboV3.active) {
-                cena.projeteisRoboV3.clear(true, true);
-            }
+            removerProjeteis(cena);
             return;
+        }
+
+        if (!podeAtacar(robo)) {
+            removerProjeteis(cena);
+            robo.proximoAtaqueV3 = Number.POSITIVE_INFINITY;
+
+            if (
+                robo.estadoRoboV3 === 'CARREGANDO'
+                || robo.estadoRoboV3 === 'RECUPERACAO'
+            ) {
+                mudar(robo, 'PERSEGUICAO', agora);
+            }
         }
 
         const atual = animacao(robo);
@@ -298,15 +385,16 @@
         if (atual === 'robo_damage') {
             robo.setVelocityX(0);
             robo.estadoRoboV3 = 'PERSEGUICAO';
-            robo.proximoAtaqueV3 = Math.max(
-                robo.proximoAtaqueV3 || 0,
-                agora + 600
-            );
+            robo.proximoAtaqueV3 = podeAtacar(robo)
+                ? Math.max(robo.proximoAtaqueV3 || 0, agora + 600)
+                : Number.POSITIVE_INFINITY;
             return;
         }
 
         if (!robo.estadoRoboV3) {
-            robo.proximoAtaqueV3 = 0;
+            robo.proximoAtaqueV3 = podeAtacar(robo)
+                ? 0
+                : Number.POSITIVE_INFINITY;
             mudar(robo, 'RONDA', agora);
         }
 
@@ -321,6 +409,23 @@
         }
     };
 
+    const falhaSegura = (cena, erro) => {
+        console.error('[ROBOT BEHAVIOR] atualização interrompida com segurança', erro);
+        removerProjeteis(cena);
+
+        const robo = cena && cena.vilao;
+        if (!robo || !robo.active) return;
+
+        robo.proximoAtaqueV3 = Number.POSITIVE_INFINITY;
+        robo.estadoRoboV3 = 'RONDA';
+        robo.estadoRoboV3Desde = cena.time ? cena.time.now : 0;
+        robo.setVelocityX(0);
+
+        if (robo.anims) {
+            patrulhar(robo);
+        }
+    };
+
     const anexar = (cena) => {
         if (!cena || !cena.events || runtime.cena === cena) return;
 
@@ -329,10 +434,17 @@
         }
 
         cena.atualizarComportamentoRobo = () => {};
-        const handler = (time) => atualizar(cena, time);
+        const handler = (time) => {
+            try {
+                atualizar(cena, time);
+            } catch (erro) {
+                falhaSegura(cena, erro);
+            }
+        };
         cena.events.on('postupdate', handler);
         cena.events.once('shutdown', () => {
             cena.events.off('postupdate', handler);
+            removerProjeteis(cena);
             if (runtime.cena === cena) {
                 runtime.cena = null;
                 runtime.handler = null;
@@ -341,10 +453,17 @@
 
         runtime.cena = cena;
         runtime.handler = handler;
-        garantirProjeteis(cena);
+
+        if (cena.vilao && podeAtacar(cena.vilao)) {
+            garantirProjeteis(cena);
+        } else {
+            removerProjeteis(cena);
+        }
 
         if (cena.vilao) {
-            cena.vilao.proximoAtaqueV3 = 0;
+            cena.vilao.proximoAtaqueV3 = podeAtacar(cena.vilao)
+                ? 0
+                : Number.POSITIVE_INFINITY;
             mudar(cena.vilao, 'RONDA', cena.time ? cena.time.now : 0);
         }
 
