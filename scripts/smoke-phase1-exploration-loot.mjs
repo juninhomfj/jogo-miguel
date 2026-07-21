@@ -101,6 +101,7 @@ try {
             && window.__MIGUEL_PHASE1_INSTALLED__
             && window.__MIGUEL_EXPLORATION_LOOT_BUILD__
             && window.__MIGUEL_EXPLORATION_COMPAT_BUILD__
+            && window.__MIGUEL_PHASE1_USABILITY_BUILD__
             && window.MIGUEL_LOOT_SYSTEM
         ),
         { timeout: 20000 }
@@ -124,6 +125,8 @@ try {
                 && cena.__MIGUEL_EXPLORATION_LOOT_APPLIED__
                 && cena.__MIGUEL_EXPLORATION_COMPAT_APPLIED__
                 && cena.__MIGUEL_HOVERBOARD_STATE__
+                && cena.__MIGUEL_PHASE1_USABILITY_APPLIED__
+                && cena.__MIGUEL_PHASE1_USABILITY_STATE__
             );
         },
         { timeout: 20000 }
@@ -146,7 +149,11 @@ try {
 
         const coletaveis = [];
         cena.coletaveis.children.iterate((item) => {
-            if (item) coletaveis.push({ x: item.x, depth: item.depth });
+            if (item) coletaveis.push({
+                x: item.x,
+                depth: item.depth,
+                textura: item.texture.key
+            });
         });
 
         const lasers = [];
@@ -179,25 +186,28 @@ try {
             }
         });
 
-        const estado = cena.__MIGUEL_HOVERBOARD_STATE__;
+        const legado = cena.__MIGUEL_HOVERBOARD_STATE__;
+        const usabilidade = cena.__MIGUEL_PHASE1_USABILITY_STATE__;
         return {
             build: window.__MIGUEL_EXPLORATION_LOOT_BUILD__,
             powerAvailable: cena.__MIGUEL_PHASE1_POWER_AVAILABLE__,
             powerConfig: window.MIGUEL_PHASE_CONFIG.fases.Fase1.controles.includes('poder'),
+            interactionConfig: window.MIGUEL_PHASE_CONFIG.fases.Fase1.controles.includes('interagir'),
             coletaveis,
             lasers,
             inimigos,
             plataformas,
-            baus: estado.baus ? estado.baus.countActive(true) : -1,
-            visuaisLaser: estado.visuaisLaser.length,
-            inventario: estado.inventario
+            baus: usabilidade.chests.length,
+            bausLegadosAtivos: legado.baus ? legado.baus.countActive(true) : -1,
+            visuaisLaser: legado.visuaisLaser.length,
+            inventario: usabilidade.inventory
         };
     });
 
     console.log('ESTRUTURA EXPLORAÇÃO:', JSON.stringify(estrutura));
 
-    if (!estrutura.powerAvailable || !estrutura.powerConfig) {
-        erros.push('poder não ficou disponível na Fase 1');
+    if (!estrutura.powerAvailable || !estrutura.powerConfig || !estrutura.interactionConfig) {
+        erros.push('poder ou interação não ficaram disponíveis na Fase 1');
     }
 
     if (estrutura.coletaveis.length !== 16) {
@@ -206,6 +216,10 @@ try {
 
     if (!estrutura.coletaveis.every((item) => item.depth >= 30)) {
         erros.push('existem cristais atrás das camadas semitransparentes');
+    }
+
+    if (!estrutura.coletaveis.every((item) => item.textura === 'fase1_cristal_eletrico_v2')) {
+        erros.push('cristais não receberam o visual elétrico atualizado');
     }
 
     if (JSON.stringify(estrutura.lasers) !== JSON.stringify([1720, 2680, 4250])) {
@@ -231,28 +245,25 @@ try {
 
     const coleta = await pagina.evaluate(async () => {
         const cena = window.__MIGUEL_GAME__.scene.getScene('Fase1');
-        const estado = cena.__MIGUEL_HOVERBOARD_STATE__;
-        const baus = [];
-        estado.baus.children.iterate((bau) => {
-            if (bau) baus.push(bau);
-        });
-        baus.sort((a, b) => a.x - b.x);
+        const usabilidade = cena.__MIGUEL_PHASE1_USABILITY_STATE__;
+        const legado = cena.__MIGUEL_HOVERBOARD_STATE__;
 
-        for (const bau of baus) {
-            cena.player.setPosition(bau.x, 430);
+        for (const bau of usabilidade.chests) {
+            cena.player.setPosition(bau.x, bau.y - 65);
             if (cena.player.body && typeof cena.player.body.reset === 'function') {
-                cena.player.body.reset(bau.x, 430);
+                cena.player.body.reset(bau.x, bau.y - 65);
             }
-            await new Promise((resolve) => setTimeout(resolve, 180));
+            await new Promise((resolve) => setTimeout(resolve, 150));
+            cena.__MIGUEL_INTERACT__();
+            await new Promise((resolve) => setTimeout(resolve, 170));
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 180));
-
         return {
-            inventario: { ...estado.inventario },
-            montado: estado.montado,
-            hoverboardVisivel: estado.hoverboardVisual.visible,
-            bausAbertos: estado.inventario.bausAbertos.length
+            inventario: { ...usabilidade.inventory },
+            montado: legado.montado,
+            hoverboardVisivel: usabilidade.hoverboard.container.visible,
+            bausAbertos: usabilidade.inventory.bausAbertos.length,
+            interacoes: cena.__MIGUEL_CHEST_INTERACTION_COUNT__
         };
     });
 
@@ -264,8 +275,8 @@ try {
         }
     }
 
-    if (coleta.bausAbertos !== 4) {
-        erros.push(`baús abertos não persistiram: ${coleta.bausAbertos}`);
+    if (coleta.bausAbertos !== 4 || coleta.interacoes !== 4) {
+        erros.push(`baús abertos não persistiram: ${coleta.bausAbertos}/${coleta.interacoes}`);
     }
 
     if (!coleta.montado || !coleta.hoverboardVisivel) {
