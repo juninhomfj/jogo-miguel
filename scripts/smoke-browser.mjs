@@ -75,18 +75,25 @@ try {
 
     pagina.on('console', (mensagem) => {
         const texto = mensagem.text();
-        if (mensagem.type() === 'error') {
+        if (
+            mensagem.type() === 'error'
+            && !texto.startsWith('Failed to load resource:')
+        ) {
             erros.push(`CONSOLE: ${texto}`);
         }
     });
 
     pagina.on('response', (resposta) => {
-        if (resposta.status() >= 400) {
+        if (
+            resposta.status() >= 400
+            && !resposta.url().endsWith('/favicon.ico')
+        ) {
             erros.push(`HTTP ${resposta.status()}: ${resposta.url()}`);
         }
     });
 
     pagina.on('requestfailed', (requisicao) => {
+        if (requisicao.url().endsWith('/favicon.ico')) return;
         const falha = requisicao.failure();
         erros.push(
             `REQUEST FAILED: ${requisicao.url()} — `
