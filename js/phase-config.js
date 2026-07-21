@@ -136,7 +136,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 7,
+        versao: 8,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -164,6 +164,11 @@
         'audio-feedback-extensions',
         'js/audio-feedback-extensions.js',
         'audio-feedback-extensions-v1-20260721'
+    );
+    carregarModulo(
+        'tutorial-transition-guard',
+        'js/tutorial-transition-guard.js',
+        'tutorial-transition-guard-v1-20260721'
     );
     carregarModulo(
         'tutorial-audio',
