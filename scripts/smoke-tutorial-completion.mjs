@@ -46,6 +46,38 @@ const esperarServidor = async () => {
     throw new Error('Servidor local não respondeu.');
 };
 
+const esperarResultado = async (pagina, timeout = 6000) => {
+    try {
+        await pagina.waitForFunction(
+            () => {
+                const game = window.__MIGUEL_GAME__;
+                const resultado = game && game.scene.getScene('ResultadoTutorial');
+                return Boolean(resultado && resultado.sys.isActive());
+            },
+            { timeout }
+        );
+        return true;
+    } catch {
+        return false;
+    }
+};
+
+const esperarTutorial = async (pagina) => {
+    await pagina.waitForFunction(
+        () => {
+            const game = window.__MIGUEL_GAME__;
+            const cena = game && game.scene.getScene('Tutorial');
+            return Boolean(
+                cena
+                && cena.sys.isActive()
+                && cena.tutorial
+                && cena.hudJogo
+            );
+        },
+        { timeout: 20000 }
+    );
+};
+
 let navegador = null;
 
 try {
@@ -64,7 +96,13 @@ try {
     });
 
     const pagina = await navegador.newPage();
-    await pagina.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
+    await pagina.setViewport({
+        width: 1180,
+        height: 820,
+        deviceScaleFactor: 1,
+        isMobile: true,
+        hasTouch: true
+    });
 
     pagina.on('pageerror', (erro) => {
         erros.push(`PAGEERROR: ${erro.stack || erro.message}`);
@@ -90,6 +128,7 @@ try {
             window.__MIGUEL_GAME__
             && window.MiguelTutorialManager
             && window.__MIGUEL_TUTORIAL_AUDIO_BUILD__
+            && window.__MIGUEL_TUTORIAL_TRANSITION_GUARD_BUILD__
         ),
         { timeout: 20000 }
     );
@@ -101,48 +140,42 @@ try {
         game.scene.start('Tutorial');
     });
 
-    await pagina.waitForFunction(
-        () => {
-            const game = window.__MIGUEL_GAME__;
-            const cena = game && game.scene.getScene('Tutorial');
-            return Boolean(
-                cena
-                && cena.sys.isActive()
-                && cena.tutorial
-                && cena.hudJogo
-                && cena.__miguelTutorialAudioBuild
-            );
-        },
-        { timeout: 20000 }
-    );
+    await esperarTutorial(pagina);
 
-    const antes = await pagina.evaluate(() => {
+    const inicioNormal = await pagina.evaluate(() => {
         const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
-        cena.tutorial.finalizar();
+        const tutorial = cena.tutorial;
+
+        tutorial.estado.distanciaMovida = 100;
+        tutorial.estado.pulo = true;
+        tutorial.estado.puloDuplo = true;
+        tutorial.estado.agachamento = true;
+        tutorial.estado.danoRobo = true;
+        tutorial.estado.ataqueRobo = true;
+        tutorial.estado.cristais = Math.max(0, tutorial.totalCristais - 1);
+        tutorial.indiceAtual = tutorial.objetivos.length - 1;
+        tutorial.concluido = false;
+        tutorial.avancoAgendado = false;
+        tutorial.transicaoFinalExecutada = false;
+
+        tutorial.registrarAcao('cristal');
+
         return {
-            ativa: cena.sys.isActive(),
-            concluido: cena.tutorial.concluido,
-            transicaoExecutada: cena.tutorial.transicaoFinalExecutada,
-            travaCena: cena.transicaoTutorialEmAndamento
+            etapa: tutorial.indiceAtual + 1,
+            cristais: tutorial.estado.cristais,
+            totalCristais: tutorial.totalCristais,
+            concluido: tutorial.concluido
         };
     });
 
-    console.log('ANTES DA TRANSIÇÃO:', JSON.stringify(antes));
+    console.log('FLUXO NORMAL INICIADO:', JSON.stringify(inicioNormal));
 
-    try {
-        await pagina.waitForFunction(
-            () => {
-                const game = window.__MIGUEL_GAME__;
-                const resultado = game && game.scene.getScene('ResultadoTutorial');
-                return Boolean(resultado && resultado.sys.isActive());
-            },
-            { timeout: 5000 }
-        );
-    } catch {
-        erros.push('ResultadoTutorial não abriu após tutorial.finalizar()');
+    const normalAbriu = await esperarResultado(pagina, 6000);
+    if (!normalAbriu) {
+        erros.push('fluxo real do último objetivo não abriu ResultadoTutorial');
     }
 
-    const depois = await pagina.evaluate(() => {
+    const estadoNormal = await pagina.evaluate(() => {
         const game = window.__MIGUEL_GAME__;
         const tutorial = game.scene.getScene('Tutorial');
         const resultado = game.scene.getScene('ResultadoTutorial');
@@ -150,30 +183,75 @@ try {
             tutorialAtivo: Boolean(tutorial && tutorial.sys.isActive()),
             resultadoAtivo: Boolean(resultado && resultado.sys.isActive()),
             tutorialConcluido: game.registry.get('tutorialConcluido'),
-            gerenciador: tutorial && tutorial.tutorial
-                ? tutorial.tutorial.obterEstado()
-                : null,
-            transicaoExecutada: tutorial && tutorial.tutorial
-                ? tutorial.tutorial.transicaoFinalExecutada
-                : null,
-            travaCena: tutorial
-                ? tutorial.transicaoTutorialEmAndamento
-                : null
+            guarda: window.__MIGUEL_TUTORIAL_TRANSITION_GUARD_LAST__ || null
         };
     });
 
-    console.log('DEPOIS DA TRANSIÇÃO:', JSON.stringify(depois));
+    console.log('FLUXO NORMAL FINAL:', JSON.stringify(estadoNormal));
 
-    if (!depois.resultadoAtivo) {
-        erros.push('tela de conquista não ficou ativa');
+    if (normalAbriu) {
+        await pagina.evaluate(() => {
+            window.__MIGUEL_GAME__.scene.start('Tutorial');
+        });
+
+        await esperarTutorial(pagina);
+
+        const inicioRecuperacao = await pagina.evaluate(() => {
+            const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
+            const tutorial = cena.tutorial;
+
+            tutorial.onComplete = () => {
+                window.__MIGUEL_TRANSICAO_SABOTADA__ = true;
+            };
+            tutorial.finalizar();
+
+            return {
+                concluido: tutorial.concluido,
+                transicaoExecutada: tutorial.transicaoFinalExecutada,
+                guardaBuild: window.__MIGUEL_TUTORIAL_TRANSITION_GUARD_BUILD__
+            };
+        });
+
+        console.log('RECUPERAÇÃO INICIADA:', JSON.stringify(inicioRecuperacao));
+
+        const recuperacaoAbriu = await esperarResultado(pagina, 7000);
+        if (!recuperacaoAbriu) {
+            erros.push('guarda não recuperou uma conclusão sem transição');
+        }
+
+        const estadoRecuperacao = await pagina.evaluate(() => {
+            const game = window.__MIGUEL_GAME__;
+            const tutorial = game.scene.getScene('Tutorial');
+            const resultado = game.scene.getScene('ResultadoTutorial');
+            return {
+                tutorialAtivo: Boolean(tutorial && tutorial.sys.isActive()),
+                resultadoAtivo: Boolean(resultado && resultado.sys.isActive()),
+                tutorialConcluido: game.registry.get('tutorialConcluido'),
+                sabotada: Boolean(window.__MIGUEL_TRANSICAO_SABOTADA__),
+                guarda: window.__MIGUEL_TUTORIAL_TRANSITION_GUARD_LAST__ || null
+            };
+        });
+
+        console.log('RECUPERAÇÃO FINAL:', JSON.stringify(estadoRecuperacao));
+
+        if (
+            recuperacaoAbriu
+            && (!estadoRecuperacao.guarda || estadoRecuperacao.guarda.forçado !== true)
+        ) {
+            erros.push('recuperação abriu resultado sem registrar acionamento da guarda');
+        }
     }
 
-    if (depois.tutorialAtivo) {
-        erros.push('tutorial permaneceu ativo depois da conclusão');
+    if (!estadoNormal.resultadoAtivo) {
+        erros.push('tela de conquista não ficou ativa no fluxo normal');
     }
 
-    if (depois.tutorialConcluido !== true) {
-        erros.push('registro tutorialConcluido não foi salvo');
+    if (estadoNormal.tutorialAtivo) {
+        erros.push('tutorial permaneceu ativo depois da conclusão normal');
+    }
+
+    if (estadoNormal.tutorialConcluido !== true) {
+        erros.push('registro tutorialConcluido não foi salvo no fluxo normal');
     }
 
     if (erros.length > 0) {
