@@ -136,7 +136,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 7,
+        versao: 9,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -156,6 +156,11 @@
         'phaser-scale-guard-v1-20260720'
     );
     carregarModulo(
+        'mobile-controls-compat',
+        'js/mobile-controls-compat.js',
+        'mobile-controls-compat-v1-20260721'
+    );
+    carregarModulo(
         'audio-manager',
         'js/audio-manager.js',
         'audio-procedural-v1-20260720'
@@ -164,6 +169,11 @@
         'audio-feedback-extensions',
         'js/audio-feedback-extensions.js',
         'audio-feedback-extensions-v1-20260721'
+    );
+    carregarModulo(
+        'tutorial-transition-guard',
+        'js/tutorial-transition-guard.js',
+        'tutorial-transition-guard-v1-20260721'
     );
     carregarModulo(
         'tutorial-audio',
