@@ -1,5 +1,5 @@
 (() => {
-    const BUILD = 'robot-attack-projectile-v2-20260721';
+    const BUILD = 'robot-attack-projectile-v3-20260721';
     const CFG = Object.freeze({
         ronda: 90,
         perseguicao: 120,
@@ -136,10 +136,26 @@
         cena.projeteisRoboV3 = grupo;
 
         cena.physics.add.overlap(
-            grupo,
             cena.player,
-            (projetil, player) => {
-                if (!projetil || !projetil.active || !player.active) return;
+            grupo,
+            (objetoA, objetoB) => {
+                const player = objetoA === cena.player
+                    ? objetoA
+                    : objetoB;
+                const projetil = objetoA === cena.player
+                    ? objetoB
+                    : objetoA;
+
+                if (
+                    player !== cena.player
+                    || !player
+                    || !player.active
+                    || !projetil
+                    || !projetil.active
+                    || projetil === player
+                ) {
+                    return;
+                }
 
                 const direcao = (
                     projetil.body
