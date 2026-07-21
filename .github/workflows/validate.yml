@@ -1,0 +1,29 @@
+name: Validar projeto
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - 'sprint/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar estrutura e sintaxe
+        run: node scripts/validate-project.mjs
