@@ -1,0 +1,51 @@
+name: Corrigir assets da fase 1
+
+on:
+  push:
+    branches:
+      - sprint/fase-1-completa-audio
+    paths:
+      - '.github/workflows/fix-phase1-assets.yml'
+      - 'js/phase1.js'
+
+permissions:
+  contents: write
+
+jobs:
+  corrigir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Baixar branch
+        uses: actions/checkout@v4
+        with:
+          ref: sprint/fase-1-completa-audio
+
+      - name: Corrigir caminhos
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -i \
+            -e "s#assets/frames/miguel/01_idle.png#assets/frames/miguel/00_idle.png#g" \
+            -e "s#assets/frames/miguel/02_walk_1.png#assets/frames/miguel/01_walk_1.png#g" \
+            -e "s#assets/frames/miguel/03_walk_2.png#assets/frames/miguel/02_walk_2.png#g" \
+            -e "s#assets/frames/miguel/04_walk_3.png#assets/frames/miguel/03_walk_3.png#g" \
+            -e "s#assets/frames/miguel/05_jump.png#assets/frames/miguel/04_jump.png#g" \
+            -e "s#assets/frames/miguel/06_double_jump.png#assets/frames/miguel/05_double_jump.png#g" \
+            -e "s#assets/frames/miguel/07_punch.png#assets/frames/miguel/06_punch.png#g" \
+            js/phase1.js
+
+      - name: Publicar correção
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- js/phase1.js; then
+            echo 'Caminhos já estavam corretos.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add js/phase1.js
+          git commit -m 'fix: corrige caminhos dos sprites de Miguel na fase 1'
+          git push origin HEAD:sprint/fase-1-completa-audio
