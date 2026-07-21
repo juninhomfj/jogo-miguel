@@ -135,7 +135,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 5,
+        versao: 6,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -170,6 +170,11 @@
             'phase1',
             'js/phase1.js',
             'fase-1-completa-v1-20260720'
+        );
+        carregarModulo(
+            'phase1-polish',
+            'js/phase1-polish.js',
+            'phase1-polish-v1-20260721'
         );
     };
 
