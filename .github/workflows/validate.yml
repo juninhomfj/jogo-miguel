@@ -15,7 +15,7 @@ permissions:
 jobs:
   validar:
     runs-on: ubuntu-latest
-    timeout-minutes: 14
+    timeout-minutes: 16
 
     steps:
       - name: Baixar repositório
@@ -53,6 +53,12 @@ jobs:
           set -o pipefail
           node scripts/smoke-tutorial-robot.mjs 2>&1 | tee smoke-tutorial-robot-output.txt
 
+      - name: Executar smoke test de áudio do tutorial
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/smoke-tutorial-audio.mjs 2>&1 | tee smoke-tutorial-audio-output.txt
+
       - name: Publicar relatórios
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,5 +69,6 @@ jobs:
             smoke-output.txt
             smoke-phase1-polish-output.txt
             smoke-tutorial-robot-output.txt
+            smoke-tutorial-audio-output.txt
           if-no-files-found: error
           retention-days: 3
