@@ -15,7 +15,7 @@ permissions:
 jobs:
   validar:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 22
 
     steps:
       - name: Baixar repositório
@@ -53,6 +53,12 @@ jobs:
           set -o pipefail
           node scripts/smoke-phase1-combat-feedback.mjs 2>&1 | tee smoke-phase1-combat-feedback-output.txt
 
+      - name: Executar smoke test do agachamento da fase 1
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/smoke-phase1-crouch.mjs 2>&1 | tee smoke-phase1-crouch-output.txt
+
       - name: Executar smoke test do disparo no tutorial
         shell: bash
         run: |
@@ -81,6 +87,7 @@ jobs:
             smoke-output.txt
             smoke-phase1-polish-output.txt
             smoke-phase1-combat-feedback-output.txt
+            smoke-phase1-crouch-output.txt
             smoke-tutorial-robot-output.txt
             smoke-tutorial-audio-output.txt
             smoke-tutorial-completion-output.txt
