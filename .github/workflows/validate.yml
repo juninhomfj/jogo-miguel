@@ -14,7 +14,7 @@ permissions:
 jobs:
   validar:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Baixar repositório
@@ -31,11 +31,22 @@ jobs:
           set -o pipefail
           node scripts/validate-project.mjs 2>&1 | tee validation-output.txt
 
-      - name: Publicar relatório
+      - name: Instalar navegador de teste
+        run: npm install --no-save puppeteer-core@24.31.0
+
+      - name: Executar smoke test no navegador
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/smoke-browser.mjs 2>&1 | tee smoke-output.txt
+
+      - name: Publicar relatórios
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: validation-output
-          path: validation-output.txt
+          path: |
+            validation-output.txt
+            smoke-output.txt
           if-no-files-found: error
           retention-days: 3
