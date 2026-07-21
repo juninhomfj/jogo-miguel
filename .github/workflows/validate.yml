@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - 'sprint/**'
+      - 'hotfix/**'
 
 permissions:
   contents: read
@@ -14,7 +15,7 @@ permissions:
 jobs:
   validar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
 
     steps:
       - name: Baixar repositório
@@ -34,11 +35,17 @@ jobs:
       - name: Instalar navegador de teste
         run: npm install --no-save puppeteer-core@24.31.0
 
-      - name: Executar smoke test no navegador
+      - name: Executar smoke test da fase 1
         shell: bash
         run: |
           set -o pipefail
           node scripts/smoke-browser.mjs 2>&1 | tee smoke-output.txt
+
+      - name: Executar smoke test do disparo no tutorial
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/smoke-tutorial-robot.mjs 2>&1 | tee smoke-tutorial-robot-output.txt
 
       - name: Publicar relatórios
         if: always()
@@ -48,5 +55,6 @@ jobs:
           path: |
             validation-output.txt
             smoke-output.txt
+            smoke-tutorial-robot-output.txt
           if-no-files-found: error
           retention-days: 3
