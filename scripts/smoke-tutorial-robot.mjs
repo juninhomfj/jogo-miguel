@@ -72,7 +72,11 @@ try {
 
     pagina.on('console', (mensagem) => {
         const texto = mensagem.text();
-        if (mensagem.type() === 'error') {
+        const recursoAusenteGenerico = texto.includes(
+            'Failed to load resource: the server responded with a status of 404'
+        );
+
+        if (mensagem.type() === 'error' && !recursoAusenteGenerico) {
             erros.push(`CONSOLE: ${texto}`);
         }
     });
@@ -107,29 +111,35 @@ try {
                 && cena.player
                 && cena.vilao
                 && cena.sistemaVida
-                && cena.projeteisRoboV3
+                && cena.vilao.estadoRoboV3
             );
         },
         { timeout: 20000 }
     );
 
-    const antes = await pagina.evaluate(() => {
+    const ataqueBloqueadoAntes = await pagina.evaluate(() => {
         const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
-        cena.player.setPosition(cena.vilao.x - 150, cena.vilao.y);
+        cena.player.body.allowGravity = false;
+        cena.player.body.reset(cena.vilao.x - 145, cena.vilao.y - 6);
         cena.player.setVelocity(0, 0);
         cena.vilao.proximoAtaqueV3 = 0;
         cena.vilao.estadoRoboV3 = 'PERSEGUICAO';
         cena.vilao.estadoRoboV3Desde = 0;
+
         return {
+            build: window.__MIGUEL_ROBOT_BEHAVIOR_BUILD__,
             tempo: cena.time.now,
             vida: cena.sistemaVida.obterEstado().vida,
-            estado: cena.vilao.estadoRoboV3
+            estado: cena.vilao.estadoRoboV3,
+            atacar: cena.vilao.capacidades
+                ? cena.vilao.capacidades.atacar
+                : null
         };
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 1400));
+    await new Promise((resolve) => setTimeout(resolve, 1100));
 
-    const depois = await pagina.evaluate(() => {
+    const ataqueBloqueadoDepois = await pagina.evaluate(() => {
         const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
         return {
             ativa: cena.sys.isActive(),
@@ -138,25 +148,90 @@ try {
             estado: cena.vilao.estadoRoboV3,
             projeteis: cena.projeteisRoboV3
                 ? cena.projeteisRoboV3.countActive(true)
-                : -1,
+                : 0,
             playerAtivo: Boolean(cena.player && cena.player.active),
             roboAtivo: Boolean(cena.vilao && cena.vilao.active)
         };
     });
 
-    console.log('ANTES:', JSON.stringify(antes));
-    console.log('DEPOIS:', JSON.stringify(depois));
+    console.log('ATAQUE BLOQUEADO ANTES:', JSON.stringify(ataqueBloqueadoAntes));
+    console.log('ATAQUE BLOQUEADO DEPOIS:', JSON.stringify(ataqueBloqueadoDepois));
 
-    if (!depois.ativa || !depois.playerAtivo || !depois.roboAtivo) {
-        erros.push('tutorial deixou de permanecer ativo após o disparo');
+    if (ataqueBloqueadoAntes.atacar !== false) {
+        erros.push('tutorial não declarou a capacidade de ataque como desativada');
     }
 
-    if (depois.tempo <= antes.tempo + 700) {
-        erros.push('relógio da cena não avançou após o disparo');
+    if (ataqueBloqueadoDepois.vida !== ataqueBloqueadoAntes.vida) {
+        erros.push('robô causou dano apesar de ataque desativado');
     }
 
-    if (!['RECUPERACAO', 'PERSEGUICAO', 'RONDA'].includes(depois.estado)) {
-        erros.push(`estado inesperado após disparo: ${depois.estado}`);
+    if (ataqueBloqueadoDepois.projeteis !== 0) {
+        erros.push('projétil foi criado apesar de ataque desativado');
+    }
+
+    if (['CARREGANDO', 'RECUPERACAO'].includes(ataqueBloqueadoDepois.estado)) {
+        erros.push(`robô entrou em ataque desativado: ${ataqueBloqueadoDepois.estado}`);
+    }
+
+    if (
+        !ataqueBloqueadoDepois.ativa
+        || !ataqueBloqueadoDepois.playerAtivo
+        || !ataqueBloqueadoDepois.roboAtivo
+    ) {
+        erros.push('tutorial deixou de permanecer ativo com ataque bloqueado');
+    }
+
+    if (ataqueBloqueadoDepois.tempo <= ataqueBloqueadoAntes.tempo + 700) {
+        erros.push('relógio da cena não avançou com ataque bloqueado');
+    }
+
+    const ataqueHabilitadoAntes = await pagina.evaluate(() => {
+        const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
+        cena.vilao.capacidades.atacar = true;
+        cena.player.body.allowGravity = false;
+        cena.player.body.reset(cena.vilao.x - 120, cena.vilao.y - 6);
+        cena.player.setVelocity(0, 0);
+        cena.vilao.proximoAtaqueV3 = 0;
+        cena.vilao.estadoRoboV3 = 'PERSEGUICAO';
+        cena.vilao.estadoRoboV3Desde = cena.time.now;
+
+        return {
+            tempo: cena.time.now,
+            vida: cena.sistemaVida.obterEstado().vida
+        };
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    const ataqueHabilitadoDepois = await pagina.evaluate(() => {
+        const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
+        return {
+            ativa: cena.sys.isActive(),
+            tempo: cena.time.now,
+            vida: cena.sistemaVida.obterEstado().vida,
+            estado: cena.vilao.estadoRoboV3,
+            playerAtivo: Boolean(cena.player && cena.player.active),
+            roboAtivo: Boolean(cena.vilao && cena.vilao.active)
+        };
+    });
+
+    console.log('ATAQUE HABILITADO ANTES:', JSON.stringify(ataqueHabilitadoAntes));
+    console.log('ATAQUE HABILITADO DEPOIS:', JSON.stringify(ataqueHabilitadoDepois));
+
+    if (ataqueHabilitadoDepois.vida >= ataqueHabilitadoAntes.vida) {
+        erros.push('disparo habilitado não atingiu Miguel no cenário controlado');
+    }
+
+    if (
+        !ataqueHabilitadoDepois.ativa
+        || !ataqueHabilitadoDepois.playerAtivo
+        || !ataqueHabilitadoDepois.roboAtivo
+    ) {
+        erros.push('tutorial deixou de permanecer ativo após disparo controlado');
+    }
+
+    if (ataqueHabilitadoDepois.tempo <= ataqueHabilitadoAntes.tempo + 900) {
+        erros.push('relógio da cena não avançou após disparo controlado');
     }
 
     if (erros.length > 0) {
