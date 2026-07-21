@@ -4,13 +4,13 @@
     const ALTURA_MUNDO = 680;
 
     const ASSETS = Object.freeze({
-        miguel_idle: 'assets/frames/miguel/01_idle.png',
-        miguel_walk_1: 'assets/frames/miguel/02_walk_1.png',
-        miguel_walk_2: 'assets/frames/miguel/03_walk_2.png',
-        miguel_walk_3: 'assets/frames/miguel/04_walk_3.png',
-        miguel_jump: 'assets/frames/miguel/05_jump.png',
-        miguel_double_jump: 'assets/frames/miguel/06_double_jump.png',
-        miguel_punch: 'assets/frames/miguel/07_punch.png',
+        miguel_idle: 'assets/frames/miguel/00_idle.png',
+        miguel_walk_1: 'assets/frames/miguel/01_walk_1.png',
+        miguel_walk_2: 'assets/frames/miguel/02_walk_2.png',
+        miguel_walk_3: 'assets/frames/miguel/03_walk_3.png',
+        miguel_jump: 'assets/frames/miguel/04_jump.png',
+        miguel_double_jump: 'assets/frames/miguel/05_double_jump.png',
+        miguel_punch: 'assets/frames/miguel/06_punch.png',
         miguel_hurt: 'assets/frames/miguel/12_hurt.png',
         miguel_victory: 'assets/frames/miguel/13_victory_trophy.png',
         miguel_crouch: 'assets/frames/miguel/14_crouch.png',
