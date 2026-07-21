@@ -62,6 +62,7 @@
                 'pulo-duplo',
                 'agachamento',
                 'ataque',
+                'poder',
                 'pausa'
             ]),
             setores: Object.freeze([
@@ -78,6 +79,8 @@
                 'obstaculos',
                 'inimigos',
                 'coletaveis',
+                'baus',
+                'montaveis',
                 'checkpoints',
                 'chefe'
             ]),
@@ -85,6 +88,7 @@
                 'atravessar-cinco-setores',
                 'ativar-dois-checkpoints',
                 'coletar-dezesseis-cristais',
+                'abrir-baus-de-equipamento',
                 'derrotar-mini-viloes',
                 'derrotar-nucleo-guardiao'
             ]),
@@ -92,6 +96,7 @@
                 cristal: 25,
                 energia: 75,
                 checkpoint: 100,
+                bau: 150,
                 sentinela: 120,
                 drone: 150,
                 torre: 180,
@@ -136,7 +141,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 11,
+        versao: 12,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -206,6 +211,16 @@
             'phase1-combat-feedback',
             'js/phase1-combat-feedback.js',
             'phase1-combat-feedback-v1-20260721'
+        );
+        carregarModulo(
+            'phase1-exploration-compat',
+            'js/phase1-exploration-compat.js',
+            'phase1-exploration-compat-v1-20260721'
+        );
+        carregarModulo(
+            'phase1-exploration-loot',
+            'js/phase1-exploration-loot.js',
+            'phase1-exploration-loot-v1-20260721'
         );
     };
 
