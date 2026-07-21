@@ -62,19 +62,23 @@ const esperarResultado = async (pagina, timeout = 6000) => {
     }
 };
 
-const esperarTutorial = async (pagina) => {
+const esperarTutorial = async (pagina, exigirResultadoInativo = false) => {
     await pagina.waitForFunction(
-        () => {
+        (resultadoDeveEstarInativo) => {
             const game = window.__MIGUEL_GAME__;
             const cena = game && game.scene.getScene('Tutorial');
-            return Boolean(
+            const resultado = game && game.scene.getScene('ResultadoTutorial');
+            const tutorialPronto = Boolean(
                 cena
                 && cena.sys.isActive()
                 && cena.tutorial
                 && cena.hudJogo
             );
+            const resultadoInativo = !resultado || !resultado.sys.isActive();
+            return tutorialPronto && (!resultadoDeveEstarInativo || resultadoInativo);
         },
-        { timeout: 20000 }
+        { timeout: 20000 },
+        exigirResultadoInativo
     );
 };
 
@@ -129,6 +133,7 @@ try {
             && window.MiguelTutorialManager
             && window.__MIGUEL_TUTORIAL_AUDIO_BUILD__
             && window.__MIGUEL_TUTORIAL_TRANSITION_GUARD_BUILD__
+            && window.__MIGUEL_MOBILE_CONTROLS_COMPAT_BUILD__
         ),
         { timeout: 20000 }
     );
@@ -191,10 +196,14 @@ try {
 
     if (normalAbriu) {
         await pagina.evaluate(() => {
-            window.__MIGUEL_GAME__.scene.start('Tutorial');
+            const game = window.__MIGUEL_GAME__;
+            window.__MIGUEL_TUTORIAL_TRANSITION_GUARD_LAST__ = null;
+            window.__MIGUEL_TRANSICAO_SABOTADA__ = false;
+            game.scene.stop('ResultadoTutorial');
+            game.scene.start('Tutorial');
         });
 
-        await esperarTutorial(pagina);
+        await esperarTutorial(pagina, true);
 
         const inicioRecuperacao = await pagina.evaluate(() => {
             const cena = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
@@ -239,6 +248,10 @@ try {
             && (!estadoRecuperacao.guarda || estadoRecuperacao.guarda.forçado !== true)
         ) {
             erros.push('recuperação abriu resultado sem registrar acionamento da guarda');
+        }
+
+        if (estadoRecuperacao.tutorialAtivo) {
+            erros.push('tutorial permaneceu ativo após recuperação forçada');
         }
     }
 
