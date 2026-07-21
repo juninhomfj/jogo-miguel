@@ -6,10 +6,7 @@
             titulo: 'Treinamento do Herói',
             tipo: 'tutorial',
             orientacao: 'landscape',
-            tamanhoLogico: Object.freeze({
-                width: 800,
-                height: 600
-            }),
+            tamanhoLogico: Object.freeze({ width: 800, height: 600 }),
             tema: 'ceu-tecnologico-noturno',
             controles: Object.freeze([
                 'movimento',
@@ -41,15 +38,9 @@
             titulo: 'Treinamento Concluído',
             tipo: 'resultado',
             orientacao: 'landscape',
-            tamanhoLogico: Object.freeze({
-                width: 800,
-                height: 600
-            }),
+            tamanhoLogico: Object.freeze({ width: 800, height: 600 }),
             tema: 'resultado-noturno',
-            controles: Object.freeze([
-                'continuar',
-                'voltar-menu'
-            ]),
+            controles: Object.freeze(['continuar', 'voltar-menu']),
             camadasDinamicas: Object.freeze([]),
             proximaCena: 'Fase1'
         }),
@@ -57,14 +48,13 @@
         Fase1: Object.freeze({
             id: 'fase-1',
             scene: 'Fase1',
-            titulo: 'Primeira Aventura',
+            titulo: 'A Cidade sem Energia',
             tipo: 'fase',
             orientacao: 'landscape',
-            tamanhoLogico: Object.freeze({
-                width: 800,
-                height: 600
-            }),
-            tema: 'mundo-1',
+            tamanhoLogico: Object.freeze({ width: 800, height: 600 }),
+            tamanhoMundo: Object.freeze({ width: 5400, height: 680 }),
+            tema: 'cidade-tecnologica-noturna',
+            musica: 'fase1',
             controles: Object.freeze([
                 'movimento',
                 'pulo',
@@ -73,77 +63,105 @@
                 'ataque',
                 'pausa'
             ]),
+            setores: Object.freeze([
+                'portao-da-cidade',
+                'fabrica-abandonada',
+                'tuneis-de-energia',
+                'ponte-das-engrenagens',
+                'nucleo-do-guardiao'
+            ]),
             camadasDinamicas: Object.freeze([
-                'cenario',
+                'cenario-parallax',
                 'plataformas',
+                'plataformas-moveis',
+                'obstaculos',
                 'inimigos',
                 'coletaveis',
+                'checkpoints',
                 'chefe'
             ]),
             objetivos: Object.freeze([
-                'atravessar-fase',
-                'coletar-itens',
-                'derrotar-chefe'
+                'atravessar-cinco-setores',
+                'ativar-dois-checkpoints',
+                'coletar-dezesseis-cristais',
+                'derrotar-mini-viloes',
+                'derrotar-nucleo-guardiao'
             ]),
+            pontuacao: Object.freeze({
+                cristal: 25,
+                energia: 75,
+                checkpoint: 100,
+                sentinela: 120,
+                drone: 150,
+                torre: 180,
+                miniChefe: 400,
+                chefe: 1200,
+                colecaoCompleta: 400,
+                semDano: 500
+            }),
             proximaCena: 'ResultadoFase1'
+        }),
+
+        ResultadoFase1: Object.freeze({
+            id: 'resultado-fase-1',
+            scene: 'ResultadoFase1',
+            titulo: 'Fase 1 Concluída',
+            tipo: 'resultado',
+            orientacao: 'landscape',
+            tamanhoLogico: Object.freeze({ width: 800, height: 600 }),
+            tema: 'cidade-restaurada',
+            controles: Object.freeze(['jogar-novamente', 'voltar-menu']),
+            camadasDinamicas: Object.freeze([]),
+            proximaCena: null
         })
     };
 
     const modelos = {
         horizontal: Object.freeze({
             orientacao: 'landscape',
-            tamanhoLogico: Object.freeze({
-                width: 960,
-                height: 540
-            }),
-            usos: Object.freeze([
-                'plataforma',
-                'perseguicao',
-                'combate',
-                'corrida'
-            ])
+            tamanhoLogico: Object.freeze({ width: 960, height: 540 }),
+            usos: Object.freeze(['plataforma', 'perseguicao', 'combate', 'corrida'])
         }),
-
         vertical: Object.freeze({
             orientacao: 'portrait',
-            tamanhoLogico: Object.freeze({
-                width: 540,
-                height: 960
-            }),
-            usos: Object.freeze([
-                'escalada',
-                'queda',
-                'torre',
-                'desafio-vertical'
-            ])
+            tamanhoLogico: Object.freeze({ width: 540, height: 960 }),
+            usos: Object.freeze(['escalada', 'queda', 'torre', 'desafio-vertical'])
         }),
-
         livre: Object.freeze({
             orientacao: 'any',
-            tamanhoLogico: Object.freeze({
-                width: 800,
-                height: 600
-            }),
-            usos: Object.freeze([
-                'menu',
-                'mapa',
-                'resultado'
-            ])
+            tamanhoLogico: Object.freeze({ width: 800, height: 600 }),
+            usos: Object.freeze(['menu', 'mapa', 'resultado'])
         })
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 4,
+        versao: 5,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
 
-    const script = document.createElement('script');
-    script.src = (
-        'js/robot-attack.js'
-        + '?v=robot-attack-projectile-v1-20260720'
+    const carregarModulo = (nome, caminho, versao) => {
+        if (document.querySelector(`[data-miguel-module="${nome}"]`)) return;
+        const script = document.createElement('script');
+        script.src = `${caminho}?v=${versao}`;
+        script.async = false;
+        script.dataset.miguelModule = nome;
+        document.head.appendChild(script);
+    };
+
+    carregarModulo(
+        'audio-manager',
+        'js/audio-manager.js',
+        'audio-procedural-v1-20260720'
     );
-    script.async = false;
-    script.dataset.miguelModule = 'robot-attack';
-    document.head.appendChild(script);
+    carregarModulo(
+        'robot-attack',
+        'js/robot-attack.js',
+        'robot-attack-projectile-v1-20260720'
+    );
+    carregarModulo(
+        'phase1',
+        'js/phase1.js',
+        'fase-1-completa-v1-20260720'
+    );
 })();
