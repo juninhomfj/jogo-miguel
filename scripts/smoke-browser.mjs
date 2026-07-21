@@ -67,7 +67,10 @@ try {
     await pagina.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
 
     pagina.on('pageerror', (erro) => {
-        erros.push(`PAGEERROR: ${erro.message}`);
+        const pilha = erro && erro.stack
+            ? String(erro.stack)
+            : String(erro && erro.message ? erro.message : erro);
+        erros.push(`PAGEERROR:\n${pilha}`);
     });
 
     pagina.on('console', (mensagem) => {
@@ -75,6 +78,20 @@ try {
         if (mensagem.type() === 'error') {
             erros.push(`CONSOLE: ${texto}`);
         }
+    });
+
+    pagina.on('response', (resposta) => {
+        if (resposta.status() >= 400) {
+            erros.push(`HTTP ${resposta.status()}: ${resposta.url()}`);
+        }
+    });
+
+    pagina.on('requestfailed', (requisicao) => {
+        const falha = requisicao.failure();
+        erros.push(
+            `REQUEST FAILED: ${requisicao.url()} — `
+            + `${falha ? falha.errorText : 'falha desconhecida'}`
+        );
     });
 
     await pagina.goto(`${endereco}/?smoke=1`, {
