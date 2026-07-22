@@ -142,7 +142,7 @@
     };
 
     window.MIGUEL_PHASE_CONFIG = Object.freeze({
-        versao: 15,
+        versao: 16,
         fases: Object.freeze(fases),
         modelos: Object.freeze(modelos)
     });
@@ -180,6 +180,11 @@
         'tutorial-transition-guard',
         'js/tutorial-transition-guard.js',
         'tutorial-transition-guard-v1-20260721'
+    );
+    carregarModulo(
+        'result-phase1-transition-guard',
+        'js/result-phase1-transition-guard.js',
+        'result-phase1-transition-guard-v2-20260721'
     );
     carregarModulo(
         'tutorial-audio',
