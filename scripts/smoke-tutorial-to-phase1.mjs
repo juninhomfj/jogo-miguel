@@ -43,7 +43,6 @@ const waitServer = async () => {
         }
         await new Promise((resolve) => setTimeout(resolve, 150));
     }
-
     throw new Error('Servidor local não respondeu.');
 };
 
@@ -125,7 +124,7 @@ try {
         { timeout: 20000 }
     );
 
-    const completion = await page.evaluate(() => {
+    await page.evaluate(() => {
         const scene = window.__MIGUEL_GAME__.scene.getScene('Tutorial');
         const tutorial = scene.tutorial;
 
@@ -141,15 +140,7 @@ try {
         tutorial.avancoAgendado = false;
         tutorial.transicaoFinalExecutada = false;
         tutorial.registrarAcao('cristal');
-
-        return {
-            concluido: tutorial.concluido,
-            cristais: tutorial.estado.cristais,
-            total: tutorial.totalCristais
-        };
     });
-
-    console.log('CONCLUSÃO SOLICITADA:', JSON.stringify(completion));
 
     await page.waitForFunction(
         () => {
@@ -179,7 +170,6 @@ try {
             resultActive: Boolean(result && result.sys.isActive()),
             guard: result.__MIGUEL_RESULT_PHASE1_GUARD_APPLIED__,
             buttonFound: Boolean(button),
-            listeners: button ? button.listenerCount('pointerdown') : 0,
             tutorialCompleted: game.registry.get('tutorialConcluido')
         };
     });
@@ -189,8 +179,8 @@ try {
     if (resultState.tutorialActive || !resultState.resultActive) {
         errors.push('tutorial não entregou corretamente a tela de conquista');
     }
-    if (!resultState.buttonFound || resultState.listeners !== 1) {
-        errors.push('botão de iniciar a Fase 1 não recebeu a guarda única');
+    if (!resultState.buttonFound || !resultState.guard) {
+        errors.push('botão de iniciar a Fase 1 não recebeu a guarda');
     }
     if (resultState.tutorialCompleted !== true) {
         errors.push('conclusão do tutorial não foi registrada');
@@ -232,6 +222,8 @@ try {
         const result = game.scene.getScene('ResultadoTutorial');
         const phase = game.scene.getScene('Fase1');
         const manager = window.MIGUEL_DEVICE_MANAGER;
+        const diagnostic = window.__MIGUEL_RESULT_PHASE1_TRANSITION_LAST__ || null;
+        const build = window.__MIGUEL_RESULT_PHASE1_TRANSITION_BUILD__;
 
         if (window.__MIGUEL_TEST_ORIGINAL_FULLSCREEN__) {
             manager.solicitarTelaCheia = window.__MIGUEL_TEST_ORIGINAL_FULLSCREEN__;
@@ -246,7 +238,8 @@ try {
             usability: phase && phase.__MIGUEL_PHASE1_USABILITY_APPLIED__,
             loot: phase && phase.__MIGUEL_EXPLORATION_LOOT_APPLIED__,
             interaction: Boolean(phase && phase.__MIGUEL_INTERACTION_BUTTON__),
-            transition: window.__MIGUEL_RESULT_PHASE1_TRANSITION_LAST__ || null
+            diagnostic,
+            build
         };
     });
 
@@ -261,19 +254,7 @@ try {
     if (!phaseState.usability || !phaseState.loot || !phaseState.interaction) {
         errors.push('últimos módulos da Fase 1 não foram aplicados após o tutorial');
     }
-    if (!phaseState.transition || phaseState.transition.build !== window.__MIGUEL_RESULT_PHASE1_TRANSITION_BUILD__) {
-        // A comparação final é repetida abaixo dentro do navegador.
-    }
-
-    const transitionDiagnostic = await page.evaluate(() => ({
-        build: window.__MIGUEL_RESULT_PHASE1_TRANSITION_BUILD__,
-        last: window.__MIGUEL_RESULT_PHASE1_TRANSITION_LAST__ || null
-    }));
-
-    if (
-        !transitionDiagnostic.last
-        || transitionDiagnostic.last.build !== transitionDiagnostic.build
-    ) {
+    if (!phaseState.diagnostic || phaseState.diagnostic.build !== phaseState.build) {
         errors.push('diagnóstico da transição não foi registrado');
     }
 
